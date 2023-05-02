@@ -1,0 +1,359 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.xibin.wms.dao.BdFittingSkuMapper" >
+  <resultMap id="BaseResultMap" type="com.xibin.wms.pojo.BdFittingSku" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="fitting_sku_code" property="fittingSkuCode" jdbcType="VARCHAR" />
+    <result column="quick_code" property="quickCode" jdbcType="VARCHAR" />
+    <result column="fitting_sku_name" property="fittingSkuName" jdbcType="VARCHAR" />
+    <result column="fitting_sku_status" property="fittingSkuStatus" jdbcType="VARCHAR" />
+    <result column="fitting_sku_remark" property="fittingSkuRemark" jdbcType="VARCHAR" />
+    <result column="manufacturer" property="manufacturer" jdbcType="VARCHAR" />
+    <result column="materialquality" property="materialquality" jdbcType="VARCHAR" />
+    <result column="package_code" property="packageCode" jdbcType="VARCHAR" />
+    <result column="uom_desc" property="uomDesc" jdbcType="VARCHAR" />
+    <result column="price" property="price" jdbcType="DOUBLE" />
+    <result column="model_code" property="modelCode" jdbcType="VARCHAR" />
+      <result column="series" property="series" jdbcType="VARCHAR" />
+    <result column="fitting_type_code" property="fittingTypeCode" jdbcType="VARCHAR" />
+    <result column="need_to_assemble" property="needToAssemble" jdbcType="VARCHAR" />
+    <result column="assemble_type" property="assembleType" jdbcType="VARCHAR" />
+    <result column="type" property="type" jdbcType="VARCHAR" />
+    <result column="is_show" property="isShow" jdbcType="VARCHAR" />
+    <result column="group_code" property="groupCode" jdbcType="VARCHAR" />
+      <result column="default_loc" property="defaultLoc" jdbcType="VARCHAR" />
+      <result column="min_inventory" property="minInventory" jdbcType="DOUBLE" />
+    <result column="def1" property="def1" jdbcType="VARCHAR" />
+    <result column="def2" property="def2" jdbcType="VARCHAR" />
+    <result column="def3" property="def3" jdbcType="VARCHAR" />
+    <result column="def4" property="def4" jdbcType="VARCHAR" />
+    <result column="def5" property="def5" jdbcType="VARCHAR" />
+      <result column="last_inbound_time" property="lastInboundTime" jdbcType="TIMESTAMP" />
+      <result column="last_outbound_time" property="lastOutboundTime" jdbcType="TIMESTAMP" />
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="creator" property="creator" jdbcType="INTEGER" />
+    <result column="modify_time" property="modifyTime" jdbcType="TIMESTAMP" />
+    <result column="modifier" property="modifier" jdbcType="INTEGER" />
+    <result column="rec_ver" property="recVer" jdbcType="INTEGER" />
+    <result column="company_id" property="companyId" jdbcType="INTEGER" />
+  </resultMap>
+  <resultMap id="QueryResultMap" type="com.xibin.wms.query.BdFittingSkuQueryItem" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="fitting_sku_code" property="fittingSkuCode" jdbcType="VARCHAR" />
+    <result column="quick_code" property="quickCode" jdbcType="VARCHAR" />
+    <result column="fitting_sku_name" property="fittingSkuName" jdbcType="VARCHAR" />
+    <result column="fitting_sku_status" property="fittingSkuStatus" jdbcType="VARCHAR" />
+    <result column="fitting_sku_remark" property="fittingSkuRemark" jdbcType="VARCHAR" />
+    <result column="manufacturer" property="manufacturer" jdbcType="VARCHAR" />
+    <result column="materialquality" property="materialquality" jdbcType="VARCHAR" />
+    <result column="package_code" property="packageCode" jdbcType="VARCHAR"/>
+    <result column="uom_desc" property="uomDesc" jdbcType="VARCHAR" />
+    <result column="price" property="price" jdbcType="DOUBLE" />
+    <result column="model_code" property="modelCode" jdbcType="VARCHAR" />
+      <result column="series" property="series" jdbcType="VARCHAR" />
+    <result column="fitting_type_code" property="fittingTypeCode" jdbcType="VARCHAR" />
+    <result column="fitting_type_name" property="fittingTypeName" jdbcType="VARCHAR" />
+    <result column="need_to_assemble" property="needToAssemble" jdbcType="VARCHAR" />
+    <result column="assemble_type" property="assembleType" jdbcType="VARCHAR" />
+    <result column="type" property="type" jdbcType="VARCHAR" />
+    <result column="is_show" property="isShow" jdbcType="VARCHAR" />
+    <result column="group_code" property="groupCode" jdbcType="VARCHAR" />
+      <result column="default_loc" property="defaultLoc" jdbcType="VARCHAR" />
+      <result column="min_inventory" property="minInventory" jdbcType="DOUBLE" />
+    <result column="def1" property="def1" jdbcType="VARCHAR" />
+    <result column="def2" property="def2" jdbcType="VARCHAR" />
+    <result column="def3" property="def3" jdbcType="VARCHAR" />
+    <result column="def4" property="def4" jdbcType="VARCHAR" />
+    <result column="def5" property="def5" jdbcType="VARCHAR" />
+      <result column="last_inbound_time" property="lastInboundTime" jdbcType="TIMESTAMP" />
+      <result column="last_outbound_time" property="lastOutboundTime" jdbcType="TIMESTAMP" />
+    <result column="fitting_sku_pic_url" property="fittingSkuPicUrl" jdbcType="VARCHAR" />
+    <result column="fitting_sku_pic_name" property="fittingSkuPicName" jdbcType="VARCHAR" />
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="creator" property="creator" jdbcType="INTEGER" />
+    <result column="modify_time" property="modifyTime" jdbcType="TIMESTAMP" />
+    <result column="modifier" property="modifier" jdbcType="INTEGER" />
+    <result column="rec_ver" property="recVer" jdbcType="INTEGER" />
+    <result column="company_id" property="companyId" jdbcType="INTEGER" />
+  </resultMap>
+  
+  <sql id="Base_Column_List">
+    bfs.id, bfs.fitting_sku_code,bfs.quick_code, bfs.fitting_sku_name, bfs.fitting_sku_status, bfs.fitting_sku_remark, bfs.manufacturer, 
+    bfs.materialquality, bfs.package_code, bfs.uom_desc, bfs.price, bfs.model_code, bfs.series,bfs.fitting_type_code, bfs.type,bfs.is_show, bfs.group_code,
+    bfs.default_loc,bfs.min_inventory,bfs.need_to_assemble,bfs.assemble_type,
+    bfs.def1, bfs.def2, bfs.def3, bfs.def4, bfs.def5, bfs.last_inbound_time,bfs.last_outbound_time,bfs.create_time, bfs.creator, bfs.modify_time, bfs.modifier, bfs.rec_ver,
+    bfs.company_id
+  </sql>
+  <!-- 条件 -->
+  <sql id="findByConditionWhere">
+      WHERE 1=1
+          <if test="id!=null and id!=''"> AND id = #{id}</if>
+          <if test="fittingSkuCode!=null and fittingSkuCode!=''"> AND bfs.fitting_sku_code LIKE CONCAT('%','${fittingSkuCode}','%')</if>
+          <if test="quickCode!=null and quickCode!=''"> AND bfs.quick_code LIKE CONCAT('%','${quickCode}','%')</if>
+          <if test="fittingSkuName!=null and fittingSkuName!=''"> AND bfs.fitting_sku_name LIKE CONCAT('%','${fittingSkuName}','%')</if>
+          <if test="fittingSkuStatus!=null and fittingSkuStatus!=''"> AND bfs.fitting_sku_status = #{fittingSkuStatus}</if>
+          <if test="modelCode!=null and modelCode!=''"> AND bfs.model_code LIKE CONCAT('%','${modelCode}','%')</if>
+          <if test="series!=null and series!=''"> AND bfs.series LIKE CONCAT('%','${series}','%')</if>
+          <if test="fittingTypeCode!=null and fittingTypeCode!=''"> AND bfs.fitting_type_code = #{fittingTypeCode}</if>
+          <if test="needToAssemble!=null and needToAssemble!=''"> AND bfs.need_to_assemble = #{needToAssemble}</if>
+          <if test="isShow!=null and isShow!=''"> AND bfs.is_show = #{isShow}</if>
+          <if test="groupCode!=null and groupCode!=''"> AND bfs.group_code = #{groupCode}</if>
+          <if test="companyId!=null and companyId!=''"> AND bfs.company_id = #{companyId}</if>
+          <if test="fuzzyCondition!=null and fuzzyCondition!=''"> 
+          AND(bfs.fitting_sku_name LIKE CONCAT('%','${fuzzyCondition}','%') 
+          OR bfs.fitting_sku_code LIKE CONCAT('%','${fuzzyCondition}','%') 
+          OR bfs.model_code LIKE CONCAT('%','${fuzzyCondition}','%'))</if>
+  </sql>
+  <!-- 条件 -->
+  <sql id="findByExampleWhere">
+      WHERE 1=1
+          <if test="id!=null and id!=''"> AND id = #{id}</if>
+          <if test="fittingSkuCode!=null and fittingSkuCode!=''"> AND bfs.fitting_sku_code  = #{fittingSkuCode}</if>
+          <if test="quickCode!=null and quickCode!=''"> AND bfs.quick_code = #{quickCode} </if>
+          <if test="fittingSkuName!=null and fittingSkuName!=''"> AND bfs.fitting_sku_name = #{fittingSkuName}</if>
+          <if test="fittingSkuStatus!=null and fittingSkuStatus!=''"> AND bfs.fitting_sku_status = #{fittingSkuStatus}</if>
+          <if test="modelCode!=null and modelCode!=''"> AND bfs.model_code = #{modelCode}</if>
+      <if test="series!=null and series!=''"> AND bfs.series = #{series}</if>
+          <if test="fittingTypeCode!=null and fittingTypeCode!=''"> AND bfs.fitting_type_code = #{fittingTypeCode}</if>
+          <if test="needToAssemble!=null and needToAssemble!=''"> AND bfs.need_to_assemble = #{needToAssemble}</if>
+          <if test="isShow!=null and isShow!=''"> AND bfs.is_show = #{isShow}</if>
+          <if test="groupCode!=null and groupCode!=''"> AND bfs.group_code = #{groupCode}</if>
+          <if test="companyId!=null and companyId!=''"> AND bfs.company_id = #{companyId}</if>
+  </sql>
+  <!-- 【固定】：按主键查询 -->
+  <select id="getById" resultMap="BaseResultMap" parameterType="java.lang.String">
+  	  select
+      <include refid="Base_Column_List"/>
+      from bd_fitting_sku
+      WHERE id in
+      <foreach collection="array" index="index" item="item" open="(" separator="," close=")">
+	           #{item}
+	  </foreach>
+  </select>
+  
+  <!-- 【固定】：插入记录（支持一条及多条） -->
+  <insert id="insert" parameterType="java.util.List">
+  	INSERT INTO bd_fitting_sku
+          (id, fitting_sku_code, quick_code,fitting_sku_name, fitting_sku_status, fitting_sku_remark, manufacturer, 
+    materialquality, package_code, uom_desc, price, model_code, series,fitting_type_code, type,is_show, need_to_assemble,assemble_type,group_code,default_loc,min_inventory,
+    def1, def2, def3, def4, def5,last_inbound_time,last_outbound_time,create_time, creator, modify_time, modifier, rec_ver,
+    company_id)
+       VALUES
+  		<foreach collection="list" item="item" index="index" separator=",">
+	   		(#{item.id}, #{item.fittingSkuCode}, #{item.quickCode},  #{item.fittingSkuName}, 
+      #{item.fittingSkuStatus}, #{item.fittingSkuRemark},#{item.manufacturer}, 
+      #{item.materialquality}, #{item.packageCode}, #{item.uomDesc}, 
+      #{item.price}, #{item.modelCode}, #{item.series}, #{item.fittingTypeCode},#{item.type},#{item.isShow}, #{item.needToAssemble},
+            #{item.assembleType},#{item.groupCode},#{item.defaultLoc},#{item.minInventory},
+      #{item.def1}, #{item.def2}, #{item.def3}, #{item.def4}, #{item.def5}, #{item.lastInboundTime},#{item.lastOutboundTime},
+      #{item.createTime}, #{item.creator}, #{item.modifyTime}, #{item.modifier}, 
+      #{item.recVer}, #{item.companyId})
+  		</foreach>
+  </insert>
+  
+  <!-- 【固定】：删除记录 -->
+  <delete id="delete" parameterType="java.lang.reflect.Array">
+      DELETE FROM bd_fitting_sku WHERE ID in 
+   <foreach collection="array" index="index" item="item" open="(" separator="," close=")">  
+           #{item}   
+   </foreach>
+  </delete>
+  
+  <!-- 【固定】：更新记录（支持一条及多条） -->
+  <update id="update" parameterType="java.util.Collection">
+	UPDATE bd_fitting_sku
+	<trim prefix="set" suffixOverrides=",">
+		<!-- 更新的字段集合 -->
+		<trim prefix="fitting_sku_code =case"  suffix="end,"  >
+             <foreach collection="list" item="item" index="index">
+                     when (ID=#{item.id}) then #{item.fittingSkuCode}
+             </foreach>
+		</trim>
+		<trim prefix="quick_code =case"  suffix="end,"  >
+             <foreach collection="list" item="item" index="index">
+                     when (ID=#{item.id}) then #{item.quickCode}
+             </foreach>
+		</trim>
+		<trim prefix="fitting_sku_name =case"  suffix="end,"  >
+             <foreach collection="list" item="item" index="index">
+                     when (ID=#{item.id}) then #{item.fittingSkuName}
+             </foreach>
+		</trim>
+		<trim prefix="fitting_sku_status =case"  suffix="end,"  >
+             <foreach collection="list" item="item" index="index">
+                     when (ID=#{item.id}) then #{item.fittingSkuStatus}
+             </foreach>
+		</trim>
+		<trim prefix="fitting_sku_remark =case"  suffix="end,"  >
+             <foreach collection="list" item="item" index="index">
+                     when (ID=#{item.id}) then #{item.fittingSkuRemark}
+             </foreach>
+		</trim>
+		
+		
+		<trim prefix="manufacturer =case"  suffix="end,"  >
+             <foreach collection="list" item="item" index="index">
+                     when (ID=#{item.id}) then #{item.manufacturer}
+             </foreach>
+		</trim>
+		<trim prefix="materialquality =case"  suffix="end,"  >
+             <foreach collection="list" item="item" index="index">
+                     when (ID=#{item.id}) then #{item.materialquality}
+             </foreach>
+		</trim>
+		<trim prefix="package_code =case"  suffix="end,"  >
+             <foreach collection="list" item="item" index="index">
+                     when (ID=#{item.id}) then #{item.packageCode}
+             </foreach>
+		</trim>
+		<trim prefix="uom_desc =case"  suffix="end,"  >
+             <foreach collection="list" item="item" index="index">
+                     when (ID=#{item.id}) then #{item.uomDesc}
+             </foreach>
+		</trim>
+		
+		<trim prefix="price =case"  suffix="end,"  >
+             <foreach collection="list" item="item" index="index">
+                     when (ID=#{item.id}) then #{item.price}
+             </foreach>
+		</trim>
+		<trim prefix="model_code =case"  suffix="end,"  >
+             <foreach collection="list" item="item" index="index">
+                     when (ID=#{item.id}) then #{item.modelCode}
+             </foreach>
+		</trim>
+        <trim prefix="series =case"  suffix="end,"  >
+            <foreach collection="list" item="item" index="index">
+                when (ID=#{item.id}) then #{item.series}
+            </foreach>
+        </trim>
+		<trim prefix="fitting_type_code =case"  suffix="end,"  >
+             <foreach collection="list" item="item" index="index">
+                     when (ID=#{item.id}) then #{item.fittingTypeCode}
+             </foreach>
+		</trim>
+		<trim prefix="need_to_assemble =case"  suffix="end,"  >
+             <foreach collection="list" item="item" index="index">
+                     when (ID=#{item.id}) then #{item.needToAssemble}
+             </foreach>
+		</trim>
+		<trim prefix="assemble_type =case"  suffix="end,"  >
+             <foreach collection="list" item="item" index="index">
+                     when (ID=#{item.id}) then #{item.assembleType}
+             </foreach>
+		</trim>
+		<trim prefix="type =case"  suffix="end,"  >
+             <foreach collection="list" item="item" index="index">
+                     when (ID=#{item.id}) then #{item.type}
+             </foreach>
+		</trim>
+		<trim prefix="is_show =case"  suffix="end,"  >
+             <foreach collection="list" item="item" index="index">
+                     when (ID=#{item.id}) then #{item.isShow}
+             </foreach>
+		</trim>
+		<trim prefix="group_code =case"  suffix="end,"  >
+             <foreach collection="list" item="item" index="index">
+                     when (ID=#{item.id}) then #{item.groupCode}
+             </foreach>
+		</trim>
+        <trim prefix="default_loc =case"  suffix="end,"  >
+            <foreach collection="list" item="item" index="index">
+                when (ID=#{item.id}) then #{item.defaultLoc}
+            </foreach>
+        </trim>
+        <trim prefix="min_inventory =case"  suffix="end,"  >
+            <foreach collection="list" item="item" index="index">
+                when (ID=#{item.id}) then #{item.minInventory}
+            </foreach>
+        </trim>
+        <trim prefix="last_inbound_time =case"  suffix="end,"  >
+            <foreach collection="list" item="item" index="index">
+                when (ID=#{item.id}) then #{item.lastInboundTime}
+            </foreach>
+        </trim>
+        <trim prefix="last_outbound_time =case"  suffix="end,"  >
+            <foreach collection="list" item="item" index="index">
+                when (ID=#{item.id}) then #{item.lastOutboundTime}
+            </foreach>
+        </trim>
+		<trim prefix="modifier =case"  suffix="end,"  >
+             <foreach collection="list" item="item" index="index">
+                     when (ID=#{item.id}) then #{item.modifier}
+             </foreach>
+		</trim>
+		<trim prefix="modify_time =case"  suffix="end,"  >
+             <foreach collection="list" item="item" index="index">
+                     when (ID=#{item.id}) then #{item.modifyTime}
+             </foreach>
+		</trim>
+		<trim prefix="rec_ver =case"  suffix="end,"  >
+             <foreach collection="list" item="item" index="index">
+                     when (ID=#{item.id}) then #{item.recVer}
+             </foreach>
+		</trim>
+		<trim prefix="company_id =case"  suffix="end,"  >
+             <foreach collection="list" item="item" index="index">
+                     when (ID=#{item.id}) then #{item.companyId}
+             </foreach>
+		</trim>
+	</trim>
+	WHERE
+	<foreach collection="list" separator="or" item="item" index="index" >
+		<if test="item.id!=null">
+		(ID=#{item.id}) AND (REC_VER=#{item.recVer}-1)
+		</if>
+	</foreach>	
+  </update>
+  
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from bd_fitting_sku bfs
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <select id="selectAllByPage" resultMap="QueryResultMap" parameterType="Map">
+    select 
+    <include refid="Base_Column_List" />
+    ,bft.fitting_type_name
+    from bd_fitting_sku bfs
+    left join bd_fitting_type bft on bfs.fitting_type_code = bft.fitting_type_code
+    <include refid="findByConditionWhere" />
+    <if test="orderCondition!=null and orderCondition!=''">${orderCondition}</if>
+  </select>
+  <select id="selectByExample" resultMap="BaseResultMap" parameterType="com.xibin.wms.pojo.BdFittingType">
+    select 
+    <include refid="Base_Column_List" />
+    from bd_fitting_sku bfs
+    <include refid="findByExampleWhere" />
+  </select>
+  <select id="selectByKey" resultMap="QueryResultMap" resultType="java.util.List"  parameterType="java.lang.String" >
+    select 
+    <include refid="Base_Column_List" />
+    ,bft.fitting_type_name
+    from bd_fitting_sku bfs
+    left join bd_fitting_type bft on bfs.fitting_type_code = bft.fitting_type_code
+    where bfs.fitting_sku_code = #{fittingSkuCode,jdbcType=VARCHAR}
+    and 
+    bfs.company_id = #{companyId,jdbcType=INTEGER}
+  </select>
+  <select id="selectALLByPageWithOnePic" resultMap="QueryResultMap" parameterType="Map" >
+    select 
+    <include refid="Base_Column_List" />
+	,bfsp.fitting_sku_pic_url,
+	bfsp.fitting_sku_pic_name
+    FROM bd_fitting_sku bfs
+    LEFT JOIN 
+    bd_fitting_type bft 
+    ON 
+    bfs.fitting_type_code = bft.fitting_type_code
+    LEFT JOIN
+	bd_fitting_sku_pic bfsp
+	ON
+	bfs.fitting_sku_code = bfsp.fitting_sku_code
+	AND 
+	bfsp.type = 'ZIP'
+	<include refid="findByConditionWhere"/>
+	GROUP BY bfs.fitting_sku_code
+  </select>
+</mapper>

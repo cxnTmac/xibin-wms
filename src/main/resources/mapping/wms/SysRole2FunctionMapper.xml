@@ -1,0 +1,175 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.xibin.wms.dao.SysRole2FunctionMapper" >
+  <resultMap id="BaseResultMap" type="com.xibin.wms.pojo.SysRole2Function" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="role_code" property="roleCode" jdbcType="VARCHAR" />
+    <result column="function_code" property="functionCode" jdbcType="VARCHAR" />
+    <result column="remark" property="remark" jdbcType="VARCHAR" />
+    <result column="creator" property="creator" jdbcType="INTEGER" />
+    <result column="create_time" property="createtime" jdbcType="TIMESTAMP" />
+    <result column="modifier" property="modifier" jdbcType="INTEGER" />
+    <result column="modify_time" property="modifytime" jdbcType="TIMESTAMP" />
+    <result column="rec_ver" property="recVer" jdbcType="INTEGER" />
+    <result column="company_id" property="companyId" jdbcType="INTEGER" />
+  </resultMap>
+  <resultMap id="role2FunctionMap" type="Map" >
+	<result column="role_code" property="roleCode" jdbcType="VARCHAR" />
+    <result column="id" property="id" jdbcType="INTEGER" />
+    <result column="function_code" property="functionCode" jdbcType="VARCHAR" />
+    <result column="function_name" property="functionName" jdbcType="VARCHAR" />
+    <result column="component" property="component" jdbcType="VARCHAR" />
+    <result column="path" property="path" jdbcType="VARCHAR" />
+    <result column="f_id" property="fId" jdbcType="INTEGER" />
+    <result column="icon" property="icon" jdbcType="VARCHAR" />
+    <result column="type" property="type" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    sr2f.id, sr2f.role_code, sr2f.function_code, sr2f.remark, sr2f.creator, sr2f.createTime, sr2f.modifier, sr2f.modifyTime, 
+    sr2f.rec_ver, sr2f.company_id
+  </sql>
+  <!-- 条件 -->
+  <sql id="findByConditionWhere">
+      WHERE 1=1
+          <if test="id!=null and id!=''"> AND sr2f.id = #{id}</if>
+          <if test="roleCode!=null and roleCode!=''"> AND sr2f.role_code = #{roleCode}</if>
+          <if test="functionCode!=null and functionCode!=''"> AND sr2f.function_code = #{functionCode}</if>
+          <if test="companyId!=null and companyId!=''"> AND sr2f.company_id = #{companyId}</if>
+  </sql>
+  <!-- 条件 -->
+  <sql id="findByExampleWhere">
+      WHERE 1=1
+          <if test="id!=null and id!=''"> AND sr2f.id = #{id}</if>
+          <if test="roleCode!=null and roleCode!=''"> AND sr2f.role_code = #{roleCode}</if>
+          <if test="functionCode!=null and functionCode!=''"> AND sr2f.function_code = #{functionCode}</if>
+          <if test="companyId!=null and companyId!=''"> AND sr2f.company_id = #{companyId}</if>
+  </sql>
+  <!-- 【固定】：按主键查询 -->
+  <select id="getById" resultMap="BaseResultMap" parameterType="java.lang.String">
+  	  select
+      <include refid="Base_Column_List"/>
+      from sys_role_2_function sr2f
+      WHERE id in
+      <foreach collection="array" index="index" item="item" open="(" separator="," close=")">
+	           #{item}
+	  </foreach>
+  </select>
+  <!-- 【固定】：插入记录（支持一条及多条） -->
+  <insert id="insert" parameterType="java.util.List">
+  	INSERT INTO sys_role_2_function
+          (id, role_code, function_code, remark, creator, createTime, modifier, modifyTime, 
+    rec_ver, company_id)
+       VALUES
+  		<foreach collection="list" item="item" index="index" separator=",">
+	   		(#{item.id}, #{item.roleCode}, #{item.functionCode},#{item.remark},#{item.creator},#{item.createTime}, #{item.modifier},  #{item.modifyTime},
+      #{item.recVer}, #{item.companyId})
+  		</foreach>
+  </insert>
+  
+  <!-- 【固定】：删除记录 -->
+  <delete id="delete" parameterType="java.lang.reflect.Array">
+      DELETE FROM sys_role_2_function WHERE id in 
+   <foreach collection="array" index="index" item="item" open="(" separator="," close=")">  
+           #{item}   
+   </foreach>
+  </delete>
+  
+   <!-- 【固定】：更新记录（支持一条及多条） -->
+  <update id="update" parameterType="java.util.Collection">
+	UPDATE sys_role_2_function
+	<trim prefix="set" suffixOverrides=",">
+		<!-- 更新的字段集合 -->
+		<trim prefix="role_code =case"  suffix="end,"  >
+             <foreach collection="list" item="item" index="index">
+                     when (ID=#{item.id}) then #{item.roleCode}
+             </foreach>
+		</trim>
+		<trim prefix="function_code =case"  suffix="end,"  >
+             <foreach collection="list" item="item" index="index">
+                     when (ID=#{item.id}) then #{item.functionCode}
+             </foreach>
+		</trim>
+		
+		<trim prefix="remark =case"  suffix="end,"  >
+             <foreach collection="list" item="item" index="index">
+                     when (ID=#{item.id}) then #{item.remark}
+             </foreach>
+		</trim>
+		
+		
+		<trim prefix="modifier =case"  suffix="end,"  >
+             <foreach collection="list" item="item" index="index">
+                     when (ID=#{item.id}) then #{item.modifier}
+             </foreach>
+		</trim>
+		<trim prefix="modify_time =case"  suffix="end,"  >
+             <foreach collection="list" item="item" index="index">
+                     when (ID=#{item.id}) then #{item.modifyTime}
+             </foreach>
+		</trim>
+		<trim prefix="rec_ver =case"  suffix="end,"  >
+             <foreach collection="list" item="item" index="index">
+                     when (ID=#{item.id}) then #{item.recVer}
+             </foreach>
+		</trim>
+		<trim prefix="company_id =case"  suffix="end,"  >
+             <foreach collection="list" item="item" index="index">
+                     when (ID=#{item.id}) then #{item.companyId}
+             </foreach>
+		</trim>
+	</trim>
+	WHERE
+	<foreach collection="list" separator="or" item="item" index="index" >
+		<if test="item.id!=null">
+		(ID=#{item.id}) AND (REC_VER=#{item.recVer}-1)
+		</if>
+	</foreach>	
+  </update>
+   <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from sys_role_2_function sr2f
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <select id="selectAllByPage" resultMap="BaseResultMap" parameterType="Map">
+    select 
+    <include refid="Base_Column_List" />
+    from sys_role_2_function sr2f
+    <include refid="findByConditionWhere" />
+  </select>
+  <select id="selectByExample" resultMap="BaseResultMap" parameterType="com.xibin.wms.pojo.SysRole2Function">
+    select 
+    <include refid="Base_Column_List" />
+    from sys_role_2_function sr2f
+    <include refid="findByExampleWhere" />
+  </select>
+  <select id="selectByKey" resultMap="BaseResultMap" resultType="java.util.List"  parameterType="Map" >
+    select 
+    <include refid="Base_Column_List" />
+    from sys_role_2_function sr2f
+    where 
+    sr2f.role_code = #{roleCode,jdbcType=VARCHAR}
+    and
+    sr2f.function_code = #{functionCode,jdbcType=VARCHAR}
+    and 
+    sr2f.company_id = #{companyId,jdbcType=INTEGER}
+  </select>
+  <select id="selectRoleFunctionsByRoleCode" resultMap="role2FunctionMap" resultType="java.util.List"  parameterType="Map" >
+    select 
+	    sr2f.role_code,
+	    sf.id,
+		sf.function_code,
+	  	sf.function_name,
+		sf.component,
+	  	sf.path,
+		sf.f_id,
+	  	sf.icon,
+	  	sf.type
+    from sys_role_2_function sr2f
+    LEFT JOIN sys_function sf ON sr2f.function_code = sf.function_code
+    where 
+    sr2f.role_code = #{roleCode,jdbcType=VARCHAR}
+    and 
+    sr2f.company_id = #{companyId,jdbcType=INTEGER}
+  </select>
+</mapper>

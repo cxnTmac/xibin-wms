@@ -1,0 +1,655 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.xibin.wms.dao.WmOutboundDetailMapper" >
+  <resultMap id="BaseResultMap" type="com.xibin.wms.pojo.WmOutboundDetail" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="order_no" property="orderNo" jdbcType="VARCHAR" />
+    <result column="line_no" property="lineNo" jdbcType="VARCHAR" />
+    <result column="status" property="status" jdbcType="VARCHAR" />
+    <result column="sku_code" property="skuCode" jdbcType="VARCHAR" />
+    <result column="buyer_code" property="buyerCode" jdbcType="VARCHAR" />
+    <result column="outbound_num" property="outboundNum" jdbcType="DOUBLE" />
+    <result column="outbound_origin_num" property="outboundOriginNum" jdbcType="DOUBLE" />
+    <result column="outbound_alloc_num" property="outboundAllocNum" jdbcType="DOUBLE" />
+    <result column="outbound_pick_num" property="outboundPickNum" jdbcType="DOUBLE" />
+    <result column="outbound_ship_num" property="outboundShipNum" jdbcType="DOUBLE" />
+    <result column="outbound_price" property="outboundPrice" jdbcType="DOUBLE" />
+    <result column="cost" property="cost" jdbcType="DOUBLE" />
+    
+    <result column="is_create_voucher" property="isCreateVoucher" jdbcType="VARCHAR" />
+    <result column="voucher_no" property="voucherNo" jdbcType="VARCHAR" />
+    <result column="is_create_cost_voucher" property="isCreateCostVoucher" jdbcType="VARCHAR" />
+    <result column="cost_voucher_no" property="costVoucherNo" jdbcType="VARCHAR" />
+    
+    <result column="plan_ship_loc" property="planShipLoc" jdbcType="VARCHAR" />
+    
+    <result column="is_cross_dock" property="isCrossDock" jdbcType="VARCHAR" />
+    <result column="inbound_order_no" property="inboundOrderNo" jdbcType="VARCHAR" />
+    <result column="inbound_line_no" property="inboundLineNo" jdbcType="VARCHAR" />
+    <result column="remark" property="remark" jdbcType="VARCHAR" />
+    <result column="creator" property="creator" jdbcType="INTEGER" />
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="modifier" property="modifier" jdbcType="INTEGER" />
+    <result column="modify_time" property="modifyTime" jdbcType="TIMESTAMP" />
+    <result column="rec_ver" property="recVer" jdbcType="INTEGER" />
+    <result column="company_id" property="companyId" jdbcType="INTEGER" />
+    <result column="warehouse_id" property="warehouseId" jdbcType="INTEGER" />
+  </resultMap>
+  <resultMap id="PriceResultMap" type="com.xibin.wms.query.WmOutboundDetailPriceQueryItem" >
+    <result column="outbound_price" property="outboundPrice" jdbcType="DOUBLE" />
+    <result column="modify_time" property="modifyTime" jdbcType="TIMESTAMP" />
+  </resultMap>
+  <resultMap id="SaleHistoryResultMap" type="com.xibin.wms.query.WmOutboundDetailSaleHistoryQueryItem" >
+    <result column="fitting_sku_name" property="fittingSkuName" jdbcType="VARCHAR" />
+    <result column="model_code" property="modelCode" jdbcType="VARCHAR" />
+    <result column="package_code" property="packageCode" jdbcType="VARCHAR" />
+    <result column="sku_code" property="skuCode" jdbcType="VARCHAR" />
+    <result column="buyer_code" property="buyerCode" jdbcType="VARCHAR" />
+    <result column="customer_name" property="customerName" jdbcType="VARCHAR" />
+    <result column="outbound_num" property="outboundNum" jdbcType="DOUBLE" />
+    <result column="outbound_price" property="outboundPrice" jdbcType="DOUBLE" />
+    <result column="modify_time" property="modifyTime" jdbcType="TIMESTAMP" />
+  </resultMap>
+  <resultMap id="SkuQueryItem" type="com.xibin.wms.query.WmOutboundDetailSkuQueryItem" >
+    <result column="order_no" property="orderNo" jdbcType="VARCHAR" />
+    <result column="header_status" property="headerStatus" jdbcType="VARCHAR" />
+    <result column="status" property="status" jdbcType="VARCHAR" />
+    <result column="buyer_code" property="buyerCode" jdbcType="VARCHAR" />
+    <result column="buyer_name" property="buyerName" jdbcType="VARCHAR" />  
+    <result column="outbound_type" property="outboundType" jdbcType="VARCHAR" /> 
+    <result column="order_time" property="orderTime" jdbcType="TIMESTAMP" /> 
+    <result column="line_no" property="lineNo" jdbcType="VARCHAR" />
+    <result column="fitting_sku_code" property="fittingSkuCode" jdbcType="VARCHAR" />
+    <result column="quick_code" property="quickCode" jdbcType="VARCHAR" />
+    <result column="fitting_sku_name" property="fittingSkuName" jdbcType="VARCHAR" />
+	<result column="model_code" property="modelCode" jdbcType="VARCHAR" />
+    <result column="outbound_num" property="outboundNum" jdbcType="DOUBLE" />
+    <result column="total_price" property="totalPrice" jdbcType="DOUBLE" />
+    <result column="is_cross_dock" property="isCrossDock" jdbcType="VARCHAR" />
+    <result column="inbound_order_no" property="inboundOrderNo" jdbcType="VARCHAR" />
+    <result column="inbound_line_no" property="inboundLineNo" jdbcType="VARCHAR" />
+    <result column="outbound_origin_num" property="outboundOriginNum" jdbcType="DOUBLE" />
+    <result column="outbound_alloc_num" property="outboundAllocNum" jdbcType="DOUBLE" />
+    <result column="outbound_pick_num" property="outboundPickNum" jdbcType="DOUBLE" />
+    <result column="outbound_ship_num" property="outboundShipNum" jdbcType="DOUBLE" />
+    <result column="outbound_price" property="outboundPrice" jdbcType="DOUBLE" />
+    <result column="plan_loc" property="planLoc" jdbcType="VARCHAR" />
+
+    <result column="remark" property="remark" jdbcType="VARCHAR" />
+    <result column="creator" property="creator" jdbcType="INTEGER" />
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="modifier" property="modifier" jdbcType="INTEGER" />
+    <result column="modify_time" property="modifyTime" jdbcType="TIMESTAMP" />
+    <result column="rec_ver" property="recVer" jdbcType="INTEGER" />
+    <result column="company_id" property="companyId" jdbcType="INTEGER" />
+    <result column="warehouse_id" property="warehouseId" jdbcType="INTEGER" />
+  </resultMap>
+  <resultMap id="QueryResultMap" type="com.xibin.wms.query.WmOutboundDetailQueryItem" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="order_no" property="orderNo" jdbcType="VARCHAR" />
+    <result column="line_no" property="lineNo" jdbcType="VARCHAR" />
+    <result column="status" property="status" jdbcType="VARCHAR" />
+    <result column="header_status" property="headerStatus" jdbcType="VARCHAR" />
+    <result column="sku_code" property="skuCode" jdbcType="VARCHAR" />
+    <result column="sku_name" property="skuName" jdbcType="VARCHAR" />
+    <result column="model_code" property="modelCode" jdbcType="VARCHAR" />
+    <result column="quick_code" property="quickCode" jdbcType="VARCHAR" />
+    <result column="buyer_code" property="buyerCode" jdbcType="VARCHAR" />
+    <result column="buyer_name" property="buyerName" jdbcType="VARCHAR" />
+    <result column="outbound_num" property="outboundNum" jdbcType="DOUBLE" />
+    <result column="outbound_origin_num" property="outboundOriginNum" jdbcType="DOUBLE" />
+    <result column="outbound_alloc_num" property="outboundAllocNum" jdbcType="DOUBLE" />
+    <result column="outbound_pick_num" property="outboundPickNum" jdbcType="DOUBLE" />
+    <result column="outbound_ship_num" property="outboundShipNum" jdbcType="DOUBLE" />
+    <result column="outbound_price" property="outboundPrice" jdbcType="DOUBLE" />
+    <result column="cost" property="cost" jdbcType="DOUBLE" />
+    <result column="is_create_voucher" property="isCreateVoucher" jdbcType="VARCHAR" />
+    <result column="voucher_no" property="voucherNo" jdbcType="VARCHAR" />
+    <result column="is_create_cost_voucher" property="isCreateCostVoucher" jdbcType="VARCHAR" />
+    <result column="cost_voucher_no" property="costVoucherNo" jdbcType="VARCHAR" />
+    <result column="plan_ship_loc" property="planShipLoc" jdbcType="VARCHAR" />
+    <result column="group_code" property="groupCode" jdbcType="VARCHAR" />
+    <result column="need_to_assemble" property="needToAssemble" jdbcType="VARCHAR" />
+    <result column="is_cross_dock" property="isCrossDock" jdbcType="VARCHAR" />
+    <result column="inbound_order_no" property="inboundOrderNo" jdbcType="VARCHAR" />
+    <result column="inbound_line_no" property="inboundLineNo" jdbcType="VARCHAR" />
+    <result column="remark" property="remark" jdbcType="VARCHAR" />
+    <result column="creator" property="creator" jdbcType="INTEGER" />
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="modifier" property="modifier" jdbcType="INTEGER" />
+    <result column="modify_time" property="modifyTime" jdbcType="TIMESTAMP" />
+    <result column="rec_ver" property="recVer" jdbcType="INTEGER" />
+    <result column="company_id" property="companyId" jdbcType="INTEGER" />
+    <result column="warehouse_id" property="warehouseId" jdbcType="INTEGER" />
+  </resultMap>
+  
+  <resultMap id="SumPriceResultMap" type="com.xibin.wms.query.WmOutboundDetailSumPriceQueryItem" >
+    <result column="total" property="total" jdbcType="DOUBLE" />
+    <result column="buyer_code" property="buyerCode" jdbcType="VARCHAR" />
+    <result column="customer_name" property="customerName" jdbcType="VARCHAR" />
+    <result column="auxi_id" property="auxiId" jdbcType="INTEGER" />
+  </resultMap>
+  
+  
+  <sql id="Base_Column_List" >
+    wod.id, wod.order_no, wod.line_no,wod.status,wod.buyer_code, wod.sku_code,wod.outbound_num,wod.outbound_origin_num,wod.outbound_alloc_num, wod.outbound_pick_num,wod.outbound_ship_num,wod.outbound_price,wod.cost,
+    wod.is_create_voucher,wod.voucher_no,wod.is_create_cost_voucher,wod.cost_voucher_no,wod.plan_ship_loc,
+    wod.is_cross_dock,wod.inbound_order_no,wod.inbound_line_no,
+    wod.remark, wod.creator, wod.create_time,wod.modifier, wod.modify_time, wod.rec_ver, wod.company_id, wod.warehouse_id
+  </sql>
+  
+  <!-- 条件 -->
+  <sql id="findByConditionWhere">
+      WHERE 1=1
+          <if test="id!=null and id!=''"> AND wod.id = #{id}</if>
+          <if test="status!=null and status!=''"> AND wod.status = #{status}</if>
+          <if test="multiStatus!=null and multiStatus!=''"> AND wod.status IN (${multiStatus})</if>
+          <if test="orderNo!=null and orderNo!=''"> AND wod.order_no LIKE CONCAT('%', '${orderNo}','%')</if>
+          <if test="lineNo!=null and lineNo!=''"> AND wod.line_no LIKE CONCAT('%','${lineNo}','%')</if>
+          <if test="skuCode!=null and skuCode!=''"> AND wod.sku_code LIKE CONCAT('%','${skuCode}','%')</if>
+          <if test="isCreateCostVoucher!=null and isCreateCostVoucher!=''"> AND wod.is_create_cost_voucher = #{isCreateCostVoucher}</if>
+          <if test="isCreateVoucher!=null and isCreateVoucher!=''"> AND wod.is_create_voucher = #{isCreateVoucher}</if>
+          <if test="voucherNo!=null and voucherNo!=''"> AND wod.voucher_no LIKE CONCAT('%','${voucherNo}','%')</if>
+          <if test="costVoucherNo!=null and costVoucherNo!=''"> AND wod.cost_voucher_no LIKE CONCAT('%','${costVoucherNo}','%')</if>
+          <if test="companyId!=null and companyId!=''"> AND wod.company_id = #{companyId}</if>
+          <if test="warehouseId!=null and warehouseId!=''"> AND wod.warehouse_id = #{warehouseId}</if>
+          <if test="fuzzyCondition!=null and fuzzyCondition!=''">AND (wod.order_no LIKE CONCAT('%','${fuzzyCondition}','%')
+          OR wod.line_no LIKE CONCAT('%','${fuzzyCondition}','%')
+          OR wod.sku_code LIKE CONCAT('%','${fuzzyCondition}','%'))</if>
+  </sql>
+  <!-- 条件 -->
+  <sql id="findByExampleWhere">
+      WHERE 1=1
+          <if test="id!=null and id!=''"> AND wod.id = #{id}</if>
+          <if test="status!=null and status!=''"> AND wod.status = #{status}</if>
+          <if test="orderNo!=null and orderNo!=''"> AND wod.order_no = #{orderNo}</if>
+          <if test="lineNo!=null and lineNo!=''"> AND wod.line_no = #{lineNo}</if>
+          <if test="skuCode!=null and skuCode!=''"> AND wod.sku_code = #{skuCode}</if>
+          <if test="isCreateCostVoucher!=null and isCreateCostVoucher!=''"> AND wod.is_create_cost_voucher = #{isCreateCostVoucher}</if>
+          <if test="isCreateVoucher!=null and isCreateVoucher!=''"> AND wod.is_create_voucher = #{isCreateVoucher}</if>
+          <if test="voucherNo!=null and voucherNo!=''"> AND wod.voucher_no = #{voucherNo}</if>
+          <if test="costVoucherNo!=null and costVoucherNo!=''"> AND wod.cost_voucher_no = #{costVoucherNo}</if>
+          <if test="companyId!=null and companyId!=''"> AND wod.company_id = #{companyId}</if>
+          <if test="warehouseId!=null and warehouseId!=''"> AND wod.warehouse_id = #{warehouseId}</if>
+  </sql>
+  
+  <!-- 【固定】：按主键查询 -->
+  <select id="getById" resultMap="BaseResultMap" parameterType="java.lang.String">
+  	  select
+      <include refid="Base_Column_List"/>
+      from wm_outbound_detail wod
+      WHERE id in
+      <foreach collection="array" index="index" item="item" open="(" separator="," close=")">
+	           #{item}
+	  </foreach>
+  </select>
+  
+  <!-- 【固定】：插入记录（支持一条及多条） -->
+  <insert id="insert" parameterType="java.util.List">
+  	INSERT INTO wm_outbound_detail
+          (id, order_no, line_no, sku_code,buyer_code,status, outbound_num, outbound_alloc_num,outbound_pick_num,outbound_ship_num,outbound_price,cost,is_create_voucher,voucher_no,is_create_cost_voucher,cost_voucher_no,plan_ship_loc,
+          is_cross_dock,inbound_order_no,inbound_line_no,
+          remark,creator, create_time, modifier, modify_time, rec_ver, company_id, warehouse_id)
+       VALUES
+  		<foreach collection="list" item="item" index="index" separator=",">
+	   		(#{item.id}, #{item.orderNo},#{item.lineNo}, #{item.skuCode},#{item.buyerCode},#{item.status},#{item.outboundNum},#{item.outboundAllocNum},#{item.outboundPickNum},#{item.outboundShipNum},#{item.outboundPrice},
+	   		#{item.cost},#{item.isCreateVoucher},#{item.isCreateVoucher},#{item.isCreateCostVoucher},#{item.costVoucherNo},#{item.planShipLoc},#{item.isCrossDock},#{item.inboundOrderNo},#{item.inboundLineNo},
+      #{item.remark},#{item.creator},#{item.createTime}, #{item.modifier},  #{item.modifyTime},
+      #{item.recVer}, #{item.companyId},#{item.warehouseId})
+  		</foreach>
+  </insert>
+  
+  <!-- 【固定】：删除记录 -->
+  <delete id="delete" parameterType="java.lang.reflect.Array">
+      DELETE FROM wm_outbound_detail WHERE id in 
+   <foreach collection="array" index="index" item="item" open="(" separator="," close=")">  
+           #{item}   
+   </foreach>
+  </delete>
+  
+  <!-- 【固定】：更新记录（支持一条及多条） -->
+  <update id="update" parameterType="java.util.Collection">
+	UPDATE wm_outbound_detail
+	<trim prefix="set" suffixOverrides=",">
+		<!-- 更新的字段集合 -->
+		<trim prefix="order_no =case"  suffix="end,"  >
+             <foreach collection="list" item="item" index="index">
+                     when (ID=#{item.id}) then #{item.orderNo}
+             </foreach>
+		</trim>
+		<trim prefix="line_no =case"  suffix="end,"  >
+             <foreach collection="list" item="item" index="index">
+                     when (ID=#{item.id}) then #{item.lineNo}
+             </foreach>
+		</trim>
+		<trim prefix="buyer_code =case"  suffix="end,"  >
+             <foreach collection="list" item="item" index="index">
+                     when (ID=#{item.id}) then #{item.buyerCode}
+             </foreach>
+		</trim>
+		<trim prefix="sku_code =case"  suffix="end,"  >
+             <foreach collection="list" item="item" index="index">
+                     when (ID=#{item.id}) then #{item.skuCode}
+             </foreach>
+		</trim>
+		<trim prefix="status =case"  suffix="end,"  >
+             <foreach collection="list" item="item" index="index">
+                     when (ID=#{item.id}) then #{item.status}
+             </foreach>
+		</trim>
+		<trim prefix="outbound_num =case"  suffix="end,"  >
+             <foreach collection="list" item="item" index="index">
+                     when (ID=#{item.id}) then #{item.outboundNum}
+             </foreach>
+		</trim>
+		<trim prefix="outbound_alloc_num =case"  suffix="end,"  >
+             <foreach collection="list" item="item" index="index">
+                     when (ID=#{item.id}) then #{item.outboundAllocNum}
+             </foreach>
+		</trim>
+		<trim prefix="outbound_pick_num =case"  suffix="end,"  >
+             <foreach collection="list" item="item" index="index">
+                     when (ID=#{item.id}) then #{item.outboundPickNum}
+             </foreach>
+		</trim>
+		<trim prefix="outbound_ship_num =case"  suffix="end,"  >
+             <foreach collection="list" item="item" index="index">
+                     when (ID=#{item.id}) then #{item.outboundShipNum}
+             </foreach>
+		</trim>
+		<trim prefix="outbound_price =case"  suffix="end,"  >
+             <foreach collection="list" item="item" index="index">
+                     when (ID=#{item.id}) then #{item.outboundPrice}
+             </foreach>
+		</trim>
+		
+		<trim prefix="cost =case"  suffix="end,"  >
+             <foreach collection="list" item="item" index="index">
+                     when (ID=#{item.id}) then #{item.cost}
+             </foreach>
+		</trim>
+		<trim prefix="is_create_voucher =case"  suffix="end,"  >
+             <foreach collection="list" item="item" index="index">
+                     when (ID=#{item.id}) then #{item.isCreateVoucher}
+             </foreach>
+		</trim>
+		<trim prefix="voucher_no =case"  suffix="end,"  >
+             <foreach collection="list" item="item" index="index">
+                     when (ID=#{item.id}) then #{item.voucherNo}
+             </foreach>
+		</trim>
+		<trim prefix="is_create_cost_voucher =case"  suffix="end,"  >
+             <foreach collection="list" item="item" index="index">
+                     when (ID=#{item.id}) then #{item.isCreateCostVoucher}
+             </foreach>
+		</trim>
+		<trim prefix="cost_voucher_no =case"  suffix="end,"  >
+             <foreach collection="list" item="item" index="index">
+                     when (ID=#{item.id}) then #{item.costVoucherNo}
+             </foreach>
+		</trim>
+		
+		<trim prefix="plan_ship_loc =case"  suffix="end,"  >
+             <foreach collection="list" item="item" index="index">
+                     when (ID=#{item.id}) then #{item.planShipLoc}
+             </foreach>
+		</trim>
+		<trim prefix="is_cross_dock =case"  suffix="end,"  >
+             <foreach collection="list" item="item" index="index">
+                     when (ID=#{item.id}) then #{item.isCrossDock}
+             </foreach>
+		</trim>
+		<trim prefix="inbound_order_no =case"  suffix="end,"  >
+             <foreach collection="list" item="item" index="index">
+                     when (ID=#{item.id}) then #{item.inboundOrderNo}
+             </foreach>
+		</trim>
+		<trim prefix="inbound_line_no =case"  suffix="end,"  >
+             <foreach collection="list" item="item" index="index">
+                     when (ID=#{item.id}) then #{item.inboundLineNo}
+             </foreach>
+		</trim>
+		<trim prefix="remark =case"  suffix="end,"  >
+             <foreach collection="list" item="item" index="index">
+                     when (ID=#{item.id}) then #{item.remark}
+             </foreach>
+		</trim>
+		<trim prefix="modifier =case"  suffix="end,"  >
+             <foreach collection="list" item="item" index="index">
+                     when (ID=#{item.id}) then #{item.modifier}
+             </foreach>
+		</trim>
+		<trim prefix="modify_time =case"  suffix="end,"  >
+             <foreach collection="list" item="item" index="index">
+                     when (ID=#{item.id}) then #{item.modifyTime}
+             </foreach>
+		</trim>
+		<trim prefix="rec_ver =case"  suffix="end,"  >
+             <foreach collection="list" item="item" index="index">
+                     when (ID=#{item.id}) then #{item.recVer}
+             </foreach>
+		</trim>
+		<trim prefix="company_id =case"  suffix="end,"  >
+             <foreach collection="list" item="item" index="index">
+                     when (ID=#{item.id}) then #{item.companyId}
+             </foreach>
+		</trim>
+		<trim prefix="warehouse_id =case"  suffix="end,"  >
+             <foreach collection="list" item="item" index="index">
+                     when (ID=#{item.id}) then #{item.warehouseId}
+             </foreach>
+		</trim>
+	</trim>
+	WHERE
+	<foreach collection="list" separator="or" item="item" index="index" >
+		<if test="item.id!=null">
+		(ID=#{item.id}) AND (REC_VER=#{item.recVer}-1)
+		</if>
+	</foreach>	
+  </update>
+  
+  
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from wm_outbound_detail wod
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  
+  <select id="selectAllByPage" resultMap="QueryResultMap" parameterType="Map">
+    select 
+    <include refid="Base_Column_List" />
+    ,bfs.fitting_sku_name as sku_name,
+    bfs.model_code,
+    bfs.group_code,
+    bfs.quick_code,
+    bfs.need_to_assemble,
+    bc.customer_name as buyer_name
+    from wm_outbound_detail wod
+    left join bd_fitting_sku bfs on 
+    bfs.fitting_sku_code = wod.sku_code
+    and bfs.company_id = wod.company_id
+    left join bd_customer bc on
+    bc.customer_code = wod.buyer_code
+    and bc.company_id = wod.company_id
+    <include refid="findByConditionWhere" />
+  </select>
+  <select id="selectByExample" resultMap="BaseResultMap" parameterType="com.xibin.wms.pojo.BdLoc">
+    select 
+    <include refid="Base_Column_List" />
+    from wm_outbound_detail wod
+    <include refid="findByExampleWhere" />
+  </select>
+  
+  <select id="selectByKey" resultMap="QueryResultMap" resultType="java.util.List"  parameterType="java.lang.String" >
+    select
+    <include refid="Base_Column_List" />
+    ,bfs.fitting_sku_name as sku_name,
+    bfs.model_code,
+    bfs.quick_code,
+    bc.customer_name as buyer_name
+    from wm_outbound_detail wod
+    left join bd_fitting_sku bfs on 
+    bfs.fitting_sku_code = wod.sku_code
+    and bfs.company_id = wod.company_id
+    left join bd_customer bc on
+    bc.customer_code = wod.buyer_code
+    and bc.company_id = wod.company_id
+    where wod.order_no = #{orderNo,jdbcType=VARCHAR}
+    and
+    wod.line_no = #{lineNo,jdbcType=VARCHAR}
+    and 
+    wod.company_id = #{companyId,jdbcType=INTEGER}
+    and
+    wod.warehouse_id = #{warehouseId,jdbcType=INTEGER}
+  </select>
+    <select id="selectByOrderNo" resultMap="QueryResultMap" resultType="java.util.List"  parameterType="java.lang.String" >
+        select
+        <include refid="Base_Column_List" />
+        ,bfs.fitting_sku_name as sku_name,
+        bfs.model_code,
+        bfs.quick_code,
+        bc.customer_name as buyer_name
+        from wm_outbound_detail wod
+        left join bd_fitting_sku bfs on
+        bfs.fitting_sku_code = wod.sku_code
+        and bfs.company_id = wod.company_id
+        left join bd_customer bc on
+        bc.customer_code = wod.buyer_code
+        and bc.company_id = wod.company_id
+        where wod.order_no = #{orderNo,jdbcType=VARCHAR}
+        and
+        wod.company_id = #{companyId,jdbcType=INTEGER}
+        and
+        wod.warehouse_id = #{warehouseId,jdbcType=INTEGER}
+    </select>
+  
+  
+  <select id="selectLastLineNo"   resultType="Integer"   parameterType="java.lang.String" >
+    select
+    max(cast(wod.line_no as signed))
+    from wm_outbound_detail wod 
+    where wod.order_no = #{orderNo,jdbcType=VARCHAR}
+    and 
+    wod.company_id = #{companyId,jdbcType=INTEGER}
+    and
+    wod.warehouse_id = #{warehouseId,jdbcType=INTEGER}
+  </select>
+  
+  
+  
+  <select id="queryHistoryPrice" resultMap="PriceResultMap" resultType="java.util.List"  parameterType="Map" >
+    select
+    wod.outbound_price,
+	wod.modify_time
+    from wm_outbound_detail wod
+    where wod.buyer_code = #{buyerCode,jdbcType=VARCHAR}
+    and
+    wod.sku_code = #{skuCode,jdbcType=VARCHAR}
+    and
+    wod.status = '80'
+    and 
+    wod.company_id = #{companyId,jdbcType=INTEGER}
+    and
+    wod.warehouse_id = #{warehouseId,jdbcType=INTEGER}
+  </select>
+  
+  <select id="queryHistorySale" resultMap="SaleHistoryResultMap" resultType="java.util.List"  parameterType="Map" >
+    SELECT
+	  	bfs.fitting_sku_name,
+		bfs.model_code,
+        bfs.package_code,
+		wod.sku_code,
+		wod.buyer_code,
+		bc.customer_name,
+		wod.modify_time,
+		wod.outbound_num,
+		wod.outbound_price
+	FROM
+		wm_outbound_detail wod
+	LEFT JOIN bd_fitting_sku bfs ON bfs.company_id = wod.company_id
+	AND bfs.fitting_sku_code = wod.sku_code
+	LEFT JOIN bd_customer bc ON bc.customer_code = wod.buyer_code
+	AND bc.company_id = wod.company_id
+    WHERE 1=1
+    and wod.status = '80'
+    <if test="buyerCode!=null and buyerCode!=''">and wod.buyer_code = #{buyerCode}</if>
+    <if test="fittingSkuName!=null and fittingSkuName!=''"> AND bfs.fitting_sku_name LIKE CONCAT('%','${fittingSkuName}','%')</if>
+    <if test="modelCode!=null and modelCode!=''"> AND bfs.model_code LIKE CONCAT('%','${modelCode}','%')</if>
+    <if test="fittingTypeCode!=null and fittingTypeCode!=''"> AND bfs.fitting_type_code = #{fittingTypeCode}</if>
+    <if test="fittingSkuCode!=null and fittingSkuCode!=''">and wod.sku_code = #{fittingSkuCode}</if>
+    <if test="orderTimeFm!=null and orderTimeFm!=''"> AND wod.modify_time &gt;= #{orderTimeFm}</if>
+    <if test="orderTimeTo!=null and orderTimeTo!=''"> AND wod.modify_time &lt;= #{orderTimeTo}</if>
+    <if test="companyId!=null and companyId!=''">and wod.company_id = #{companyId}</if>
+    <if test="warehouseId!=null and warehouseId!=''">and wod.warehouse_id = #{warehouseId}</if>
+    order by wod.buyer_code,wod.sku_code,wod.create_time desc
+  </select>
+  
+  
+  <select id="selectClosedOrderDetail"   resultMap="QueryResultMap"   parameterType="Map" >
+    select
+    <include refid="Base_Column_List" />
+    ,bc.customer_name as buyer_name,
+    woh.status as header_status
+    from wm_outbound_header woh
+    left join bd_customer bc on
+    	bc.customer_code = woh.buyer_code
+    and bc.company_id = woh.company_id
+    left join wm_outbound_detail wod on
+    wod.order_no = woh.order_no
+    and wod.company_id = woh.company_id
+    and wod.warehouse_id = woh.warehouse_id
+    <include refid="findByConditionWhere" /> 
+    <if test="headerStatus!=null and headerStatus!=''">AND woh.status = #{headerStatus}</if>
+    <if test="outboundType!=null and outboundType!=''">AND woh.outbound_type = #{outboundType}</if>
+    <if test="isCalculated!=null and isCalculated!=''">AND woh.is_calculated = #{isCalculated}</if>
+    <if test="isCostCalculated!=null and isCostCalculated!=''">AND woh.is_cost_calculated = #{isCostCalculated}</if>
+    <if test="orderTimeFm!=null and orderTimeFm!=''"> AND woh.order_time &gt;= #{orderTimeFm}</if>
+    <if test="orderTimeTo!=null and orderTimeTo!=''"> AND woh.order_time &lt;= #{orderTimeTo} </if>
+    order by woh.order_no,wod.line_no
+  </select>
+
+    <select id="querySumPriceGroupByOrderNoForAccount"   resultMap="SumPriceResultMap"   parameterType="Map" >
+        SELECT
+        sum(
+        round(wod.outbound_price * wod.outbound_ship_num,2)
+        )as total,
+        wod.buyer_code,
+        bc.customer_name,
+        bc.auxi_id
+        FROM
+        wm_outbound_detail wod
+        LEFT JOIN bd_customer bc ON bc.company_id = wod.company_id
+        AND bc.customer_code = wod.buyer_code
+        LEFT JOIN wm_outbound_header woh ON wod.order_no = woh.order_no
+        AND wod.company_id = woh.company_id
+        AND wod.warehouse_id = woh.warehouse_id
+        WHERE
+        1 = 1
+        <if test="orderNo!=null and orderNo!=''">
+            AND woh.order_no = #{orderNo}
+        </if>
+        AND woh.status = '80'
+        AND wod.company_id = #{companyId,jdbcType=INTEGER}
+        AND wod.warehouse_id = #{warehouseId,jdbcType=INTEGER}
+        GROUP BY
+        wod.order_no
+    </select>
+  <select id="querySumPriceGroupByBuyerForAccount"   resultMap="SumPriceResultMap"   parameterType="Map" >
+	SELECT
+	sum(
+		round(wod.outbound_price * wod.outbound_ship_num,2)
+	)as total,
+	wod.buyer_code,
+	bc.customer_name,
+	bc.auxi_id
+	FROM
+		wm_outbound_detail wod
+	LEFT JOIN bd_customer bc ON bc.company_id = wod.company_id
+	AND bc.customer_code = wod.buyer_code
+	LEFT JOIN wm_outbound_header woh ON wod.order_no = woh.order_no
+	AND wod.company_id = woh.company_id
+	AND wod.warehouse_id = woh.warehouse_id
+	WHERE
+		1 = 1   
+	<if test="orderNos!=null and orderNos!=''">
+			AND wod.order_no in
+          	<foreach item="item" index="index" collection="orderNos" open="(" separator="," close=")">  
+      			#{item}  
+     	  	</foreach>
+	</if>
+	<if test="outboundType!=null and outboundType!=''">
+    AND woh.outbound_type = #{outboundType}
+    </if>
+	AND woh.status = '99'
+	AND wod.company_id = #{companyId,jdbcType=INTEGER}
+	AND wod.warehouse_id = #{warehouseId,jdbcType=INTEGER}
+	GROUP BY
+		wod.buyer_code	
+ </select>
+ 
+ <select id="queryWmOutboundDetailByPage"   resultMap="SkuQueryItem"   parameterType="Map" >
+ SELECT
+	woh.order_no,
+	woh. STATUS AS header_status,
+	wod. STATUS,
+	woh.buyer_code,
+	bc.customer_name AS buyer_name,
+	woh.outbound_type,
+	woh.order_time,
+	wod.line_no,
+	bfs.fitting_sku_code,
+	bfs.quick_code,
+	bfs.fitting_sku_name,
+	bfs.model_code,
+	wod.outbound_num,
+     cast(wod.outbound_num*wod.outbound_price as DECIMAL(9,2)) AS total_price,
+	wod.outbound_alloc_num,
+	wod.outbound_pick_num,
+	wod.outbound_ship_num,
+	wod.outbound_price,
+  	wod.cost,
+  	wod.is_cross_dock,
+  	wod.inbound_order_no,
+  	wod.inbound_line_no,
+    wod.remark
+     FROM wm_outbound_header woh
+     LEFT JOIN wm_outbound_detail wod ON wod.order_no = woh.order_no
+     AND woh.company_id = wod.company_id
+	LEFT JOIN bd_fitting_sku bfs ON wod.sku_code = bfs.fitting_sku_code
+	AND wod.company_id = bfs.company_id
+	LEFT JOIN bd_customer bc ON bc.customer_code = wod.buyer_code
+	AND bc.company_id = wod.company_id
+	WHERE
+		1 = 1
+     <if test="fittingSkuCode!=null and fittingSkuCode!=''">AND bfs.fitting_sku_code = #{fittingSkuCode}</if>
+     <if test="fittingSkuName!=null and fittingSkuName!=''">AND bfs.fitting_sku_name LIKE CONCAT('%','${fittingSkuName}','%')</if>
+     <if test="modelCode!=null and modelCode!=''">AND bfs.model_code LIKE CONCAT('%','${modelCode}','%')</if>
+     <if test="remark!=null and remark!=''">AND wod.remark LIKE CONCAT('%','${remark}','%')</if>
+     <if test="buyerCode!=null and buyerCode!=''">AND woh.buyer_code = #{buyerCode}</if>
+	<if test="headerStatus!=null and headerStatus!=''">AND woh.status = #{headerStatus}</if>
+	<if test="orderTimeFm!=null and orderTimeFm!=''"> AND woh.order_time &gt;= #{orderTimeFm}</if>
+    <if test="orderTimeTo!=null and orderTimeTo!=''"> AND woh.order_time &lt;= #{orderTimeTo}</if>
+	<if test="companyId!=null and companyId!=''"> AND woh.company_id = #{companyId}</if>
+    <if test="warehouseId!=null and warehouseId!=''"> AND woh.warehouse_id = #{warehouseId}</if>
+    <if test="outboundTypes!=null and outboundTypes.size()>0"> 
+          	AND woh.outbound_type in 
+          	<foreach item="item" index="index" collection="outboundTypes" open="(" separator="," close=")">  
+      			#{item}
+     	  	</foreach>
+    </if>
+	ORDER BY
+	woh.order_time DESC,
+	wod.line_no+0
+  </select>
+
+    <delete id="deleteByOrderNo" parameterType="Map" >
+        DELETE FROM wm_outbound_detail
+        WHERE order_no =  #{orderNo}
+        AND company_id = #{companyId}
+        AND warehouse_id = #{warehouseId}
+    </delete>
+    <select id="queryRecentPrice"   resultType="Double"   parameterType="Map" >
+        SELECT
+        wod.outbound_price
+        FROM
+        wm_outbound_detail wod
+        LEFT JOIN wm_outbound_header woh ON wod.company_id = woh.company_id
+        AND wod.order_no = woh.order_no
+        WHERE
+        1 = 1
+        <if test="skuCode!=null and skuCode!=''">
+        AND wod.sku_code = #{skuCode}
+        </if>
+        <if test="buyerCode!=null and buyerCode!=''">
+        AND wod.buyer_code = #{buyerCode}
+        </if>
+        AND wod.company_id = #{companyId}
+        AND wod.warehouse_id = #{warehouseId}
+        ORDER BY
+        woh.order_time DESC
+        LIMIT 1;
+    </select>
+
+
+</mapper>

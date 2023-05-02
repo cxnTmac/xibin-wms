@@ -1,0 +1,371 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.xibin.wms.dao.WmInboundHeaderMapper" >
+  <resultMap id="BaseResultMap" type="com.xibin.wms.pojo.WmInboundHeader" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="order_no" property="orderNo" jdbcType="VARCHAR" />
+    <result column="supplier_code" property="supplierCode" jdbcType="VARCHAR" />
+    <result column="status" property="status" jdbcType="VARCHAR" />
+    <result column="order_time" property="orderTime" jdbcType="TIMESTAMP" />
+    <result column="audit_op" property="auditOp" jdbcType="INTEGER" />
+    <result column="audit_status" property="auditStatus" jdbcType="VARCHAR" />
+    <result column="audit_time" property="auditTime" jdbcType="TIMESTAMP" />
+    <result column="is_calculated" property="isCalculated" jdbcType="VARCHAR" />
+    <result column="is_cost_calculated" property="isCostCalculated" jdbcType="VARCHAR" />
+    <result column="inbound_type" property="inboundType" jdbcType="VARCHAR" />
+    <result column="voucher_id" property="voucherId" jdbcType="INTEGER" />
+    <result column="cost_voucher_id" property="costVoucherId" jdbcType="INTEGER" />
+    <result column="remark" property="remark" jdbcType="VARCHAR" />
+    <result column="creator" property="creator" jdbcType="INTEGER" />
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="modifier" property="modifier" jdbcType="INTEGER" />
+    <result column="modify_time" property="modifyTime" jdbcType="TIMESTAMP" />
+    <result column="rec_ver" property="recVer" jdbcType="INTEGER" />
+    <result column="company_id" property="companyId" jdbcType="INTEGER" />
+    <result column="warehouse_id" property="warehouseId" jdbcType="INTEGER" />
+  </resultMap>
+  <resultMap id="QueryResultMap" type="com.xibin.wms.query.WmInboundHeaderQueryItem" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="order_no" property="orderNo" jdbcType="VARCHAR" />
+    <result column="supplier_code" property="supplierCode" jdbcType="VARCHAR" />
+    <result column="supplier_name" property="supplierName" jdbcType="VARCHAR" />
+    <result column="status" property="status" jdbcType="VARCHAR" />
+    <result column="order_time" property="orderTime" jdbcType="TIMESTAMP" />
+    <result column="audit_op" property="auditOp" jdbcType="INTEGER" />
+    <result column="audit_status" property="auditStatus" jdbcType="VARCHAR" />
+    <result column="audit_time" property="auditTime" jdbcType="TIMESTAMP" />
+    <result column="is_calculated" property="isCalculated" jdbcType="VARCHAR" />
+    <result column="is_cost_calculated" property="isCostCalculated" jdbcType="VARCHAR" />
+    <result column="inbound_type" property="inboundType" jdbcType="VARCHAR" />
+    <result column="voucher_id" property="voucherId" jdbcType="INTEGER" />
+    <result column="cost_voucher_id" property="costVoucherId" jdbcType="INTEGER" />
+    <result column="remark" property="remark" jdbcType="VARCHAR" />
+    <result column="creator" property="creator" jdbcType="INTEGER" />
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="modifier" property="modifier" jdbcType="INTEGER" />
+    <result column="modify_time" property="modifyTime" jdbcType="TIMESTAMP" />
+    <result column="rec_ver" property="recVer" jdbcType="INTEGER" />
+    <result column="company_id" property="companyId" jdbcType="INTEGER" />
+    <result column="warehouse_id" property="warehouseId" jdbcType="INTEGER" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    wih.id, wih.order_no, wih.supplier_code,wih.status,wih.order_time, wih.audit_op,wih.audit_status, wih.audit_time, wih.inbound_type,wih.is_calculated,wih.is_cost_calculated,wih.voucher_id,wih.cost_voucher_id, wih.remark, 
+    wih.creator, wih.create_time, wih.modifier, wih.modify_time, wih.rec_ver, wih.company_id, wih.warehouse_id
+  </sql>
+  
+  <!-- 条件 -->
+  <sql id="findByConditionWhere">
+      WHERE 1=1
+          <if test="id!=null and id!=''"> AND wih.id = #{id}</if>
+          <if test="orderNo!=null and orderNo!=''"> AND wih.order_no LIKE CONCAT('%','${orderNo}','%')</if>
+          <if test="supplierCode!=null and supplierCode!=''"> AND wih.supplier_code = #{supplierCode}</if>
+          <if test="auditStatus!=null and auditStatus!=''"> AND wih.audit_status = #{auditStatus}</if>
+          <if test="status!=null and status!=''"> AND wih.status = #{status}</if>
+          <if test="orderTimeFm!=null and orderTimeFm!=''"> AND wih.order_time &gt;= #{orderTimeFm}</if>
+          <if test="orderTimeTo!=null and orderTimeTo!=''"> AND wih.order_time &lt;= #{orderTimeTo} </if>
+          <if test="isCalculated!=null and isCalculated!=''"> AND wih.is_calculated = #{isCalculated}</if>
+          <if test="inboundType!=null and inboundType!=''"> AND wih.inbound_type = #{inboundType}</if>
+          <if test="multiStatus!=null and multiStatus!=''"> AND woh.status IN (${multiStatus})</if>
+          <if test="companyId!=null and companyId!=''"> AND wih.company_id = #{companyId}</if>
+          <if test="warehouseId!=null and warehouseId!=''"> AND wih.warehouse_id = #{warehouseId}</if>
+  </sql>
+  <!-- 条件 -->
+  <sql id="findByExampleWhere">
+      WHERE 1=1
+          <if test="id!=null and id!=''"> AND wih.id = #{id}</if>
+          <if test="orderNo!=null and orderNo!=''"> AND wih.order_no = #{orderNo}</if>
+          <if test="supplierCode!=null and supplierCode!=''"> AND wih.supplier_code = #{supplierCode}</if>
+          <if test="auditStatus!=null and auditStatus!=''"> AND wih.audit_status = #{auditStatus}</if>
+          <if test="status!=null and status!=''"> AND wih.status = #{status}</if>
+          <if test="inboundType!=null and inboundType!=''"> AND wih.inbound_type = #{inboundType}</if>
+          <if test="isCalculated!=null and isCalculated!=''"> AND wih.is_calculated = #{isCalculated}</if>
+          <if test="companyId!=null and companyId!=''"> AND wih.company_id = #{companyId}</if>
+          <if test="warehouseId!=null and warehouseId!=''"> AND wih.warehouse_id = #{warehouseId}</if>
+  </sql>
+  <!-- 【固定】：按主键查询 -->
+  <select id="getById" resultMap="BaseResultMap" parameterType="java.lang.String">
+  	  select
+      <include refid="Base_Column_List"/>
+      from wm_inbound_header
+      WHERE id in
+      <foreach collection="array" index="index" item="item" open="(" separator="," close=")">
+	           #{item}
+	  </foreach>
+  </select>
+  
+  <!-- 【固定】：插入记录（支持一条及多条） -->
+  <insert id="insert" parameterType="java.util.List">
+  	INSERT INTO wm_inbound_header
+          (id, order_no, supplier_code, status,order_time, audit_op,audit_status, audit_time, inbound_type,is_calculated,is_cost_calculated,voucher_id,cost_voucher_id, remark, 
+    creator, create_time, modifier, modify_time, rec_ver, company_id, warehouse_id)
+       VALUES
+  		<foreach collection="list" item="item" index="index" separator=",">
+	   		(#{item.id}, #{item.orderNo}, #{item.supplierCode},#{item.status},
+      #{item.orderTime}, #{item.auditOp},#{item.auditStatus},#{item.auditTime}, 
+      #{item.inboundType},#{item.isCalculated},#{item.isCostCalculated},#{item.voucherId},#{item.costVoucherId}, #{item.remark}, #{item.creator},#{item.createTime},#{item.modifier}, #{item.modifyTime}, 
+      #{item.recVer}, #{item.companyId},#{item.warehouseId})
+  		</foreach>
+  </insert>
+  
+  <!-- 【固定】：删除记录 -->
+  <delete id="delete" parameterType="java.lang.reflect.Array">
+      DELETE FROM wm_inbound_header WHERE ID in 
+   <foreach collection="array" index="index" item="item" open="(" separator="," close=")">  
+           #{item}   
+   </foreach>
+  </delete>
+  
+  <!-- 【固定】：更新记录（支持一条及多条） -->
+  <update id="update" parameterType="java.util.Collection">
+	UPDATE wm_inbound_header
+	<trim prefix="set" suffixOverrides=",">
+		<!-- 更新的字段集合 -->
+		<trim prefix="order_no =case"  suffix="end,"  >
+             <foreach collection="list" item="item" index="index">
+                     when (ID=#{item.id}) then #{item.orderNo}
+             </foreach>
+		</trim>
+		<trim prefix="supplier_code =case"  suffix="end,"  >
+             <foreach collection="list" item="item" index="index">
+                     when (ID=#{item.id}) then #{item.supplierCode}
+             </foreach>
+		</trim>
+		<trim prefix="status =case"  suffix="end,"  >
+             <foreach collection="list" item="item" index="index">
+                     when (ID=#{item.id}) then #{item.status}
+             </foreach>
+		</trim>
+		<trim prefix="order_time =case"  suffix="end,"  >
+             <foreach collection="list" item="item" index="index">
+                     when (ID=#{item.id}) then #{item.orderTime}
+             </foreach>
+		</trim>
+		<trim prefix="audit_op =case"  suffix="end,"  >
+             <foreach collection="list" item="item" index="index">
+                     when (ID=#{item.id}) then #{item.auditOp}
+             </foreach>
+		</trim>
+		<trim prefix="audit_status =case"  suffix="end,"  >
+             <foreach collection="list" item="item" index="index">
+                     when (ID=#{item.id}) then #{item.auditStatus}
+             </foreach>
+		</trim>
+		
+		<trim prefix="audit_time =case"  suffix="end,"  >
+             <foreach collection="list" item="item" index="index">
+                     when (ID=#{item.id}) then #{item.auditTime}
+             </foreach>
+		</trim>
+		<trim prefix="inbound_type =case"  suffix="end,"  >
+             <foreach collection="list" item="item" index="index">
+                     when (ID=#{item.id}) then #{item.inboundType}
+             </foreach>
+		</trim>
+		<trim prefix="is_calculated =case"  suffix="end,"  >
+             <foreach collection="list" item="item" index="index">
+                     when (ID=#{item.id}) then #{item.isCalculated}
+             </foreach>
+		</trim>
+		<trim prefix="is_cost_calculated =case"  suffix="end,"  >
+             <foreach collection="list" item="item" index="index">
+                     when (ID=#{item.id}) then #{item.isCostCalculated}
+             </foreach>
+		</trim>
+		<trim prefix="voucher_id =case"  suffix="end,"  >
+             <foreach collection="list" item="item" index="index">
+                     when (ID=#{item.id}) then #{item.voucherId}
+             </foreach>
+		</trim>
+		<trim prefix="cost_voucher_id =case"  suffix="end,"  >
+             <foreach collection="list" item="item" index="index">
+                     when (ID=#{item.id}) then #{item.costVoucherId}
+             </foreach>
+		</trim>
+		<trim prefix="remark =case"  suffix="end,"  >
+             <foreach collection="list" item="item" index="index">
+                     when (ID=#{item.id}) then #{item.remark}
+             </foreach>
+		</trim>
+		
+		
+		
+		<trim prefix="modifier =case"  suffix="end,"  >
+             <foreach collection="list" item="item" index="index">
+                     when (ID=#{item.id}) then #{item.modifier}
+             </foreach>
+		</trim>
+		<trim prefix="modify_time =case"  suffix="end,"  >
+             <foreach collection="list" item="item" index="index">
+                     when (ID=#{item.id}) then #{item.modifyTime}
+             </foreach>
+		</trim>
+		<trim prefix="rec_ver =case"  suffix="end,"  >
+             <foreach collection="list" item="item" index="index">
+                     when (ID=#{item.id}) then #{item.recVer}
+             </foreach>
+		</trim>
+		<trim prefix="company_id =case"  suffix="end,"  >
+             <foreach collection="list" item="item" index="index">
+                     when (ID=#{item.id}) then #{item.companyId}
+             </foreach>
+		</trim>
+		<trim prefix="warehouse_id =case"  suffix="end,"  >
+             <foreach collection="list" item="item" index="index">
+                     when (ID=#{item.id}) then #{item.warehouseId}
+             </foreach>
+		</trim>
+	</trim>
+	WHERE
+	<foreach collection="list" separator="or" item="item" index="index" >
+		<if test="item.id!=null">
+		(ID=#{item.id}) AND (REC_VER=#{item.recVer}-1)
+		</if>
+	</foreach>	
+  </update>
+  
+  
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from wm_inbound_header wih
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <select id="selectAllByPage" resultMap="QueryResultMap" parameterType="Map">
+    select 
+    <include refid="Base_Column_List" />
+    ,bc.customer_name as supplier_name
+    from wm_inbound_header wih
+    left join bd_customer bc on
+    bc.customer_code = wih.supplier_code
+    and bc.company_id = wih.company_id
+    <include refid="findByConditionWhere" />
+    order by wih.order_time desc
+  </select>
+  <select id="selectByExample" resultMap="BaseResultMap" parameterType="com.xibin.wms.pojo.BdFittingType">
+    select 
+    <include refid="Base_Column_List" />
+    from wm_inbound_header wih
+    <include refid="findByExampleWhere" />
+  </select>
+  <select id="selectByKey" resultMap="QueryResultMap" resultType="java.util.List"  parameterType="java.lang.String" >
+    select 
+    <include refid="Base_Column_List" />
+    ,bc.customer_name as supplier_name
+    from wm_inbound_header wih
+    left join bd_customer bc on
+    bc.customer_code = wih.supplier_code
+    where order_no = #{orderNo}
+    and 
+    wih.company_id = #{companyId}
+    and
+    wih.warehouse_id = #{warehouseId}
+  </select>
+  <select id="queryOrderNosByStatus"  resultType="String"  parameterType="Map" >
+
+    SELECT
+		wih.order_no
+	FROM
+		wm_inbound_header wih
+	WHERE
+		1=1
+		<if test="orderNos!=null and orderNos!=''">
+			AND wih.order_no in
+          	<foreach item="item" index="index" collection="orderNos" open="(" separator="," close=")">  
+      			#{item}  
+     	  	</foreach>
+		</if>
+	
+	AND wih.status = #{status}
+	<if test="isCalculated!=null and isCalculated!=''">
+	AND wih.is_calculated = #{isCalculated}
+	</if>
+	<if test="isCostCalculated!=null and isCostCalculated!=''">
+	AND wih.is_cost_calculated = #{isCostCalculated}
+	</if>
+	AND wih.company_id = #{companyId,jdbcType=INTEGER}
+    AND wih.warehouse_id = #{warehouseId,jdbcType=INTEGER}
+  </select>
+  
+  <update id="updateStatusByOrderNos" parameterType="Map">
+  	UPDATE wm_inbound_header wih
+  	set 
+  	wih.is_calculated = #{isCalculated}
+  	<if test="toStatus!=null and toStatus!=''">
+  	,wih.status = #{toStatus}
+  	</if>
+  	<if test="toVoucherId!=null and toVoucherId!=''">
+  	, wih.voucher_id = #{toVoucherId}
+  	</if>
+  	WHERE 1=1
+		<if test="orderNos!=null and orderNos!=''">
+			AND wih.order_no in
+          	<foreach item="item" index="index" collection="orderNos" open="(" separator="," close=")">  
+      			#{item}  
+     	  	</foreach>
+		</if>
+	<if test="voucherId!=null and voucherId!=''">
+	AND wih.voucher_id = #{voucherId}
+	</if>
+	<if test="inboundType!=null and inboundType!=''">
+	AND wih.inbound_type = #{inboundType}
+	</if>
+	AND wih.company_id = #{companyId}
+    AND wih.warehouse_id = #{warehouseId}
+  	
+  </update>
+  
+  
+  <update id="updateCostCalculateByOrderNos" parameterType="Map">
+  	UPDATE wm_inbound_header wih
+  	set 
+  	wih.cost_voucher_id = #{toCostVoucherId}
+  	<if test="isCostCalculated!=null and isCostCalculated!=''">
+  	,wih.is_cost_calculated = #{isCostCalculated}
+  	</if>
+  	WHERE 1=1
+		<if test="orderNos!=null and orderNos!=''">
+			AND wih.order_no in
+          	<foreach item="item" index="index" collection="orderNos" open="(" separator="," close=")">  
+      			#{item}  
+     	  	</foreach>
+		</if>
+	<if test="costVoucherId!=null and costVoucherId!=''">
+	AND wih.cost_voucher_id = #{costVoucherId}
+	</if>
+	<if test="inboundType!=null and inboundType!=''">
+	AND wih.inbound_type = #{inboundType}
+	</if>
+	AND wih.company_id = #{companyId}
+    AND wih.warehouse_id = #{warehouseId}
+  </update>
+
+
+    <select id="selectNextOrderNo"  resultType="String"  parameterType="Map" >
+
+        SELECT
+        wih.order_no
+        FROM
+        wm_inbound_header wih
+        WHERE
+        1=1
+        AND wih.id &gt; #{id}
+        AND wih.company_id = #{companyId,jdbcType=INTEGER}
+        AND wih.warehouse_id = #{warehouseId,jdbcType=INTEGER}
+        order by wih.id
+        limit 1
+    </select>
+    <select id="selectPreOrderNo"  resultType="String"  parameterType="Map" >
+
+        SELECT
+        wih.order_no
+        FROM
+        wm_inbound_header wih
+        WHERE
+        1=1
+        AND wih.id &lt; #{id}
+        AND wih.company_id = #{companyId,jdbcType=INTEGER}
+        AND wih.warehouse_id = #{warehouseId,jdbcType=INTEGER}
+        order by wih.id DESC
+        limit 1
+    </select>
+</mapper>

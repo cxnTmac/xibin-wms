@@ -1,0 +1,309 @@
+package com.xibin.wms.pojo;
+
+import com.xibin.core.daosupport.BaseModel;
+
+import java.util.Date;
+
+public class BdCustomer extends BaseModel {
+	private Integer id;
+
+	private String customerCode;
+
+	private String customerName;
+
+	private String status;
+
+	private String customerType;
+
+	private String customerTel;
+
+	private String province;
+
+	private String city;
+
+	private String county;
+
+	private String lng;
+
+	private String lat;
+
+	private String consigneeName;
+
+	private String consigneeAddress;
+
+	private String consigneePhone;
+
+	private String consigneeCompany;
+
+	private Double balance;
+
+	public String getLng() {
+		return lng;
+	}
+
+	public void setLng(String lng) {
+		this.lng = lng;
+	}
+
+	public String getLat() {
+		return lat;
+	}
+
+	public void setLat(String lat) {
+		this.lat = lat;
+	}
+
+	private String customerAddress;
+
+	private String customerEmail;
+
+	private String contactName;
+
+	private String contactTel;
+
+	private String contactEmail;
+
+	private Integer auxiId;
+
+	private String remark;
+
+	private Integer creator;
+
+	private Date createTime;
+
+	private Integer modifier;
+
+	private Date modifyTime;
+
+	private Integer recVer;
+
+	private Integer companyId;
+
+	@Override
+	public Integer getId() {
+		return id;
+	}
+
+	@Override
+	public void setId(Integer id) {
+		this.id = id;
+	}
+
+	public String getCustomerCode() {
+		return customerCode;
+	}
+
+	public void setCustomerCode(String customerCode) {
+		this.customerCode = customerCode;
+	}
+
+	public String getCustomerName() {
+		return customerName;
+	}
+
+	public void setCustomerName(String customerName) {
+		this.customerName = customerName;
+	}
+
+	public String getStatus() {
+		return status;
+	}
+
+	public void setStatus(String status) {
+		this.status = status;
+	}
+
+	public String getCustomerType() {
+		return customerType;
+	}
+
+	public void setCustomerType(String customerType) {
+		this.customerType = customerType;
+	}
+
+	public String getCustomerTel() {
+		return customerTel;
+	}
+
+	public void setCustomerTel(String customerTel) {
+		this.customerTel = customerTel;
+	}
+
+	public String getProvince() {
+		return province;
+	}
+
+	public void setProvince(String province) {
+		this.province = province;
+	}
+
+	public String getCity() {
+		return city;
+	}
+
+	public void setCity(String city) {
+		this.city = city;
+	}
+
+	public String getCounty() {
+		return county;
+	}
+
+	public void setCounty(String county) {
+		this.county = county;
+	}
+
+	public String getCustomerAddress() {
+		return customerAddress;
+	}
+
+	public void setCustomerAddress(String customerAddress) {
+		this.customerAddress = customerAddress;
+	}
+
+	public String getCustomerEmail() {
+		return customerEmail;
+	}
+
+	public void setCustomerEmail(String customerEmail) {
+		this.customerEmail = customerEmail;
+	}
+
+	public String getContactName() {
+		return contactName;
+	}
+
+	public void setContactName(String contactName) {
+		this.contactName = contactName;
+	}
+
+	public String getContactTel() {
+		return contactTel;
+	}
+
+	public void setContactTel(String contactTel) {
+		this.contactTel = contactTel;
+	}
+
+	public String getContactEmail() {
+		return contactEmail;
+	}
+
+	public void setContactEmail(String contactEmail) {
+		this.contactEmail = contactEmail;
+	}
+
+	public String getRemark() {
+		return remark;
+	}
+
+	public void setRemark(String remark) {
+		this.remark = remark;
+	}
+
+	@Override
+	public Integer getCreator() {
+		return creator;
+	}
+
+	@Override
+	public void setCreator(Integer creator) {
+		this.creator = creator;
+	}
+
+	@Override
+	public Date getCreateTime() {
+		return createTime;
+	}
+
+	@Override
+	public void setCreateTime(Date createTime) {
+		this.createTime = createTime;
+	}
+
+	@Override
+	public Integer getModifier() {
+		return modifier;
+	}
+
+	@Override
+	public void setModifier(Integer modifier) {
+		this.modifier = modifier;
+	}
+
+	@Override
+	public Date getModifyTime() {
+		return modifyTime;
+	}
+
+	@Override
+	public void setModifyTime(Date modifyTime) {
+		this.modifyTime = modifyTime;
+	}
+
+	@Override
+	public Integer getRecVer() {
+		return recVer;
+	}
+
+	@Override
+	public void setRecVer(Integer recVer) {
+		this.recVer = recVer;
+	}
+
+	public Integer getCompanyId() {
+		return companyId;
+	}
+
+	public void setCompanyId(Integer companyId) {
+		this.companyId = companyId;
+	}
+
+	public Integer getAuxiId() {
+		return auxiId;
+	}
+
+	public void setAuxiId(Integer auxiId) {
+		this.auxiId = auxiId;
+	}
+
+	public String getConsigneeName() {
+		return consigneeName;
+	}
+
+	public void setConsigneeName(String consigneeName) {
+		this.consigneeName = consigneeName;
+	}
+
+	public String getConsigneeAddress() {
+		return consigneeAddress;
+	}
+
+	public void setConsigneeAddress(String consigneeAddress) {
+		this.consigneeAddress = consigneeAddress;
+	}
+
+	public String getConsigneePhone() {
+		return consigneePhone;
+	}
+
+	public void setConsigneePhone(String consigneePhone) {
+		this.consigneePhone = consigneePhone;
+	}
+
+	public String getConsigneeCompany() {
+		return consigneeCompany;
+	}
+
+	public void setConsigneeCompany(String consigneeCompany) {
+		this.consigneeCompany = consigneeCompany;
+	}
+
+	public Double getBalance() {
+		return balance;
+	}
+
+	public void setBalance(Double balance) {
+		this.balance = balance;
+	}
+}

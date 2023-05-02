@@ -1,0 +1,454 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.xibin.wms.dao.WmOutboundHeaderMapper" >
+  <resultMap id="BaseResultMap" type="com.xibin.wms.pojo.WmOutboundHeader" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="order_no" property="orderNo" jdbcType="VARCHAR" />
+    <result column="buyer_code" property="buyerCode" jdbcType="VARCHAR" />
+    <result column="status" property="status" jdbcType="VARCHAR" />
+    <result column="order_time" property="orderTime" jdbcType="TIMESTAMP" />
+    <result column="audit_op" property="auditOp" jdbcType="INTEGER" />
+    <result column="audit_status" property="auditStatus" jdbcType="VARCHAR" />
+    <result column="audit_time" property="auditTime" jdbcType="TIMESTAMP" />
+    <result column="is_calculated" property="isCalculated" jdbcType="VARCHAR" />
+    <result column="is_cost_calculated" property="isCostCalculated" jdbcType="VARCHAR" />
+    <result column="outbound_type" property="outboundType" jdbcType="VARCHAR" />
+    <result column="voucher_id" property="voucherId" jdbcType="INTEGER" />
+    <result column="cost_voucher_id" property="costVoucherId" jdbcType="INTEGER" />
+    <result column="tracking_no" property="trackingNo" jdbcType="VARCHAR" />
+    <result column="logistics_no" property="logisticsNo" jdbcType="VARCHAR" />
+    <result column="freight" property="freight" jdbcType="DOUBLE" />
+      <result column="freight_type" property="freightType" jdbcType="DOUBLE" />
+    <result column="remark" property="remark" jdbcType="VARCHAR" />
+    <result column="creator" property="creator" jdbcType="INTEGER" />
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="modifier" property="modifier" jdbcType="INTEGER" />
+    <result column="modify_time" property="modifyTime" jdbcType="TIMESTAMP" />
+    <result column="rec_ver" property="recVer" jdbcType="INTEGER" />
+    <result column="company_id" property="companyId" jdbcType="INTEGER" />
+    <result column="warehouse_id" property="warehouseId" jdbcType="INTEGER" />
+  </resultMap>
+  <resultMap id="QueryResultMap" type="com.xibin.wms.query.WmOutboundHeaderQueryItem" >
+    <id column="id" property="id" jdbcType="INTEGER"/>
+    <result column="order_no" property="orderNo" jdbcType="VARCHAR" />
+    <result column="buyer_code" property="buyerCode" jdbcType="VARCHAR" />
+    <result column="buyer_name" property="buyerName" jdbcType="VARCHAR" />
+    <result column="status" property="status" jdbcType="VARCHAR" />
+    <result column="order_time" property="orderTime" jdbcType="TIMESTAMP" />
+    <result column="audit_op" property="auditOp" jdbcType="INTEGER" />
+    <result column="audit_status" property="auditStatus" jdbcType="VARCHAR" />
+    <result column="audit_time" property="auditTime" jdbcType="TIMESTAMP" />
+    <result column="is_calculated" property="isCalculated" jdbcType="VARCHAR" />
+    <result column="is_cost_calculated" property="isCostCalculated" jdbcType="VARCHAR" />
+    <result column="outbound_type" property="outboundType" jdbcType="VARCHAR" />
+      <result column="freight_type" property="freightType" jdbcType="DOUBLE" />
+    <result column="remark" property="remark" jdbcType="VARCHAR" />
+    <result column="voucher_id" property="voucherId" jdbcType="INTEGER" />
+    <result column="cost_voucher_id" property="costVoucherId" jdbcType="INTEGER" />
+    <result column="tracking_no" property="trackingNo" jdbcType="VARCHAR" />
+    <result column="logistics_no" property="logisticsNo" jdbcType="VARCHAR" />
+    <result column="logistics_company" property="logisticsCompany" jdbcType="VARCHAR" />
+    <result column="freight" property="freight" jdbcType="DOUBLE" />
+    <result column="creator" property="creator" jdbcType="INTEGER" />
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="modifier" property="modifier" jdbcType="INTEGER" />
+    <result column="modify_time" property="modifyTime" jdbcType="TIMESTAMP" />
+    <result column="rec_ver" property="recVer" jdbcType="INTEGER" />
+    <result column="company_id" property="companyId" jdbcType="INTEGER" />
+    <result column="warehouse_id" property="warehouseId" jdbcType="INTEGER" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    woh.id, woh.order_no, woh.buyer_code, woh.status,woh.order_time,woh.audit_op,woh.audit_status, woh.audit_time, woh.outbound_type, woh.is_calculated,woh.is_cost_calculated,woh.voucher_id,woh.cost_voucher_id,woh.remark, 
+    woh.tracking_no,woh.logistics_no,woh.freight,woh.freight_type,woh.creator, woh.create_time, woh.modifier, woh.modify_time, woh.rec_ver, woh.company_id, woh.warehouse_id
+  </sql>
+  
+   <!-- 条件 -->
+  <sql id="findByConditionWhere">
+      WHERE 1=1
+          <if test="id!=null and id!=''"> AND woh.id = #{id}</if>
+          <if test="orderNo!=null and orderNo!=''"> AND woh.order_no LIKE CONCAT('%', '${orderNo}','%')</if>
+          <if test="buyerCode!=null and buyerCode!=''"> AND woh.buyer_code = #{buyerCode}</if>
+          <if test="status!=null and status!=''"> AND woh.status = #{status}</if>
+          <if test="outboundType!=null and outboundType!=''"> AND woh.outbound_type = #{outboundType}</if>
+          <if test="auditOp!=null and auditOp!=''"> AND woh.audit_op = #{auditOp}</if>
+          <if test="auditStatus!=null and auditStatus!=''"> AND woh.audit_status = #{auditStatus}</if>
+          <if test="orderTimeFm!=null and orderTimeFm!=''"> AND woh.order_time &gt;= #{orderTimeFm}</if>
+          <if test="orderTimeTo!=null and orderTimeTo!=''"> AND woh.order_time &lt;= #{orderTimeTo}</if>
+          <if test="isCalculated!=null and isCalculated!=''"> AND woh.is_calculated = #{isCalculated}</if>
+          <if test="isCostCalculated!=null and isCostCalculated!=''"> AND woh.is_cost_calculated = #{isCostCalculated}</if>
+          <if test="companyId!=null and companyId!=''"> AND woh.company_id = #{companyId}</if>
+          <if test="warehouseId!=null and warehouseId!=''"> AND woh.warehouse_id = #{warehouseId}</if>
+          <if test="multiStatus!=null and multiStatus!=''"> AND woh.status IN (${multiStatus})</if>
+          <if test="fuzzyCondition!=null and fuzzyCondition!=''"> AND (woh.order_no LIKE CONCAT('%','${fuzzyCondition}','%')
+          OR woh.line_no LIKE CONCAT('%','${fuzzyCondition}','%')
+          OR woh.sku_code LIKE CONCAT('%','${fuzzyCondition}','%'))</if>
+  </sql>
+  <!-- 条件 -->
+  <sql id="findByExampleWhere">
+      WHERE 1=1
+          <if test="id!=null and id!=''"> AND woh.id = #{id}</if>
+          <if test="orderNo!=null and orderNo!=''"> AND woh.order_no = #{orderNo}</if>
+          <if test="buyerCode!=null and buyerCode!=''"> AND woh.buyer_code = #{buyerCode}</if>
+          <if test="status!=null and status!=''"> AND woh.status = #{status}</if>
+          <if test="auditStatus!=null and auditStatus!=''"> AND woh.audit_status = #{auditStatus}</if>
+          <if test="auditOp!=null and auditOp!=''"> AND woh.audit_op = #{auditOp}</if>
+          <if test="outboundType!=null and outboundType!=''"> AND woh.outbound_type = #{outboundType}</if>
+          <if test="isCalculated!=null and isCalculated!=''"> AND woh.is_calculated = #{isCalculated}</if>
+          <if test="isCostCalculated!=null and isCostCalculated!=''"> AND woh.is_cost_calculated = #{isCostCalculated}</if>
+          <if test="companyId!=null and companyId!=''"> AND woh.company_id = #{companyId}</if>
+          <if test="warehouseId!=null and warehouseId!=''"> AND woh.warehouse_id = #{warehouseId}</if>
+  </sql>
+  
+  <!-- 【固定】：按主键查询 -->
+  <select id="getById" resultMap="BaseResultMap" parameterType="java.lang.String">
+  	  select
+      <include refid="Base_Column_List"/>
+      from wm_outbound_header woh
+      WHERE id in
+      <foreach collection="array" index="index" item="item" open="(" separator="," close=")">
+	           #{item}
+	  </foreach>
+  </select>
+  
+  <!-- 【固定】：插入记录（支持一条及多条） -->
+  <insert id="insert" parameterType="java.util.List">
+  	INSERT INTO wm_outbound_header
+          (id, order_no,buyer_code,status,order_time,audit_op,audit_status,audit_time,outbound_type,is_calculated,is_cost_calculated,voucher_id,cost_voucher_id,tracking_no,logistics_no,freight,freight_type,
+          remark,creator,create_time, modifier,modify_time,rec_ver,company_id,warehouse_id)
+       VALUES
+  		<foreach collection="list" item="item" index="index" separator=",">
+	   	(#{item.id}, #{item.orderNo},#{item.buyerCode},#{item.status},#{item.orderTime},#{item.auditOp},#{item.auditStatus},#{item.auditTime},#{item.outboundType},#{item.isCalculated},#{item.isCostCalculated},#{item.voucherId},#{item.costVoucherId},
+      #{item.trackingNo},#{item.logisticsNo},#{item.freight},#{item.freightType},#{item.remark},#{item.creator},#{item.createTime}, #{item.modifier},#{item.modifyTime},#{item.recVer},#{item.companyId},#{item.warehouseId})
+  		</foreach>
+  </insert>
+  
+  <!-- 【固定】：删除记录 -->
+  <delete id="delete" parameterType="java.lang.reflect.Array">
+      DELETE FROM wm_outbound_header WHERE id in 
+   <foreach collection="array" index="index" item="item" open="(" separator="," close=")">  
+           #{item}   
+   </foreach>
+  </delete>
+  
+  <!-- 【固定】：更新记录（支持一条及多条） -->
+  <update id="update" parameterType="java.util.Collection">
+	UPDATE wm_outbound_header
+	<trim prefix="set" suffixOverrides=",">
+		<!-- 更新的字段集合 -->
+		<trim prefix="order_no =case"  suffix="end,"  >
+             <foreach collection="list" item="item" index="index">
+                     when (ID=#{item.id}) then #{item.orderNo}
+             </foreach>
+		</trim>
+		<trim prefix="buyer_code =case"  suffix="end,"  >
+             <foreach collection="list" item="item" index="index">
+                     when (ID=#{item.id}) then #{item.buyerCode}
+             </foreach>
+		</trim>
+		<trim prefix="status =case"  suffix="end,"  >
+             <foreach collection="list" item="item" index="index">
+                     when (ID=#{item.id}) then #{item.status}
+             </foreach>
+		</trim>
+		<trim prefix="order_time =case"  suffix="end,"  >
+             <foreach collection="list" item="item" index="index">
+                     when (ID=#{item.id}) then #{item.orderTime}
+             </foreach>
+		</trim>
+		<trim prefix="audit_op =case"  suffix="end,"  >
+             <foreach collection="list" item="item" index="index">
+                     when (ID=#{item.id}) then #{item.auditOp}
+             </foreach>
+		</trim>
+		<trim prefix="audit_status =case"  suffix="end,"  >
+             <foreach collection="list" item="item" index="index">
+                     when (ID=#{item.id}) then #{item.auditStatus}
+             </foreach>
+		</trim>
+		<trim prefix="audit_time =case"  suffix="end,"  >
+             <foreach collection="list" item="item" index="index">
+                     when (ID=#{item.id}) then #{item.auditTime}
+             </foreach>
+		</trim>
+		<trim prefix="is_calculated =case"  suffix="end,"  >
+             <foreach collection="list" item="item" index="index">
+                     when (ID=#{item.id}) then #{item.isCalculated}
+             </foreach>
+		</trim>
+		<trim prefix="is_cost_calculated =case"  suffix="end,"  >
+             <foreach collection="list" item="item" index="index">
+                     when (ID=#{item.id}) then #{item.isCostCalculated}
+             </foreach>
+		</trim>
+		<trim prefix="outbound_type =case"  suffix="end,"  >
+             <foreach collection="list" item="item" index="index">
+                     when (ID=#{item.id}) then #{item.outboundType}
+             </foreach>
+		</trim>
+		<trim prefix="voucher_id =case"  suffix="end,"  >
+             <foreach collection="list" item="item" index="index">
+                     when (ID=#{item.id}) then #{item.voucherId}
+             </foreach>
+		</trim>
+		<trim prefix="cost_voucher_id =case"  suffix="end,"  >
+             <foreach collection="list" item="item" index="index">
+                     when (ID=#{item.id}) then #{item.costVoucherId}
+             </foreach>
+		</trim>
+		<trim prefix="tracking_no =case"  suffix="end,"  >
+             <foreach collection="list" item="item" index="index">
+                     when (ID=#{item.id}) then #{item.trackingNo}
+             </foreach>
+		</trim>
+		<trim prefix="logistics_no =case"  suffix="end,"  >
+             <foreach collection="list" item="item" index="index">
+                     when (ID=#{item.id}) then #{item.logisticsNo}
+             </foreach>
+		</trim>
+		<trim prefix="freight =case"  suffix="end,"  >
+             <foreach collection="list" item="item" index="index">
+                     when (ID=#{item.id}) then #{item.freight}
+             </foreach>
+		</trim>
+        <trim prefix="freight_type =case"  suffix="end,"  >
+            <foreach collection="list" item="item" index="index">
+                when (ID=#{item.id}) then #{item.freightType}
+            </foreach>
+        </trim>
+		
+		<trim prefix="remark =case"  suffix="end,"  >
+             <foreach collection="list" item="item" index="index">
+                     when (ID=#{item.id}) then #{item.remark}
+             </foreach>
+		</trim>
+		<trim prefix="modifier =case"  suffix="end,"  >
+             <foreach collection="list" item="item" index="index">
+                     when (ID=#{item.id}) then #{item.modifier}
+             </foreach>
+		</trim>
+		<trim prefix="modify_time =case"  suffix="end,"  >
+             <foreach collection="list" item="item" index="index">
+                     when (ID=#{item.id}) then #{item.modifyTime}
+             </foreach>
+		</trim>
+		<trim prefix="rec_ver =case"  suffix="end,"  >
+             <foreach collection="list" item="item" index="index">
+                     when (ID=#{item.id}) then #{item.recVer}
+             </foreach>
+		</trim>
+		<trim prefix="company_id =case"  suffix="end,"  >
+             <foreach collection="list" item="item" index="index">
+                     when (ID=#{item.id}) then #{item.companyId}
+             </foreach>
+		</trim>
+		<trim prefix="warehouse_id =case"  suffix="end,"  >
+             <foreach collection="list" item="item" index="index">
+                     when (ID=#{item.id}) then #{item.warehouseId}
+             </foreach>
+		</trim>
+	</trim>
+	WHERE
+	<foreach collection="list" separator="or" item="item" index="index" >
+		<if test="item.id!=null">
+		(ID=#{item.id}) AND (REC_VER=#{item.recVer}-1)
+		</if>
+	</foreach>	
+  </update>
+  
+  
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    
+    from wm_outbound_header woh
+   
+    
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  
+  <select id="selectAllByPage" resultMap="QueryResultMap" parameterType="Map">
+    select 
+    <include refid="Base_Column_List" />
+    ,bc.customer_name as buyer_name,
+    bc2.customer_name as logistics_company
+    from wm_outbound_header woh
+    left join bd_customer bc on
+    bc.customer_code = woh.buyer_code
+    left join bd_customer bc2 on
+    bc2.customer_code = woh.logistics_no
+    <include refid="findByConditionWhere" />
+    order by woh.order_time desc
+  </select>
+  <select id="selectByExample" resultMap="BaseResultMap" parameterType="com.xibin.wms.pojo.BdLoc">
+    select 
+    <include refid="Base_Column_List" />
+    from wm_outbound_header woh
+    <include refid="findByExampleWhere" />
+  </select>
+  
+  <select id="selectByKey" resultMap="QueryResultMap" resultType="java.util.List"  parameterType="java.lang.String" >
+    select 
+    <include refid="Base_Column_List" />
+    ,bc.customer_name as buyer_name,
+    bc2.customer_name as logistics_company
+    from wm_outbound_header woh
+    left join bd_customer bc on
+    bc.customer_code = woh.buyer_code
+    left join bd_customer bc2 on
+    bc2.customer_code = woh.logistics_no
+    where woh.order_no = #{orderNo,jdbcType=VARCHAR}
+    and 
+    woh.company_id = #{companyId,jdbcType=INTEGER}
+    and
+    woh.warehouse_id = #{warehouseId,jdbcType=INTEGER}
+  </select>
+  <select id="queryOrderNosByStatus"  resultType="String"  parameterType="Map" >
+
+    SELECT
+		woh.order_no
+	FROM
+		wm_outbound_header woh
+	WHERE
+		1=1
+		<if test="orderNos!=null and orderNos!=''">
+			AND woh.order_no in
+          	<foreach item="item" index="index" collection="orderNos" open="(" separator="," close=")">  
+      			#{item}  
+     	  	</foreach>
+		</if>
+	
+	AND woh.status = #{status}
+	<if test="isCalculated!=null and isCalculated!=''">
+	AND woh.is_calculated = #{isCalculated}
+	</if>
+	<if test="isCostCalculated!=null and isCostCalculated!=''">
+	AND woh.is_cost_calculated = #{isCostCalculated}
+	</if>
+	AND woh.company_id = #{companyId,jdbcType=INTEGER}
+    AND woh.warehouse_id = #{warehouseId,jdbcType=INTEGER}
+  </select>
+  <select id="selectNextOrderNo"  resultType="String"  parameterType="Map" >
+
+    SELECT
+		woh.order_no
+	FROM
+		wm_outbound_header woh
+	WHERE
+		1=1
+	AND woh.id &gt; #{id}
+	AND woh.company_id = #{companyId,jdbcType=INTEGER}
+    AND woh.warehouse_id = #{warehouseId,jdbcType=INTEGER}
+      order by woh.id
+    limit 1
+  </select>
+  <select id="selectPreOrderNo"  resultType="String"  parameterType="Map" >
+
+    SELECT
+		woh.order_no
+	FROM
+		wm_outbound_header woh
+	WHERE
+		1=1
+	AND woh.id &lt; #{id}
+	AND woh.company_id = #{companyId,jdbcType=INTEGER}
+    AND woh.warehouse_id = #{warehouseId,jdbcType=INTEGER}
+    order by woh.id DESC
+    limit 1
+  </select>
+  <update id="updateCalculateByOrderNos" parameterType="Map">
+  	UPDATE wm_outbound_header woh
+  	set 
+  	woh.voucher_id = #{toVoucherId}
+  	<if test="isCalculated!=null and isCalculated!=''">
+  	,woh.is_calculated = #{isCalculated}
+  	</if>
+  	WHERE 1=1
+		<if test="orderNos!=null and orderNos!=''">
+			AND woh.order_no in
+          	<foreach item="item" index="index" collection="orderNos" open="(" separator="," close=")">  
+      			#{item}  
+     	  	</foreach>
+		</if>
+	<if test="voucherId!=null and voucherId!=''">
+	AND woh.voucher_id = #{voucherId}
+	</if>
+	<if test="outboundType!=null and outboundType!=''">
+	AND woh.outbound_type = #{outboundType}
+	</if>
+	AND woh.company_id = #{companyId}
+    AND woh.warehouse_id = #{warehouseId}
+  </update>
+  
+  <update id="updateCostCalculateByOrderNos" parameterType="Map">
+  	UPDATE wm_outbound_header woh
+  	set 
+  	woh.cost_voucher_id = #{toCostVoucherId}
+  	<if test="isCostCalculated!=null and isCostCalculated!=''">
+  	,woh.is_cost_calculated = #{isCostCalculated}
+  	</if>
+  	WHERE 1=1
+		<if test="orderNos!=null and orderNos!=''">
+			AND woh.order_no in
+          	<foreach item="item" index="index" collection="orderNos" open="(" separator="," close=")">  
+      			#{item}  
+     	  	</foreach>
+		</if>
+	<if test="costVoucherId!=null and costVoucherId!=''">
+	AND woh.cost_voucher_id = #{costVoucherId}
+	</if>
+	<if test="outboundType!=null and outboundType!=''">
+	AND woh.outbound_type = #{outboundType}
+	</if>
+	AND woh.company_id = #{companyId}
+    AND woh.warehouse_id = #{warehouseId}
+  </update>
+  <select id="queryForOutboundDaily" resultType="Map"  parameterType="Map" >
+      SELECT
+      DATE_FORMAT(woh.order_time, '%Y年%m月%d日') as date,
+      woh.order_no,
+      woh.remark,
+      bc.customer_name,
+      IF(woh.freight_type = 'PAID', woh.freight, 0) AS freight_paid,
+      IF(woh.freight_type = 'COLLECT', woh.freight, 0) AS freight_collect,
+      sumOfDetail.totalSale,
+      sumOfDetail.cost,
+      sumOfDetail.totalSale-sumOfDetail.cost-IF(woh.freight>0,woh.freight,0) AS gross_profit,
+      (sumOfDetail.totalSale-sumOfDetail.cost-IF(woh.freight>0,woh.freight,0)) / sumOfDetail.totalSale * 100 as gross_profit_margin,
+      IF(
+      woh.freight > 0,
+      woh.freight / sumOfDetail.totalSale * 100,
+      0
+      ) AS freight_rate,
+      woh.buyer_code,
+      woh.status,
+      woh.outbound_type,
+      woh.is_calculated,
+      woh.voucher_id
+      FROM
+      wm_outbound_header woh
+      LEFT JOIN (
+      SELECT
+      wod.order_no,
+      wod.company_id,
+      SUM(wod.outbound_num * outbound_price) AS totalSale,
+      SUM(wod.outbound_num * cost) AS cost
+      FROM
+      wm_outbound_detail wod
+      GROUP BY
+      wod.order_no
+      ) sumOfDetail ON sumOfDetail.order_no = woh.order_no
+      AND sumOfDetail.company_id = woh.company_id
+      LEFT JOIN bd_customer bc ON bc.customer_code = woh.buyer_code
+      AND bc.company_id = woh.company_id
+      WHERE
+      1=1
+      <if test="orderDate!=null and orderDate!=''">
+      AND DATE_FORMAT(woh.order_time, '%Y-%m-%d') = #{orderDate}
+      </if>
+      AND woh.company_id = #{companyId}
+      AND woh.warehouse_id = #{warehouseId}
+      ORDER BY
+      woh.order_time DESC
+  </select>
+  
+</mapper>

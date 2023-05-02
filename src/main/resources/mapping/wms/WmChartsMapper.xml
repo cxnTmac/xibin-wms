@@ -1,0 +1,229 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.xibin.wms.dao.WmChartsMapper" >
+  <resultMap id="pieChartForCurrentMonthSaleByTypeMap" type="com.xibin.wms.pojo.PieChartForCurrentMonthSaleByType" >
+    <result column="sales" property="sales" jdbcType="DOUBLE" />
+	<result column="outbound_num" property="outboundNum" jdbcType="DOUBLE" />
+    <result column="fitting_type_code" property="fittingTypeCode" jdbcType="VARCHAR" />
+    <result column="fitting_type_name" property="fittingTypeName" jdbcType="VARCHAR" />
+  </resultMap>
+  <resultMap type="Map" id="pieChartAndMapForMonthSaleByProvinceMap">
+      <result column="sales" property="sales"/>
+	  <result column="outbound_num" property="outboundNum"/>
+      <result column="province" property="province"/>
+  </resultMap>
+  <resultMap type="Map" id="monthSaleByDateMap">
+      <result column="sales" property="sales"/>
+      <result column="datx" property="datx"/>
+  </resultMap>
+	<resultMap type="Map" id="turnoverRateMap">
+		<result column="skuName" property="skuName"/>
+		<result column="skuCode" property="skuCode"/>
+		<result column="modelCode" property="modelCode"/>
+		<result column="OUB" property="OUB"/>
+		<result column="ASS" property="ASS"/>
+		<result column="INB" property="INB"/>
+		<result column="ROT" property="ROT"/>
+	</resultMap>
+
+  <select id="pieChartForCurrentMonthSaleByType" resultMap="pieChartForCurrentMonthSaleByTypeMap" resultType="java.util.List"  parameterType="Map" >
+    SELECT
+		round(sum(
+			wod.outbound_price * wod.outbound_num
+		),2) as sales,
+	  	sum(wod.outbound_num) as outbound_num,
+		bft.fitting_type_code,
+		bft.fitting_type_name
+	FROM
+		wm_outbound_detail wod
+	LEFT JOIN wm_outbound_header woh ON woh.order_no = wod.order_no
+	AND wod.company_id = woh.company_id
+	LEFT JOIN bd_fitting_sku bfs ON wod.sku_code = bfs.fitting_sku_code
+	AND bfs.company_id = wod.company_id
+	LEFT JOIN bd_fitting_type bft ON bfs.fitting_type_code = bft.fitting_type_code
+	AND bft.company_id = bfs.company_id
+	WHERE
+	  1=1
+	AND woh.outbound_type IN ('PO','XX')
+	<if test="day!=null and day!=''">
+	AND date_format(woh.order_time,'%Y-%m-%d')=date_format(#{day},'%Y-%m-%d')
+	</if>
+	<if test="month!=null and month!=''">
+	AND date_format(woh.order_time,'%Y-%m')=date_format(#{month},'%Y-%m')
+	</if>
+	AND 
+	wod.company_id = #{companyId}
+	AND
+	wod.warehouse_id = #{warehouseId}
+	GROUP BY
+		bfs.fitting_type_code
+  </select>
+  <select id="pieChartAndMapForMonthSaleByProvince" resultMap="pieChartAndMapForMonthSaleByProvinceMap" resultType="java.util.List"  parameterType="Map" >
+    SELECT
+	bc.province,
+	sum(wod.outbound_num) as outbound_num,
+	round(
+		sum(
+			wod.outbound_num * wod.outbound_price
+		),
+		2
+	) as sales
+	FROM
+		wm_outbound_detail wod
+	LEFT JOIN bd_customer bc ON wod.buyer_code = bc.customer_code
+	AND wod.company_id = bc.company_id
+	LEFT JOIN wm_outbound_header woh ON woh.order_no = wod.order_no
+	AND wod.company_id = woh.company_id
+	WHERE
+	1=1
+	  AND woh.outbound_type IN ('PO','XX')
+	  <if test="year!=null and year!=''">
+		  AND date_format(woh.order_time,'%Y')=date_format(#{year},'%Y')
+	  </if>
+	  <if test="month!=null and month!=''">
+		  AND date_format(woh.order_time,'%Y-%m')=date_format(#{month},'%Y-%m')
+	  </if>
+	AND 
+	wod.company_id = #{companyId}
+	AND
+	wod.warehouse_id = #{warehouseId}
+	GROUP BY
+		bc.province
+  </select>
+  
+  
+  <select id="monthSaleByDate" resultMap="monthSaleByDateMap" resultType="java.util.List"  parameterType="Map" >
+	  SELECT
+		date(woh.order_time) as datex,
+		round(
+			sum(
+				wod.outbound_ship_num * wod.outbound_price
+			),
+			2
+		) as sales
+		FROM
+			wm_outbound_detail wod
+		LEFT JOIN wm_outbound_header woh ON wod.order_no = woh.order_no
+		AND woh.company_id = wod.company_id
+		WHERE 
+			1=1
+	  AND woh.outbound_type IN ('PO','XX')
+	  <if test="month!=null and month!=''">
+		  AND date_format(woh.order_time,'%Y-%m')=date_format(#{month},'%Y-%m')
+	  </if>
+			AND 
+			wod.company_id = #{companyId}
+			AND
+			wod.warehouse_id = #{warehouseId}
+		GROUP BY
+			date(woh.order_time)
+   </select>
+	<select id="yearSaleByMonth" resultMap="monthSaleByDateMap" resultType="java.util.List"  parameterType="Map" >
+		SELECT
+		date_format(woh.order_time,'%Y-%m') AS datex,
+		round(
+		sum(
+		wod.outbound_ship_num * wod.outbound_price
+		),
+		2
+		) as sales
+		FROM
+		wm_outbound_detail wod
+		LEFT JOIN wm_outbound_header woh ON wod.order_no = woh.order_no
+		AND woh.company_id = wod.company_id
+		WHERE
+		1=1
+		AND woh.outbound_type IN ('PO','XX')
+		<if test="year!=null and year!=''">
+			AND date_format(woh.order_time,'%Y')=date_format(#{year},'%Y')
+		</if>
+		AND
+		wod.company_id = #{companyId}
+		AND
+		wod.warehouse_id = #{warehouseId}
+		GROUP BY
+		datex
+		ORDER BY
+		datex
+	</select>
+	<select id="turnoverRate" resultMap="turnoverRateMap" resultType="java.util.List"  parameterType="Map" >
+		SELECT total.* FROM(
+		SELECT bfs.fitting_sku_name AS skuName,
+		bfs.fitting_sku_code AS skuCode,
+		bfs.model_code AS modelCode,
+		IFNULL(OUBSUM.sumOutboundNum,0) AS OUB,
+		IFNULL(ASSSUM.sumAssembleNum,0) AS ASS,
+		IFNULL(INBSUM.sumInboundNum,0) AS INB,
+		IFNULL(INVSUM.sumInvNum,0) AS INV,
+		IFNULL(INVSUM.sumTotalPrice,0) AS INVPRICE,
+		datediff(now(),IFNULL(OUBSUM.createTime,'2020-11-01')) AS DAYS,
+		ROUND(IFNULL(INVSUM.sumInvNum,0)*datediff(now(),IFNULL(OUBSUM.createTime,'2020-11-01'))/IFNULL(OUBSUM.sumOutboundNum,0),0) AS OUBDAYS,
+		ROUND(IFNULL(OUBSUM.sumOutboundNum,0)/(IFNULL(ASSSUM.sumAssembleNum,0)+ IFNULL(INBSUM.sumInboundNum,0)),3) AS ROT
+		FROM bd_fitting_sku bfs
+		LEFT JOIN (
+		SELECT SUM(wid.inbound_num) AS sumInboundNum,wid.sku_code AS inbSkuCode
+		FROM wm_inbound_detail wid
+		WHERE wid.`status` = '20'
+		GROUP BY wid.sku_code)INBSUM ON bfs.fitting_sku_code = INBSUM.inbSkuCode
+		LEFT JOIN (
+		SELECT SUM(wod.outbound_num) AS sumOutboundNum,wod.sku_code AS oubSkuCode,wod.create_time AS createTime
+		FROM wm_outbound_detail wod
+		WHERE wod.`status` = '80'
+		GROUP BY wod.sku_code)OUBSUM ON bfs.fitting_sku_code = OUBSUM.oubSkuCode
+		LEFT JOIN (
+		SELECT SUM(wafd.num) AS sumAssembleNum,wafd.fitting_sku_code AS assembleSkuCode
+		FROM wm_assemble_f_detail wafd
+		WHERE wafd.`status` = '70'
+		GROUP BY wafd.fitting_sku_code)ASSSUM ON bfs.fitting_sku_code = ASSSUM.assembleSkuCode
+		LEFT JOIN (
+		SELECT SUM(wm.inv_num) AS sumInvNum,SUM(wm.total_price) AS sumTotalPrice,wm.sku_code AS invSkuCode FROM wm_inventory wm
+		GROUP BY wm.sku_code) INVSUM ON bfs.fitting_sku_code = INVSUM.invSkuCode
+		WHERE 1=1
+		<if test="fittingTypeCode!=null and fittingTypeCode!=''">
+			AND bfs.fitting_type_code = #{fittingTypeCode}
+		</if>
+		<if test="fittingSkuName!=null and fittingSkuName!=''">
+			AND bfs.fitting_sku_name LIKE CONCAT('%','${fittingSkuName}','%')
+		</if>
+		<if test="modelCode!=null and modelCode!=''">
+			AND bfs.model_code LIKE CONCAT('%','${modelCode}','%')
+		</if>
+		<if test="invFm!=null and invFm!=''">
+			AND INVSUM.sumInvNum <![CDATA[>=]]> #{invFm}
+		</if>
+		<if test="oubTo!=null and oubTo!=''">
+			AND OUBSUM.sumOutboundNum <![CDATA[<]]> #{oubTo}
+		</if>
+		AND  bfs.fitting_type_code <![CDATA[<>]]> 'SP1'
+		AND  bfs.company_id = #{companyId}
+		) AS total
+		ORDER BY total.OUBDAYS
+	</select>
+<!--	<select id="turnoverRate" resultMap="turnoverRateMap" resultType="java.util.List"  parameterType="Map" >-->
+<!--		SELECT bfs.fitting_sku_name AS skuName,bfs.fitting_sku_code AS skuCode,bfs.model_code AS modelCode, IFNULL(OUBSUM.sumOutboundNum,0) AS OUB, IFNULL(ASSSUM.sumAssembleNum,0) AS ASS, IFNULL(INBSUM.sumInboundNum,0) AS INB, IFNULL(OUBSUM.sumOutboundNum,0)/(IFNULL(ASSSUM.sumAssembleNum,0)+ IFNULL(INBSUM.sumInboundNum,0)) AS ROT-->
+<!--		FROM bd_fitting_sku bfs-->
+<!--		LEFT JOIN (-->
+<!--		SELECT SUM(wid.inbound_num) AS sumInboundNum,wid.sku_code AS inbSkuCode-->
+<!--		FROM wm_inbound_detail wid-->
+<!--		WHERE wid.`status` = '20'-->
+<!--		GROUP BY wid.sku_code)INBSUM ON bfs.fitting_sku_code = INBSUM.inbSkuCode-->
+<!--		LEFT JOIN (-->
+<!--		SELECT SUM(wod.outbound_num) AS sumOutboundNum,wod.sku_code AS oubSkuCode-->
+<!--		FROM wm_outbound_detail wod-->
+<!--		WHERE wod.`status` = '80'-->
+<!--		GROUP BY wod.sku_code)OUBSUM ON INBSUM.inbSkuCode = OUBSUM.oubSkuCode-->
+<!--		LEFT JOIN (-->
+<!--		SELECT SUM(wafd.num) AS sumAssembleNum,wafd.fitting_sku_code AS assembleSkuCode-->
+<!--		FROM wm_assemble_f_detail wafd-->
+<!--		WHERE wafd.`status` = '70'-->
+<!--		GROUP BY wafd.fitting_sku_code)ASSSUM ON OUBSUM.oubSkuCode = ASSSUM.assembleSkuCode-->
+<!--		WHERE 1=1-->
+<!--		<if test="fittingTypeCode!=null and fittingTypeCode!=''">-->
+<!--			AND bfs.fitting_type_code = #{fittingTypeCode}-->
+<!--		</if>-->
+<!--		AND  bfs.fitting_type_code = 'WJ'-->
+<!--		AND-->
+<!--		bfs.company_id = #{companyId}-->
+<!--		ORDER BY IFNULL(OUBSUM.sumOutboundNum,0)/(IFNULL(ASSSUM.sumAssembleNum,0)+IFNULL(INBSUM.sumInboundNum,0))-->
+<!--	</select>-->
+</mapper>

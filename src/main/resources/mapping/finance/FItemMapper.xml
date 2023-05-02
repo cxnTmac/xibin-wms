@@ -1,0 +1,178 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.xibin.finance.dao.FItemDao">
+	<resultMap type="com.xibin.finance.pojo.FItem" id="FItemMap">
+		<id     property="itemID"  column="itemID"  />
+		<result property="itemClassID"  column="itemClassID"  />
+		<result property="number"  column="number"  />
+		<result property="parentID"  column="parentID"  />
+		<result property="level"  column="level"  />
+		<result property="detail"  column="detail"  />
+		<result property="name"  column="name"  />
+		<result property="isDelete"  column="isDelete"  />
+		<result property="shortNumber"  column="shortNumber"  />
+		<result property="fullName"  column="fullName"  />
+		<result property="updateTime"  column="updateTime"  />
+	</resultMap>
+	
+	<sql id="selectVo">
+        select
+			a.itemID, a.itemClassID, a.number, a.parentID, a.level, a.detail, a.name, a.isDelete, a.shortNumber, a.fullName, a.updateTime 
+			,(select txt from bean_type where tKey="account_boolean" and val=a.isDelete) as isDeleteTxt		
+			,(select txt from bean_type where tKey="account_boolean" and val=a.detail) as detailTxt		
+		from f_item a where 1=1 and a.isDelete = 0
+    </sql>
+    
+	<select id="findFItemList" parameterType="java.util.Map" resultType="java.util.Map">
+		<include refid="selectVo"/>
+		<if test="itemClassID != null and itemClassID != ''">
+			AND a.itemClassID like concat('%', #{itemClassID}, '%')
+		</if>
+		<if test="number != null and number != ''">
+			AND a.number like concat('%', #{number}, '%')
+		</if>
+		<if test="parentID != null and parentID != ''">
+			AND a.parentID like concat('%', #{parentID}, '%')
+		</if>
+		<if test="level != null and level != ''">
+			AND a.level like concat('%', #{level}, '%')
+		</if>
+		<if test="detail != null and detail != ''">
+			AND a.detail like concat('%', #{detail}, '%')
+		</if>
+		<if test="name != null and name != ''">
+			AND a.name like concat('%', #{name}, '%')
+		</if>
+		<if test="isDelete != null and isDelete != ''">
+			AND a.isDelete like concat('%', #{isDelete}, '%')
+		</if>
+		<if test="shortNumber != null and shortNumber != ''">
+			AND a.shortNumber like concat('%', #{shortNumber}, '%')
+		</if>
+		<if test="fullName != null and fullName != ''">
+			AND a.fullName like concat('%', #{fullName}, '%')
+		</if>
+		<if test="updateTime != null and updateTime != ''">
+			AND a.updateTime like concat('%', #{updateTime}, '%')
+		</if>
+	</select>
+	
+	<select id="getById" resultMap="FItemMap">
+		<include refid="selectVo"/>
+		and a.itemID = #{id}
+	</select>
+	
+	<select id="getByItemClassID" resultMap="FItemMap">
+		<include refid="selectVo"/>
+		and a.itemClassID = #{id}
+	</select>
+	
+	<!-- 查询直属下级 -->
+	<select id="findItemClass" parameterType="java.util.Map" resultType="java.util.HashMap">	
+		select a.itemClassID as id, a.name, a.itemClassID as number
+		<if test="itemClassID == 0">
+			,(select count(*) from f_item_class where itemClassID = a.itemClassID) as sonNum
+		</if>
+		<if test="itemClassID != 0">
+			,(select count(*) from f_item where itemClassID = a.itemClassID and isDelete = 0) as sonNum
+		</if>
+		from f_item_class a where 1=1
+		<if test="itemClassID != null and itemClassID != ''">
+			and itemClassID = #{itemClassID}
+		 </if>
+	</select>
+	
+	<!-- 查询别表直属下级 -->
+	<select id="findItem" parameterType="java.util.Map" resultType="java.util.Map">	
+		select CONCAT('#',a.itemID) as id, a.name, a.parentID, a.number
+		,(select count(*) from f_item where parentID = a.itemID and isDelete = 0) as sonNum
+		from f_item a where 1=1 and a.isDelete = 0
+		<if test="itemClassID != null and itemClassID != ''">
+			and itemClassID = #{itemClassID} and level = 1
+		</if>
+		<if test="parentID != null and parentID != ''">
+			and parentID = #{parentID}
+		</if>
+	</select>
+	
+	<!-- 查询别表直属下级 -->
+	<select id="findTreeDataTrueFalse" parameterType="java.util.Map" resultType="java.util.Map">	
+		select *
+		from f_item_class a where 1=1
+		<if test="id != null and id != ''">
+			and a.itemClassID = #{id}
+		</if>
+	</select>
+	
+	<!-- 查询别表下一级num -->
+	<select id="findItemNum" resultType="java.util.HashMap">	
+		select count(*) as num
+		from f_item a where a.isDelete = 0 and itemClassID = #{id}
+	</select>
+	
+ 	<update id="deleteFItemByIds">
+ 		update f_item set isDelete = 1 where itemID in
+ 		<foreach collection="array" item="id" open="(" separator="," close=")">
+ 			#{id}
+        </foreach> 
+	</update>
+ 	
+ 	<update id="updateFItem" parameterType="com.xibin.finance.pojo.FItem">
+ 		update f_item
+ 		<set>
+			<if test="itemClassID != null">itemClassID = #{itemClassID},</if>
+			<if test="number != null">number = #{number},</if>
+			<if test="parentID != null">parentID = #{parentID},</if>
+			<if test="level != null">level = #{level},</if>
+			<if test="detail != null">detail = #{detail},</if>
+			<if test="name != null">name = #{name},</if>
+			<if test="isDelete != null">isDelete = #{isDelete},</if>
+			<if test="shortNumber != null">shortNumber = #{shortNumber},</if>
+			<if test="fullName != null">fullName = #{fullName},</if>
+			<if test="updateTime != null">updateTime = #{updateTime},</if>
+ 		</set>
+ 		where itemID = #{itemID}
+	</update>
+	
+ 	<insert id="saveFItem" parameterType="com.xibin.finance.pojo.FItem" useGeneratedKeys="true" keyProperty="itemID">
+ 		insert into f_item
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="itemClassID != null">itemClassID,</if>
+			<if test="number != null">number,</if>
+			<if test="parentID != null">parentID,</if>
+			<if test="level != null">level,</if>
+			<if test="detail != null">detail,</if>
+			<if test="name != null">name,</if>
+			<if test="isDelete != null">isDelete,</if>
+			<if test="shortNumber != null">shortNumber,</if>
+			<if test="fullName != null">fullName,</if>
+			<if test="updateTime != null">updateTime,</if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="itemClassID != null">#{itemClassID},</if>
+			<if test="number != null">#{number},</if>
+			<if test="parentID != null">#{parentID},</if>
+			<if test="level != null">#{level},</if>
+			<if test="detail != null">#{detail},</if>
+			<if test="name != null">#{name},</if>
+			<if test="isDelete != null">#{isDelete},</if>
+			<if test="shortNumber != null">#{shortNumber},</if>
+			<if test="fullName != null">#{fullName},</if>
+			<if test="updateTime != null">#{updateTime},</if>
+		</trim>
+ 	</insert>
+    
+	<select id="findMemberList" parameterType="java.util.Map" resultType="java.util.Map">
+		select a.* from f_item a where 1=1 and a.isDelete = 0
+		<if test="fAccount_name != null and fAccount_name != ''">
+			AND (a.number like concat('%', #{fAccount_name}, '%') or a.name like concat('%', #{fAccount_name}, '%'))
+		</if>
+		<if test="itemClassID != null and itemClassID != ''">
+			and (itemClassID = #{itemClassID} or a.number like concat((select a.number from f_item a where 1=1 and a.itemID = #{itemClassID} and level > 1), '%'))
+		</if>
+		<if test="parentID != null and parentID != ''">
+			and (parentID = #{parentID} or (a.number like concat((select a.number from f_item a where 1=1 and a.itemID = #{parentID}), '%') and (parentID = #{fid} or itemClassID = #{fid})))
+		</if>
+	</select>
+ 	
+</mapper>
