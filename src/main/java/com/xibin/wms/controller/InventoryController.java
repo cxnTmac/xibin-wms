@@ -174,4 +174,43 @@ public class InventoryController {
 			return message;
 		}
 	}
+	@RequestMapping("/getMaxInventoryBySkuCode")
+	@ResponseBody
+	public Map<String, Object> getMaxInventoryBySkuCode(HttpServletRequest request, Model model) {
+		String skuCode = request.getParameter("skuCode");
+		MyUserDetails userDetails = SecurityUtil.getMyUserDetails();
+		Map skuCodeCondition= new HashMap();
+		skuCodeCondition.put("skuCode",skuCode);
+		if (userDetails != null) {
+			skuCodeCondition.put("companyId", userDetails.getCompanyId());
+			skuCodeCondition.put("warehouseId", userDetails.getWarehouseId());
+		}
+		return wmInventoryService.getMaxInventoryBySkuCode(skuCodeCondition);
+	}
+
+	@RequestMapping("/changeLocByAlloc")
+	@ResponseBody
+	public Message changeLocByAlloc(HttpServletRequest request, Model model) {
+		String skuCode = request.getParameter("skuCode");
+		String targetLocCode = request.getParameter("targetLocCode");
+		Message message = new Message();
+		if(skuCode==null||"".equals(skuCode)){
+			message.setCode(0);
+			message.setMsg("没有传入目标参数，请联系管理员！");
+			return message;
+		}
+		if(targetLocCode==null||"".equals(targetLocCode)){
+			message.setCode(0);
+			message.setMsg("没有传入目标参数，请联系管理员！");
+			return message;
+		}
+		try {
+			return wmInventoryService.changeLocByAlloc(skuCode, targetLocCode);
+		} catch (BusinessException e) {
+			message.setCode(0);
+			message.setMsg(e.getMessage());
+			e.printStackTrace();
+			return message;
+		}
+	}
 }

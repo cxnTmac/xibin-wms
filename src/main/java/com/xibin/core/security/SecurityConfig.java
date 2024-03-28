@@ -3,6 +3,7 @@ package com.xibin.core.security;
 import com.alibaba.fastjson.JSON;
 import com.xibin.core.pojo.Message;
 import com.xibin.core.security.filter.UserAuthenticationFilter;
+import com.xibin.core.security.filter.WeixinAuthenticationFilter;
 import com.xibin.core.security.util.SecurityUtil;
 import org.apache.http.HttpStatus;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,6 +14,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -32,8 +34,11 @@ public class SecurityConfig  extends WebSecurityConfigurerAdapter {
     @Autowired
     private UserLoginAuthenticationProvider loginAuthenticationProvider;
     @Autowired
+    private WeixinAuthenticationProvider weixinAuthenticationProvider;
+    @Autowired
     private MyLogoutSuccessHandler myLogoutSuccessHandler;
-
+    @Autowired
+    UserDetailsServiceImpl userService;
     @Bean
     CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
@@ -71,13 +76,23 @@ public class SecurityConfig  extends WebSecurityConfigurerAdapter {
                     .antMatchers("/wx/*").permitAll()// 微信和网站接口开放
                     .anyRequest().authenticated();
         });
+        http
+                .sessionManagement()
+                .sessionCreationPolicy( SessionCreationPolicy.IF_REQUIRED )
+                .maximumSessions( 20 )
+                .maxSessionsPreventsLogin( true )
+                .expiredUrl( "/login" )
+                .and()
+                .invalidSessionUrl( "/login" )
+                .sessionFixation().migrateSession();
+
         http.logout().logoutUrl("/logout").deleteCookies("JSESSIONID").logoutSuccessHandler(myLogoutSuccessHandler);  ;
         //启用自定义的过滤器
-        http.addFilterAt(userAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
+        http.addFilterBefore(weixinAuthenticationFilter(),UsernamePasswordAuthenticationFilter.class);
+        http.addFilterBefore(userAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
         http.cors();//启用跨域
         http.csrf().disable();//关闭跨站攻击
     }
-
     /**
      * 用户认证
      * @param auth
@@ -86,6 +101,10 @@ public class SecurityConfig  extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
         //使用自定义的Provider，进行数据校验
+        auth.userDetailsService(userService);
+        //微信登录
+        auth.authenticationProvider(weixinAuthenticationProvider);
+        //账号密码登录
         auth.authenticationProvider(loginAuthenticationProvider);
     }
     /**
@@ -146,7 +165,33 @@ public class SecurityConfig  extends WebSecurityConfigurerAdapter {
         });
         //设置用户发起登陆请求时的url
         filter.setFilterProcessesUrl("/user/login");
-        filter.setAuthenticationManager(authenticationManager());
+        filter.setAuthenticationManager(authenticationManagerBean());
         return filter;
     }
+    @Bean
+    public WeixinAuthenticationFilter weixinAuthenticationFilter() throws Exception {
+        WeixinAuthenticationFilter filter = new WeixinAuthenticationFilter();
+        filter.setAuthenticationSuccessHandler((request,response,authentication)->{
+            System.out.println("用户认证成功");
+            //响应成功状态码必须为200
+            response.setStatus(HttpStatus.SC_OK);
+            response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+            response.setCharacterEncoding("utf-8");
+            //将数据以json的形式返回给前台
+            Message msg = new Message();
+            msg.setCode(200);
+            msg.setMsg("登陆成功");
+            msg.setData(SecurityUtil.getMyUserDetails());
+            response.getWriter().print(JSON.toJSONString(msg));
+        });
+        //设置用户发起登陆请求时的url
+        filter.setFilterProcessesUrl("/wx/getAccessTokenForLogin");
+        filter.setAuthenticationManager(authenticationManagerBean());
+        return filter;
+    }
+    @Bean
+    public WeixinAuthenticationProvider weixinAuthenticationProvider() {
+        return new WeixinAuthenticationProvider(userService);
+    }
+
 }

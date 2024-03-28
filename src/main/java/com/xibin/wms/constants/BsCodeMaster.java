@@ -30,6 +30,10 @@ public enum BsCodeMaster {
 	 */
 	TYPE_RECEIVE_CASH("RECEIVE_CASH"),
 	/**
+	 * 银行转账
+	 */
+	TYPE_BANK_TRANSFER("BANK_TRANSFER"),
+	/**
 	 * 付款
 	 */
 	TYPE_PAY("PAY"),
@@ -77,7 +81,19 @@ public enum BsCodeMaster {
 	/**
 	 * 运费到付
 	 */
-	TYPE_FREIGHT_COLLECT("FREIGHT_COLLECT");
+	TYPE_FREIGHT_COLLECT("FREIGHT_COLLECT"),
+	/**
+	 * 运费客户付款
+	 */
+	TYPE_FREIGHT_CUSTOMER_PAID("FREIGHT_CUSTOMER_PAID"),
+	/**
+	 * 运费现金付款
+	 */
+	TYPE_FREIGHT_CASH_PAID("FREIGHT_CASH_PAID"),
+	/**
+	 * 运费账上扣款
+	 */
+	TYPE_FREIGHT_DEBIT_ON_ACCOUNT("FREIGHT_DEBIT_ON_ACCOUNT");
 	private String code;
 
 	public String getCode() {

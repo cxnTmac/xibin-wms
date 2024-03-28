@@ -1,8 +1,8 @@
 package com.xibin.wms.pojo;
 
-import java.util.Date;
-
 import com.xibin.core.daosupport.BaseModel;
+
+import java.util.Date;
 
 public class WmOutboundAlloc extends BaseModel {
 	private Integer id;
@@ -21,6 +21,8 @@ public class WmOutboundAlloc extends BaseModel {
 
 	private String skuCode;
 
+	private String genericSkuCode;
+
 	private Double outboundNum;
 
 	private Double outboundPrice;
@@ -36,6 +38,10 @@ public class WmOutboundAlloc extends BaseModel {
 	private Double cost;
 
 	private Date pickTime;
+
+	private Integer packageNo;
+
+	private Integer packageNum;
 
 	private Integer shipOp;
 
@@ -277,4 +283,27 @@ public class WmOutboundAlloc extends BaseModel {
 		this.allocType = allocType;
 	}
 
+	public Integer getPackageNo() {
+		return packageNo;
+	}
+
+	public void setPackageNo(Integer packageNo) {
+		this.packageNo = packageNo;
+	}
+
+	public Integer getPackageNum() {
+		return packageNum;
+	}
+
+	public void setPackageNum(Integer packageNum) {
+		this.packageNum = packageNum;
+	}
+
+	public String getGenericSkuCode() {
+		return genericSkuCode;
+	}
+
+	public void setGenericSkuCode(String genericSkuCode) {
+		this.genericSkuCode = genericSkuCode;
+	}
 }

@@ -20,7 +20,13 @@ public interface WmInventoryMapper extends BaseMapper {
 
 	List<WmInventory> getAvailableInvByExample(WmInventory example);
 
+	List<WmInventory> getStorageInvByExample(WmInventory example);
+
+	List<WmInventory> getVirtualInvByExample(WmInventory example);
+
 	List<WmInventoryQueryItem> getAvailableInvByPage(Map map);
 
 	Double getCostBySkuCode(Map map);
+
+	Map<String, Object> getMaxInventoryBySkuCode(Map map);
 }

@@ -42,7 +42,21 @@ public class WmOutboundHeaderQueryItem implements Serializable {
 
 	private String freightType;
 
+	private Date paymentTime;
+
+	private String paymentPicUrl;
+
 	private String remark;
+
+	private String isRecievedCash;
+
+	private Double totalPrice;
+
+	private Double cash;
+
+	private Double priceDifferent;
+
+	private String paymentCategory;
 
 	private Integer creator;
 
@@ -272,5 +286,61 @@ public class WmOutboundHeaderQueryItem implements Serializable {
 
 	public void setFreightType(String freightType) {
 		this.freightType = freightType;
+	}
+
+	public String getIsRecievedCash() {
+		return isRecievedCash;
+	}
+
+	public void setIsRecievedCash(String isRecievedCash) {
+		this.isRecievedCash = isRecievedCash;
+	}
+
+	public Double getTotalPrice() {
+		return totalPrice;
+	}
+
+	public void setTotalPrice(Double totalPrice) {
+		this.totalPrice = totalPrice;
+	}
+
+	public Double getCash() {
+		return cash;
+	}
+
+	public void setCash(Double cash) {
+		this.cash = cash;
+	}
+
+	public String getPaymentCategory() {
+		return paymentCategory;
+	}
+
+	public void setPaymentCategory(String paymentCategory) {
+		this.paymentCategory = paymentCategory;
+	}
+
+	public Date getPaymentTime() {
+		return paymentTime;
+	}
+
+	public void setPaymentTime(Date paymentTime) {
+		this.paymentTime = paymentTime;
+	}
+
+	public String getPaymentPicUrl() {
+		return paymentPicUrl;
+	}
+
+	public void setPaymentPicUrl(String paymentPicUrl) {
+		this.paymentPicUrl = paymentPicUrl;
+	}
+
+	public Double getPriceDifferent() {
+		return priceDifferent;
+	}
+
+	public void setPriceDifferent(Double priceDifferent) {
+		this.priceDifferent = priceDifferent;
 	}
 }

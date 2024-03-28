@@ -1,8 +1,8 @@
 package com.xibin.wms.pojo;
 
-import java.util.Date;
-
 import com.xibin.core.daosupport.BaseModel;
+
+import java.util.Date;
 
 public class WmOutboundDetail extends BaseModel {
 	private Integer id;
@@ -14,6 +14,8 @@ public class WmOutboundDetail extends BaseModel {
 	private String buyerCode;
 
 	private String skuCode;
+
+	private String genericSkuCode;
 
 	private String status;
 
@@ -307,4 +309,11 @@ public class WmOutboundDetail extends BaseModel {
 		this.inboundLineNo = inboundLineNo;
 	}
 
+	public String getGenericSkuCode() {
+		return genericSkuCode;
+	}
+
+	public void setGenericSkuCode(String genericSkuCode) {
+		this.genericSkuCode = genericSkuCode;
+	}
 }

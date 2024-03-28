@@ -24,6 +24,9 @@
       <result column="consignee_company" property="consigneeCompany" jdbcType="VARCHAR" />
     <result column="auxi_id" property="auxiId" jdbcType="INTEGER" />
       <result column="balance" property="balance" jdbcType="DOUBLE" />
+      <result column="payment_category" property="paymentCategory" jdbcType="VARCHAR" />
+      <result column="label_city" property="labelCity" jdbcType="VARCHAR" />
+      <result column="label_name" property="labelName" jdbcType="VARCHAR" />
     <result column="remark" property="remark" jdbcType="VARCHAR" />
     <result column="creator" property="creator" jdbcType="INTEGER" />
     <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
@@ -56,6 +59,9 @@
       <result column="consignee_company" property="consigneeCompany" jdbcType="VARCHAR" />
     <result column="auxi_id" property="auxiId" jdbcType="INTEGER" />
       <result column="balance" property="balance" jdbcType="DOUBLE" />
+      <result column="payment_category" property="paymentCategory" jdbcType="VARCHAR" />
+      <result column="label_city" property="labelCity" jdbcType="VARCHAR" />
+      <result column="label_name" property="labelName" jdbcType="VARCHAR" />
     <result column="remark" property="remark" jdbcType="VARCHAR" />
     <result column="creator" property="creator" jdbcType="INTEGER" />
     <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
@@ -67,7 +73,7 @@
   <sql id="Base_Column_List" >
     id, customer_code, customer_name, status, customer_type, customer_tel,customer_email,
     province,city,county,lng,lat,customer_address,
-    contact_name,contact_tel,contact_email,auxi_id,consignee_name,consignee_address,consignee_phone,consignee_company,balance,
+    contact_name,contact_tel,contact_email,auxi_id,consignee_name,consignee_address,consignee_phone,consignee_company,balance,payment_category,label_city,label_name,
     remark,creator,create_time, modifier, modify_time,rec_ver, company_id
   </sql>
   
@@ -82,6 +88,7 @@
           <if test="province!=null and province!=''"> AND bc.province  = #{province}</if>
           <if test="city!=null and city!=''"> AND bc.status  = #{city}</if>
           <if test="county!=null and county!=''"> AND bc.county  = #{county}</if>
+          <if test="payment_category!=null and payment_category!=''"> AND bc.payment_category  = #{paymentCategory}</if>
           <if test="companyId!=null and companyId!=''"> AND bc.company_id = #{companyId}</if>
           <if test="fuzzyCondition!=null and fuzzyCondition!=''"> AND (bc.customer_code LIKE CONCAT('%','${fuzzyCondition}','%') 
           OR bc.customer_name LIKE CONCAT('%','${fuzzyCondition}','%') 
@@ -98,6 +105,7 @@
           <if test="customerName!=null and customerName!=''"> AND bc.customer_name = #{customerName}</if>
           <if test="status!=null and status!=''"> AND bc.status  = #{status}</if>
           <if test="province!=null and province!=''"> AND bc.province  = #{province}</if>
+      <if test="payment_category!=null and payment_category!=''"> AND bc.payment_category  = #{paymentCategory}</if>
           <if test="city!=null and city!=''"> AND bc.status  = #{city}</if>
           <if test="county!=null and county!=''"> AND bc.county  = #{county}</if>
           <if test="companyId!=null and companyId!=''"> AND bc.company_id = #{companyId}</if>
@@ -119,13 +127,13 @@
   <insert id="insert" parameterType="java.util.List">
   	INSERT INTO bd_customer
           (id, customer_code, customer_name, status, customer_type, customer_tel,province,city,county,lng,lat,customer_address,
-          contact_name,contact_tel,contact_email,auxi_id,consignee_name,consignee_address,consignee_phone,consignee_company,
+          contact_name,contact_tel,contact_email,auxi_id,consignee_name,consignee_address,consignee_phone,consignee_company,payment_category,label_city,label_name,
     remark,balance,creator,create_time, modifier, modify_time,rec_ver, company_id)
        VALUES
   		<foreach collection="list" item="item" index="index" separator=",">
 	   		(#{item.id}, #{item.customerCode},#{item.customerName}, #{item.status},#{item.customerType},#{item.customerTel},#{item.province},#{item.city},#{item.county},
       #{item.lng},#{item.lat},#{item.customerAddress},#{item.contactName},#{item.contactTel},#{item.contactEmail},#{item.auxiId},
-            #{item.consigneeName},#{item.consigneeAddress},#{item.consigneePhone},#{item.consigneeCompany},
+            #{item.consigneeName},#{item.consigneeAddress},#{item.consigneePhone},#{item.consigneeCompany},#{item.paymentCategory},#{item.labelCity},#{item.labelName},
       #{item.remark},#{item.balance},#{item.creator},#{item.createTime}, #{item.modifier},  #{item.modifyTime},#{item.recVer}, #{item.companyId})
   		</foreach>
   </insert>
@@ -245,7 +253,21 @@
                 when (ID=#{item.id}) then #{item.consigneeCompany}
             </foreach>
         </trim>
-
+        <trim prefix="payment_category =case"  suffix="end,"  >
+            <foreach collection="list" item="item" index="index">
+                when (ID=#{item.id}) then #{item.paymentCategory}
+            </foreach>
+        </trim>
+        <trim prefix="label_city =case"  suffix="end,"  >
+            <foreach collection="list" item="item" index="index">
+                when (ID=#{item.id}) then #{item.labelCity}
+            </foreach>
+        </trim>
+        <trim prefix="label_name =case"  suffix="end,"  >
+        <foreach collection="list" item="item" index="index">
+            when (ID=#{item.id}) then #{item.labelName}
+        </foreach>
+    </trim>
 		<trim prefix="remark =case"  suffix="end,"  >
              <foreach collection="list" item="item" index="index">
                      when (ID=#{item.id}) then #{item.remark}

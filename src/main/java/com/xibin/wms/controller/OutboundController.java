@@ -114,6 +114,18 @@ public class OutboundController {
 
 	}
 
+	@RequestMapping("/selectForMobileAlloc")
+	@ResponseBody
+	public List<WmOutboundAllocQueryItem> selectForMobileAlloc(HttpServletRequest request, Model model) {
+		// 开始分页
+		MyUserDetails userDetails = SecurityUtil.getMyUserDetails();
+		Map map = JSONObject.parseObject(request.getParameter("conditions"));
+		if (userDetails != null) {
+			map.put("companyId", userDetails.getCompanyId());
+			map.put("warehouseId", userDetails.getWarehouseId());
+		}
+		return outboundAllocService.selectForMobileAlloc(map);
+	}
 	@RequestMapping("/showAllOutboundAlloc")
 	@ResponseBody
 	public PageEntity<WmOutboundAllocQueryItem> showAllOutboundAlloc(HttpServletRequest request, Model model) {
@@ -428,7 +440,7 @@ public class OutboundController {
 	@RequestMapping("/alloc")
 	@ResponseBody
 	public Message alloc(@RequestParam("orderNo") String orderNo, @RequestParam("lineNos") String[] lineNos,
-			@RequestParam("type") String type) {
+						 @RequestParam("type") String type) {
 		Message message = new Message();
 		List<String> errors = new ArrayList<String>();
 		for (String lineNo : lineNos) {
@@ -443,6 +455,32 @@ public class OutboundController {
 				errors.add(e.getMessage());
 			}
 		}
+		if (errors.size() == 0) {
+			message.setCode(200);
+			message.setMsg("操作成功");
+		} else {
+			message.setCode(100);
+			message.setMsgs(errors);
+			message.converMsgsToMsg("");
+		}
+		return message;
+	}
+	@RequestMapping("/virtualAlloc")
+	@ResponseBody
+	public Message virtualAlloc(@RequestParam("orderNo") String orderNo, @RequestParam("lineNo") String lineNo,
+						 @RequestParam("type") String type) {
+		Message message = new Message();
+		List<String> errors = new ArrayList<String>();
+			try {
+				Message singleMessage = outboundDetailService.virtualAllocByKey(orderNo, lineNo, type);
+				if (singleMessage.getCode() != 200) {
+					errors.add(singleMessage.getMsg());
+				}
+			} catch (BusinessException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+				errors.add(e.getMessage());
+			}
 		if (errors.size() == 0) {
 			message.setCode(200);
 			message.setMsg("操作成功");
@@ -539,17 +577,60 @@ public class OutboundController {
 		message.converMsgsToMsg("</br>");
 		return message;
 	}
-
+	@RequestMapping("/packByAlloc")
+	@ResponseBody
+	public Message packByAlloc(HttpServletRequest request, Model model) {
+		Message message = new Message();
+		String str = request.getParameter("alloc");
+		WmOutboundAlloc bean = JSON.parseObject(str, WmOutboundAlloc.class);
+		try {
+			this.outboundAllocService.packByAlloc(bean);
+			message.setCode(200);
+			message.setMsg("操作成功！");
+		} catch (BusinessException e) {
+			e.printStackTrace();
+			message.setCode(0);
+			message.setMsg(e.getMessage());
+		}
+		return message;
+	}
+	@RequestMapping("/cancelPackByAlloc")
+	@ResponseBody
+	public Message cancelPackByAlloc(HttpServletRequest request, Model model) {
+		Message message = new Message();
+		String str = request.getParameter("alloc");
+		WmOutboundAlloc bean = JSON.parseObject(str, WmOutboundAlloc.class);
+		try {
+			this.outboundAllocService.cancelPackByAlloc(bean);
+			message.setCode(200);
+			message.setMsg("操作成功！");
+		} catch (BusinessException e) {
+			e.printStackTrace();
+			message.setCode(0);
+			message.setMsg(e.getMessage());
+		}
+		return message;
+	}
 	@RequestMapping("/pickByAlloc")
 	@ResponseBody
 	public Message pickByAlloc(HttpServletRequest request, Model model) {
 		Message message = new Message();
 		String str = request.getParameter("alloc");
 		String pickNumStr = request.getParameter("pickNum");
+		String isPackedSku = request.getParameter("isPackedSku");
+		String packageNum = request.getParameter("packageNum");
 		double pickNum = Double.parseDouble(pickNumStr);
 		WmOutboundAlloc bean = JSON.parseObject(str, WmOutboundAlloc.class);
 		try {
-			this.outboundAllocService.pickByAlloc(bean, pickNum);
+			if(isPackedSku==null||isPackedSku.equals("")||isPackedSku.equals("true")){
+				if(packageNum==null||packageNum.equals("")){
+					this.outboundAllocService.pickByAlloc(bean, pickNum,true,0);
+				}else{
+					this.outboundAllocService.pickByAlloc(bean, pickNum,true,Integer.parseInt(packageNum));
+				}
+			}else{
+				this.outboundAllocService.pickByAlloc(bean, pickNum,false,0);
+			}
 			message.setCode(200);
 			message.setMsg("操作成功！");
 		} catch (BusinessException e) {
@@ -560,7 +641,24 @@ public class OutboundController {
 		}
 		return message;
 	}
-
+	@RequestMapping("/reAllocByAllocId")
+	@ResponseBody
+	public Message reAllocByAllocId(HttpServletRequest request, Model model) {
+		Message message = new Message();
+		String str = request.getParameter("id");
+		int allocId = Integer.parseInt(str);
+		try {
+			this.outboundAllocService.reAllocByAllocId(allocId);
+			message.setCode(200);
+			message.setMsg("操作成功！");
+		} catch (BusinessException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			message.setCode(0);
+			message.setMsg(e.getMessage());
+		}
+		return message;
+	}
 	@RequestMapping("/cancelPickByAlloc")
 	@ResponseBody
 	public Message cancelPickByAlloc(HttpServletRequest request, Model model) {
@@ -814,14 +912,20 @@ public class OutboundController {
 
 	@RequestMapping("/selectNextOrderNo")
 	@ResponseBody
-	public String selectNextOrderNo(@RequestParam("id") String id) {
-		return outboundHeaderService.selectNextOrderNo(id);
+	public String selectNextOrderNo(@RequestParam("orderTime") String orderTime) {
+		return outboundHeaderService.selectNextOrderNo(orderTime);
 	}
 
 	@RequestMapping("/selectPreOrderNo")
 	@ResponseBody
-	public String selectPreOrderNo(@RequestParam("id") String id) {
-		return outboundHeaderService.selectPreOrderNo(id);
+	public String selectPreOrderNo(@RequestParam("orderTime") String orderTime) {
+		return outboundHeaderService.selectPreOrderNo(orderTime);
+	}
+
+	@RequestMapping("/selectRecentOrderHeaderByBuyerCode")
+	@ResponseBody
+	public Map selectRecentOrderHeaderByBuyerCode(@RequestParam("buyerCode") String buyerCode) {
+		return outboundHeaderService.selectRecentOrderHeaderByBuyerCode(buyerCode);
 	}
 
 	@RequestMapping("/queryForOutboundDaily")
@@ -836,5 +940,49 @@ public class OutboundController {
 		}
 		List<Map> list = outboundHeaderService.queryForOutboundDaily(map);
 		return list;
+	}
+
+	@RequestMapping("/getTotalPackageNumByOrderNo")
+	@ResponseBody
+	public Message getTotalPackageNumByOrderNo(HttpServletRequest request, Model model) {
+		Message message = new Message();
+		String orderNo = request.getParameter("orderNo");
+		message.setData(this.outboundAllocService.getTotalPackageNumByOrderNo(orderNo));
+		message.setCode(200);
+		return message;
+
+	}
+
+
+	@RequestMapping("/selectForReAlloc")
+	@ResponseBody
+	public List<Map> selectForReAlloc(HttpServletRequest request, Model model) {
+		// 开始分页
+		MyUserDetails userDetails = SecurityUtil.getMyUserDetails();
+		Map map = JSONObject.parseObject(request.getParameter("conditions"));
+		if (userDetails != null) {
+			map.put("companyId", userDetails.getCompanyId());
+			map.put("warehouseId", userDetails.getWarehouseId());
+		}
+		return outboundAllocService.selectForReAlloc(map);
+	}
+
+	@RequestMapping("/mobileScanSaveOutboundDetail")
+	@ResponseBody
+	public Message mobileScanSaveOutboundDetail(HttpServletRequest request, Model model) {
+		Message message = new Message();
+		String orderNo = request.getParameter("orderNo");
+		String skuCode = request.getParameter("skuCode");
+		String outboundNumStr = request.getParameter("outboundNum");
+		Double outboundNum = Double.parseDouble(outboundNumStr);
+		try {
+			return this.outboundDetailService.mobileScanSaveOutboundDetail(orderNo,skuCode,outboundNum);
+		} catch (BusinessException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			message.setCode(0);
+			message.setMsg(e.getMessage());
+			return message;
+		}
 	}
 }

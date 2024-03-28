@@ -22,7 +22,7 @@ public class WxApiController {
 	public Message getAccessToken(HttpServletRequest request, Model model) {
 		Message msg = new Message();
 		JsApiTicket jsApiTicket = AccessTokenUtil.jsApiTicket;
-		if(jsApiTicket != null){
+		if(jsApiTicket == null){
 			msg.setCode(0);
 		}else{
 			Map<String, String> result = SignUtil.sign(jsApiTicket.getTicket(),

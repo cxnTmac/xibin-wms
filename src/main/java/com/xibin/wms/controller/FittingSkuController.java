@@ -169,7 +169,31 @@ public class FittingSkuController {
 		}
 		return message;
 	}
-
+	@RequestMapping("/updateSkuPackageCode")
+	@ResponseBody
+	public Message updateSkuPackageCode(HttpServletRequest request, Model model) {
+		Message message = new Message();
+		String skuCode = request.getParameter("skuCode");
+		String newPackageCode = request.getParameter("newPackageCode");
+		BdFittingSku result = new BdFittingSku();
+		if(skuCode ==null||"".equals(skuCode)){
+			message.setCode(0);
+			message.setMsg("产品编码为空");
+			return message;
+		}
+		try {
+			result = this.fittingSkuService.updateSkuPackageCode(skuCode,newPackageCode);
+			message.setCode(200);
+			message.setData(result);
+			message.setMsg("操作成功！");
+		} catch (BusinessException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			message.setCode(0);
+			message.setMsg(e.getMessage());
+		}
+		return message;
+	}
 	@RequestMapping("/removeFittingSkuPic")
 	@ResponseBody
 	public Message removeFittingSkuPic(@RequestParam("idNormal") int idNoromal, @RequestParam("idZip") int idZip,
@@ -226,5 +250,15 @@ public class FittingSkuController {
 			return message;
 		}
 	}
-
+	@RequestMapping(value = "/getSkuBySkuCode")
+	@ResponseBody
+	public BdFittingSkuQueryItem getSkuBySkuCode(HttpServletRequest request) {
+		String skuCode = request.getParameter("skuCode");
+		List<BdFittingSkuQueryItem> skus = fittingSkuService.selectByKey(skuCode);
+		if(skus.size()>0){
+			return skus.get(0);
+		}else{
+			return null;
+		}
+	}
 }

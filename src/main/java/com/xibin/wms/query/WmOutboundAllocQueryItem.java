@@ -22,11 +22,15 @@ public class WmOutboundAllocQueryItem implements Serializable {
 
 	private String skuCode;
 
+	private String genericSkuCode;
+
 	private String skuName;
 
 	private String modelCode;
 
 	private Double outboundNum;
+
+	private Double totalOutboundNum;
 
 	private Double pickNum;
 
@@ -43,6 +47,12 @@ public class WmOutboundAllocQueryItem implements Serializable {
 	private Integer shipOp;
 
 	private Date shipTime;
+
+	private String packageCode;
+
+	private Integer packageNo;
+
+	private Integer packageNum;
 
 	private Double cost;
 
@@ -294,4 +304,43 @@ public class WmOutboundAllocQueryItem implements Serializable {
 		this.allocType = allocType;
 	}
 
+	public Integer getPackageNo() {
+		return packageNo;
+	}
+
+	public void setPackageNo(Integer packageNo) {
+		this.packageNo = packageNo;
+	}
+
+	public Integer getPackageNum() {
+		return packageNum;
+	}
+
+	public void setPackageNum(Integer packageNum) {
+		this.packageNum = packageNum;
+	}
+
+	public Double getTotalOutboundNum() {
+		return totalOutboundNum;
+	}
+
+	public void setTotalOutboundNum(Double totalOutboundNum) {
+		this.totalOutboundNum = totalOutboundNum;
+	}
+
+	public String getGenericSkuCode() {
+		return genericSkuCode;
+	}
+
+	public void setGenericSkuCode(String genericSkuCode) {
+		this.genericSkuCode = genericSkuCode;
+	}
+
+	public String getPackageCode() {
+		return packageCode;
+	}
+
+	public void setPackageCode(String packageCode) {
+		this.packageCode = packageCode;
+	}
 }

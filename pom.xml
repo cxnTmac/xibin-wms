@@ -32,12 +32,12 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web</artifactId>
 <!-- 打包成WAR需要去掉该注释START-->
-            <exclusions>
-                <exclusion>
-                    <groupId>org.springframework.boot</groupId>
-                    <artifactId>spring-boot-starter-tomcat</artifactId>
-                </exclusion>
-            </exclusions>
+<!--            <exclusions>-->
+<!--			<exclusion>-->
+<!--				<groupId>org.springframework.boot</groupId>-->
+<!--				<artifactId>spring-boot-starter-tomcat</artifactId>-->
+<!--			</exclusion>-->
+<!--		</exclusions>-->
 <!-- 打包成WAR需要去掉该注释END-->
         </dependency>
 		<dependency>
@@ -62,17 +62,17 @@
 			<scope>test</scope>
 		</dependency>
 <!-- 打包成WAR需要去掉该注释START -->
-        <dependency>
-		<groupId>org.springframework.boot</groupId>
-		<artifactId>spring-boot-starter-tomcat</artifactId>
-		<scope>provided</scope>
-	</dependency>
-		<dependency>
-			<groupId>org.apache.tomcat</groupId>
-			<artifactId>tomcat-servlet-api</artifactId>
-			<version>7.0.42</version>
-			<scope>provided</scope>
-		</dependency>
+<!--        <dependency>-->
+<!--		<groupId>org.springframework.boot</groupId>-->
+<!--		<artifactId>spring-boot-starter-tomcat</artifactId>-->
+<!--		<scope>provided</scope>-->
+<!--	</dependency>-->
+<!--		<dependency>-->
+<!--			<groupId>org.apache.tomcat</groupId>-->
+<!--			<artifactId>tomcat-servlet-api</artifactId>-->
+<!--			<version>7.0.42</version>-->
+<!--			<scope>provided</scope>-->
+<!--		</dependency>-->
 <!-- 打包成WAR需要去掉该注释END -->
 
 
@@ -85,8 +85,8 @@
 		<!-- WXUtil需要使用 -->
 		<dependency>
 			<groupId>com.alibaba</groupId>
-			<artifactId>fastjson</artifactId>
-			<version>1.1.41</version>
+			<artifactId>fastjson</artifactId><version>1.1.41</version>
+
 		</dependency>
 		<dependency>
 			<groupId>org.apache.httpcomponents</groupId>
@@ -130,18 +130,42 @@
 			<artifactId>groovy-all</artifactId>
 			<version>2.2.2</version>
 		</dependency>
-		<!-- iReport 二维码打印所需jar -->
-		<dependency>
-			<groupId>com.google.zxing</groupId>
-			<artifactId>core</artifactId>
-			<version>2.2</version>
-		</dependency>
+		<!-- iReport 5.6 二维码打印所需jar -->
+<!--		<dependency>-->
+<!--			<groupId>com.google.zxing</groupId>-->
+<!--			<artifactId>core</artifactId>-->
+<!--			<version>2.2</version>-->
+<!--		</dependency>-->
+<!--		<dependency>-->
+<!--			<groupId>com.google.zxing</groupId>-->
+<!--			<artifactId>javase</artifactId>-->
+<!--			<version>2.2</version>-->
+<!--		</dependency>-->
+
+
+		<!-- iReport 6.13.0 二维码打印所需jar -->
 		<dependency>
 			<groupId>com.google.zxing</groupId>
 			<artifactId>javase</artifactId>
-			<version>2.2</version>
+			<version>3.3.2</version>
+			<scope>compile</scope>
 		</dependency>
 
+		<dependency>
+			<groupId>com.google.zxing</groupId>
+			<artifactId>core</artifactId>
+			<version>3.1.0</version>
+		</dependency>
+        <dependency>
+            <groupId>net.sf.barcode4j</groupId>
+            <artifactId>barcode4j</artifactId>
+            <version>2.1</version>
+        </dependency>
+		<dependency>
+			<groupId>org.apache.xmlgraphics</groupId>
+			<artifactId>batik-bridge</artifactId>
+			<version>1.11</version>
+		</dependency>
 
 		<!-- 上传组件包 -->
 		<dependency>
@@ -157,6 +181,32 @@
 			<scope>system</scope>
 			<systemPath>${project.basedir}/lib/CXN.jar</systemPath>
 		</dependency>
+
+
+
+		<!-- XML 文件读写 -->
+		<dependency>
+			<groupId>org.dom4j</groupId>
+			<artifactId>dom4j</artifactId>
+			<version>2.0.0</version>
+		</dependency>
+		<!-- java对象转换为xml字符串 -->
+		<dependency>
+			<groupId>com.thoughtworks.xstream</groupId>
+			<artifactId>xstream</artifactId>
+			<version>1.4.19</version>
+		</dependency>
+		<dependency>
+			<groupId>com.github.liyiorg</groupId>
+			<artifactId>weixin-popular</artifactId>
+			<version>2.8.30</version>
+		</dependency>
+		<dependency>
+			<groupId>com.github.binarywang</groupId>
+			<artifactId>weixin-java-mp</artifactId>
+			<version>3.7.0</version>
+		</dependency>
+
 	</dependencies>
 
 	<build>

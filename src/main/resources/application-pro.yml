@@ -1,8 +1,7 @@
-#server:
-#  port: 8080
-#  servlet:
-#    session:
-#      timeout:10800
+server:
+  servlet:
+    session:
+      timeout: 28800
 spring:
   jackson:
     date-format: yyyy-MM-dd HH:mm:ss
@@ -34,7 +33,7 @@ back:
   datasource:
     druid:
       driver-class-name: com.mysql.cj.jdbc.Driver
-      url: jdbc:mysql://10.66.146.113:3306/jun_finance?useUnicode=true&characterEncoding=utf-8&useSSL=true&serverTimezone=UTC&allowMultiQueries=true
+      url: jdbc:mysql://10.66.146.113:3306/jun_finance_0915?useUnicode=true&characterEncoding=utf-8&useSSL=true&serverTimezone=UTC&allowMultiQueries=true
       username: root
       password: cxn22111578
       initial-size: 5
@@ -61,4 +60,5 @@ logging:
 file:
   webPicUploadUrl: /usr/local/nginx/html/pic
   webPicUploadWithOutHost : pic
+  paymentPicUploadUrl: /usr/local/nginx/html/pic
 

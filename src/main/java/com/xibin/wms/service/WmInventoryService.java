@@ -13,6 +13,8 @@ import java.util.Map;
 public interface WmInventoryService {
 	public WmInventory getInventoryById(int userId);
 
+	public WmInventoryQueryItem saveInventory(WmInventory model) throws BusinessException;
+
 	public List<WmInventoryQueryItem> getAllInventoryByPage(Map map);
 
 	public List<WmInventoryQueryItem> getAvailableInvByPage(Map map);
@@ -22,6 +24,8 @@ public interface WmInventoryService {
 	public List<WmInventory> selectByExample(WmInventory model);
 
 	public List<WmInventory> getAvailableInvByExample(WmInventory model);
+
+	public List<WmInventory> getVirtualInvByExample(WmInventory model);
 
 	public WmActTran updateInventory(InventoryUpdateEntity fmIn) throws BusinessException;
 
@@ -36,4 +40,7 @@ public interface WmInventoryService {
 
 	public List<Map<String,Object>> queryAvaiableInventorySum(Map map);
 
+	public Map<String, Object> getMaxInventoryBySkuCode(Map map);
+
+	public Message changeLocByAlloc(String skuCode, String targetLocCode) throws BusinessException;
 }

@@ -30,6 +30,12 @@
     <result column="def5" property="def5" jdbcType="VARCHAR" />
       <result column="last_inbound_time" property="lastInboundTime" jdbcType="TIMESTAMP" />
       <result column="last_outbound_time" property="lastOutboundTime" jdbcType="TIMESTAMP" />
+      <result column="release_date" property="releaseDate" jdbcType="TIMESTAMP" />
+      <result column="label_sku_name" property="labelSkuName" jdbcType="VARCHAR" />
+      <result column="label_model_code" property="labelModelCode" jdbcType="VARCHAR" />
+      <result column="label_specification" property="labelSpecification" jdbcType="VARCHAR" />
+      <result column="label_packageNum" property="labelPackageNum" jdbcType="VARCHAR" />
+      <result column="label_drawingNo" property="labelDrawingNo" jdbcType="VARCHAR" />
     <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
     <result column="creator" property="creator" jdbcType="INTEGER" />
     <result column="modify_time" property="modifyTime" jdbcType="TIMESTAMP" />
@@ -69,6 +75,12 @@
       <result column="last_outbound_time" property="lastOutboundTime" jdbcType="TIMESTAMP" />
     <result column="fitting_sku_pic_url" property="fittingSkuPicUrl" jdbcType="VARCHAR" />
     <result column="fitting_sku_pic_name" property="fittingSkuPicName" jdbcType="VARCHAR" />
+      <result column="release_date" property="releaseDate" jdbcType="TIMESTAMP" />
+      <result column="label_sku_name" property="labelSkuName" jdbcType="VARCHAR" />
+      <result column="label_model_code" property="labelModelCode" jdbcType="VARCHAR" />
+      <result column="label_specification" property="labelSpecification" jdbcType="VARCHAR" />
+      <result column="label_packageNum" property="labelPackageNum" jdbcType="VARCHAR" />
+      <result column="label_drawingNo" property="labelDrawingNo" jdbcType="VARCHAR" />
     <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
     <result column="creator" property="creator" jdbcType="INTEGER" />
     <result column="modify_time" property="modifyTime" jdbcType="TIMESTAMP" />
@@ -81,7 +93,8 @@
     bfs.id, bfs.fitting_sku_code,bfs.quick_code, bfs.fitting_sku_name, bfs.fitting_sku_status, bfs.fitting_sku_remark, bfs.manufacturer, 
     bfs.materialquality, bfs.package_code, bfs.uom_desc, bfs.price, bfs.model_code, bfs.series,bfs.fitting_type_code, bfs.type,bfs.is_show, bfs.group_code,
     bfs.default_loc,bfs.min_inventory,bfs.need_to_assemble,bfs.assemble_type,
-    bfs.def1, bfs.def2, bfs.def3, bfs.def4, bfs.def5, bfs.last_inbound_time,bfs.last_outbound_time,bfs.create_time, bfs.creator, bfs.modify_time, bfs.modifier, bfs.rec_ver,
+    bfs.def1, bfs.def2, bfs.def3, bfs.def4, bfs.def5, bfs.last_inbound_time,bfs.last_outbound_time,bfs.release_date,bfs.create_time, bfs.creator, bfs.modify_time, bfs.modifier, bfs.rec_ver,
+    bfs.label_sku_name, bfs.label_model_code, bfs.label_specification, bfs.label_packageNum, bfs.label_drawingNo,
     bfs.company_id
   </sql>
   <!-- 条件 -->
@@ -99,6 +112,8 @@
           <if test="isShow!=null and isShow!=''"> AND bfs.is_show = #{isShow}</if>
           <if test="groupCode!=null and groupCode!=''"> AND bfs.group_code = #{groupCode}</if>
           <if test="companyId!=null and companyId!=''"> AND bfs.company_id = #{companyId}</if>
+      <if test="releaseDateFm!=null and releaseDateFm!=''"> AND bfs.release_date &gt;= #{releaseDateFm}</if>
+      <if test="releaseDateTo!=null and releaseDateTo!=''"> AND bfs.release_date &lt;= #{releaseDateTo}</if>
           <if test="fuzzyCondition!=null and fuzzyCondition!=''"> 
           AND(bfs.fitting_sku_name LIKE CONCAT('%','${fuzzyCondition}','%') 
           OR bfs.fitting_sku_code LIKE CONCAT('%','${fuzzyCondition}','%') 
@@ -117,6 +132,7 @@
           <if test="fittingTypeCode!=null and fittingTypeCode!=''"> AND bfs.fitting_type_code = #{fittingTypeCode}</if>
           <if test="needToAssemble!=null and needToAssemble!=''"> AND bfs.need_to_assemble = #{needToAssemble}</if>
           <if test="isShow!=null and isShow!=''"> AND bfs.is_show = #{isShow}</if>
+      <if test="releaseDate!=null and releaseDate!=''"> AND bfs.release_date = #{releaseDate}</if>
           <if test="groupCode!=null and groupCode!=''"> AND bfs.group_code = #{groupCode}</if>
           <if test="companyId!=null and companyId!=''"> AND bfs.company_id = #{companyId}</if>
   </sql>
@@ -136,7 +152,7 @@
   	INSERT INTO bd_fitting_sku
           (id, fitting_sku_code, quick_code,fitting_sku_name, fitting_sku_status, fitting_sku_remark, manufacturer, 
     materialquality, package_code, uom_desc, price, model_code, series,fitting_type_code, type,is_show, need_to_assemble,assemble_type,group_code,default_loc,min_inventory,
-    def1, def2, def3, def4, def5,last_inbound_time,last_outbound_time,create_time, creator, modify_time, modifier, rec_ver,
+    def1, def2, def3, def4, def5,last_inbound_time,last_outbound_time,release_date,label_sku_name, label_model_code, label_specification, label_packageNum, label_drawingNo,create_time, creator, modify_time, modifier, rec_ver,
     company_id)
        VALUES
   		<foreach collection="list" item="item" index="index" separator=",">
@@ -145,7 +161,8 @@
       #{item.materialquality}, #{item.packageCode}, #{item.uomDesc}, 
       #{item.price}, #{item.modelCode}, #{item.series}, #{item.fittingTypeCode},#{item.type},#{item.isShow}, #{item.needToAssemble},
             #{item.assembleType},#{item.groupCode},#{item.defaultLoc},#{item.minInventory},
-      #{item.def1}, #{item.def2}, #{item.def3}, #{item.def4}, #{item.def5}, #{item.lastInboundTime},#{item.lastOutboundTime},
+      #{item.def1}, #{item.def2}, #{item.def3}, #{item.def4}, #{item.def5}, #{item.lastInboundTime},#{item.lastOutboundTime},#{item.releaseDate},
+      #{item.labelSkuName}, #{item.labelModelCode}, #{item.labelSpecification}, #{item.labelPackageNum}, #{item.labelDrawingNo},
       #{item.createTime}, #{item.creator}, #{item.modifyTime}, #{item.modifier}, 
       #{item.recVer}, #{item.companyId})
   		</foreach>
@@ -275,6 +292,38 @@
         <trim prefix="last_outbound_time =case"  suffix="end,"  >
             <foreach collection="list" item="item" index="index">
                 when (ID=#{item.id}) then #{item.lastOutboundTime}
+            </foreach>
+        </trim>
+
+        <trim prefix="label_sku_name =case"  suffix="end,"  >
+            <foreach collection="list" item="item" index="index">
+                when (ID=#{item.id}) then #{item.labelSkuName}
+            </foreach>
+        </trim>
+        <trim prefix="label_model_code =case"  suffix="end,"  >
+            <foreach collection="list" item="item" index="index">
+                when (ID=#{item.id}) then #{item.labelModelCode}
+            </foreach>
+        </trim>
+        <trim prefix="label_specification =case"  suffix="end,"  >
+            <foreach collection="list" item="item" index="index">
+                when (ID=#{item.id}) then #{item.labelSpecification}
+            </foreach>
+        </trim>
+        <trim prefix="label_packageNum =case"  suffix="end,"  >
+            <foreach collection="list" item="item" index="index">
+                when (ID=#{item.id}) then #{item.labelPackageNum}
+            </foreach>
+        </trim>
+        <trim prefix="label_drawingNo =case"  suffix="end,"  >
+            <foreach collection="list" item="item" index="index">
+                when (ID=#{item.id}) then #{item.labelDrawingNo}
+            </foreach>
+        </trim>
+
+        <trim prefix="release_date =case"  suffix="end,"  >
+            <foreach collection="list" item="item" index="index">
+                when (ID=#{item.id}) then #{item.releaseDate}
             </foreach>
         </trim>
 		<trim prefix="modifier =case"  suffix="end,"  >

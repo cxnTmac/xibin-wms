@@ -11,6 +11,7 @@ import com.xibin.wms.dao.BdFittingSkuMapper;
 import com.xibin.wms.pojo.BdFittingSku;
 import com.xibin.wms.query.BdFittingSkuQueryItem;
 import com.xibin.wms.service.BdFittingSkuService;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
@@ -80,7 +81,25 @@ public class BdFittingSkuServiceImpl extends BaseManagerImpl implements BdFittin
 		}
 		return (BdFittingSku) this.save(model);
 	}
-
+	@Override
+	public BdFittingSku updateSkuPackageCode(String skuCode,String newPackageCode) throws BusinessException {
+		// TODO Auto-generated method stub
+		MyUserDetails myUserDetails = SecurityUtil.getMyUserDetails();
+		List<BdFittingSkuQueryItem> list = bdFittingSkuMapper.selectByKey(skuCode,
+				myUserDetails.getCompanyId().toString());
+		if (list.size() == 0) {
+			throw new BusinessException("编码：[" + skuCode + "] 不存在，无法更新包装规格！");
+		}
+		BdFittingSkuQueryItem queryItem = list.get(0);
+		BdFittingSku model = new BdFittingSku();
+		BeanUtils.copyProperties(queryItem,model);
+		if(newPackageCode!=null&&!newPackageCode.equals(model.getPackageCode())){
+			model.setPackageCode(newPackageCode);
+			return (BdFittingSku) this.save(model);
+		}else{
+			return model;
+		}
+	}
 	@Override
 	public List<BdFittingSkuQueryItem> selectByKey(String skuCode) {
 		// TODO Auto-generated method stub

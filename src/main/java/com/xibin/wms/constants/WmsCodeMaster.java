@@ -228,6 +228,18 @@ public enum WmsCodeMaster {
 	 */
 	ACT_ALLOC("ALLOC"),
 	/**
+	 * 虚拟分配
+	 */
+	ACT_VIRTUAL_ALLOC("VIRTUAL_ALLOC"),
+	/**
+	 * 通用分配
+	 */
+	ACT_GENERIC_ALLOC("GENERIC_ALLOC"),
+	/**
+	 * 重新分配
+	 */
+	ACT_RE_ALLOC("RE_ALLOC"),
+	/**
 	 * 预加工分配
 	 */
 	ACT_PRE_ASSEMBLE_ALLOC("PRE_ASSEMBLE_ALLOC"),
@@ -322,6 +334,14 @@ public enum WmsCodeMaster {
 	/**
 	 * 预加工分配
 	 */
+	ALLOC_VIRTUAL("VIRTUAL"),
+	/**
+	 * 预加工分配
+	 */
+	ALLOC_GENERIC("GENERIC"),
+	/**
+	 * 预加工分配
+	 */
 	ALLOC_ASS("ASS"),
 	/****************************************
 	 * 固定库位 WM_LOC_CODE *
@@ -346,7 +366,39 @@ public enum WmsCodeMaster {
 	/**
 	 * 到付
 	 */
-	FREIGHT_COLLCECI("COLLCECI");
+	FREIGHT_COLLCECI("COLLCECI"),
+	/**
+	 * 客户付款
+	 */
+	FREIGHT_CUSTOMER_PAID("CUSTOMER_PAID"),
+	/**
+	 * 客户付款后账上扣除
+	 */
+	FREIGHT_CUSTOMER_PAID_DEDUCTION("CUSTOMER_PAID_DEDUCTION"),
+	/**
+	 * 现金付款
+	 */
+	FREIGHT_CASH_PAID("CASH_PAID"),
+	/**
+	 * 账上扣款
+	 */
+	FREIGHT_DEBIT_ON_ACCOUNT("DEBIT_ON_ACCOUNT"),
+	/****************************************
+	 * 订单支付情况类型 WM_IS_RECEIVE_CASH *
+	 ****************************************
+	 */
+	/**
+	 * 已付
+	 */
+	IS_RECEIVE_CASH_Y("Y"),
+	/**
+	 * 未付
+	 */
+	IS_RECEIVE_CASH_N("N"),
+	/**
+	 * 非现金
+	 */
+	IS_RECEIVE_CASH_NO_CASH("NO_CASH");
 	private String code;
 
 	public String getCode() {

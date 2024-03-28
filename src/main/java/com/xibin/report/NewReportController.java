@@ -17,7 +17,9 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -41,10 +43,17 @@ public class NewReportController {
     @GetMapping("/report/{reportName}")
     public void getReportByParam(
             @PathVariable("reportName") final String reportName,
-            @RequestParam(required = false) Map<String, Object> parameters,
+            @RequestParam(required = false) Map<String, Object> parameters,@RequestParam(required = false,value = "array")String [] array,
             HttpServletResponse response) throws SQLException, ClassNotFoundException, JRException, IOException {
-
         parameters = parameters == null ? new HashMap<>() : parameters;
+        String listKey = (String) parameters.get("arrayKey");
+        if(null!=listKey&&!"".equals(listKey)){
+            List<String> list = new ArrayList<>();
+            for (String item : array) {
+                list.add(item);
+            }
+            parameters.put(listKey,list);
+        }
         //获取文件流
         ClassPathResource resource = new ClassPathResource("jaspers" + File.separator + reportName + ".jasper");
         InputStream jasperStream = resource.getInputStream();

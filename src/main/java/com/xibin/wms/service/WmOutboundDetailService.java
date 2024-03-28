@@ -33,6 +33,8 @@ public interface WmOutboundDetailService {
 
 	public Message allocByKey(String orderNo, String lineNo, String type) throws BusinessException;
 
+	public Message virtualAllocByKey(String orderNo, String lineNo, String type) throws BusinessException;
+
 	public Message cancelAllocByKey(String orderNo, String lineNo) throws BusinessException;
 
 	public List<WmOutboundDetailPriceQueryItem> queryHistoryPrice(Map map);
@@ -55,5 +57,7 @@ public interface WmOutboundDetailService {
 	public Message createCrossDockInboundByDetails(String supplierCode, String orderNo, String[] lineNos)
 			throws BusinessException;
 	public Double queryRecentPrice(String skuCode,String buyerCode);
+
+	public Message mobileScanSaveOutboundDetail(String orderNo,String skuCode,double outboundNum) throws BusinessException;
 
 }

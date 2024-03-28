@@ -29,4 +29,6 @@ public interface WmOutboundHeaderMapper extends BaseMapper {
 	String selectNextOrderNo(Map map);
 
 	String selectPreOrderNo(Map map);
+
+	Map selectRecentOrderHeaderByBuyerCode(Map map);
 }

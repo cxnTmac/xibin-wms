@@ -16,7 +16,6 @@ public class UserLoginAuthenticationProvider extends DaoAuthenticationProvider{
         @Autowired
         private PasswordEncoder encoder;
 
-
     /**
          * 找到容器中的detailsService，并执行setUserDetailsService方法，完成赋值
          *

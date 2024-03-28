@@ -19,6 +19,12 @@
     <result column="logistics_no" property="logisticsNo" jdbcType="VARCHAR" />
     <result column="freight" property="freight" jdbcType="DOUBLE" />
       <result column="freight_type" property="freightType" jdbcType="DOUBLE" />
+      <result column="is_recieved_cash" property="isRecievedCash" jdbcType="VARCHAR" />
+      <result column="total_price" property="totalPrice" jdbcType="DOUBLE" />
+      <result column="cash" property="cash" jdbcType="DOUBLE" />
+      <result column="price_different" property="priceDifferent" jdbcType="DOUBLE" />
+      <result column="payment_time" property="paymentTime" jdbcType="TIMESTAMP" />
+      <result column="payment_pic_url" property="paymentPicUrl" jdbcType="VARCHAR" />
     <result column="remark" property="remark" jdbcType="VARCHAR" />
     <result column="creator" property="creator" jdbcType="INTEGER" />
     <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
@@ -42,13 +48,20 @@
     <result column="is_cost_calculated" property="isCostCalculated" jdbcType="VARCHAR" />
     <result column="outbound_type" property="outboundType" jdbcType="VARCHAR" />
       <result column="freight_type" property="freightType" jdbcType="DOUBLE" />
+      <result column="total_price" property="totalPrice" jdbcType="DOUBLE" />
+      <result column="cash" property="cash" jdbcType="DOUBLE" />
+      <result column="price_different" property="priceDifferent" jdbcType="DOUBLE" />
+      <result column="payment_time" property="paymentTime" jdbcType="TIMESTAMP" />
+      <result column="payment_pic_url" property="paymentPicUrl" jdbcType="VARCHAR" />
     <result column="remark" property="remark" jdbcType="VARCHAR" />
     <result column="voucher_id" property="voucherId" jdbcType="INTEGER" />
     <result column="cost_voucher_id" property="costVoucherId" jdbcType="INTEGER" />
     <result column="tracking_no" property="trackingNo" jdbcType="VARCHAR" />
     <result column="logistics_no" property="logisticsNo" jdbcType="VARCHAR" />
-    <result column="logistics_company" property="logisticsCompany" jdbcType="VARCHAR" />
+    <result column="payment_category" property="paymentCategory" jdbcType="VARCHAR" />
     <result column="freight" property="freight" jdbcType="DOUBLE" />
+      <result column="is_recieved_cash" property="isRecievedCash" jdbcType="VARCHAR" />
+      <result column="logistics_company" property="logisticsCompany" jdbcType="VARCHAR" />
     <result column="creator" property="creator" jdbcType="INTEGER" />
     <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
     <result column="modifier" property="modifier" jdbcType="INTEGER" />
@@ -58,8 +71,8 @@
     <result column="warehouse_id" property="warehouseId" jdbcType="INTEGER" />
   </resultMap>
   <sql id="Base_Column_List" >
-    woh.id, woh.order_no, woh.buyer_code, woh.status,woh.order_time,woh.audit_op,woh.audit_status, woh.audit_time, woh.outbound_type, woh.is_calculated,woh.is_cost_calculated,woh.voucher_id,woh.cost_voucher_id,woh.remark, 
-    woh.tracking_no,woh.logistics_no,woh.freight,woh.freight_type,woh.creator, woh.create_time, woh.modifier, woh.modify_time, woh.rec_ver, woh.company_id, woh.warehouse_id
+    woh.id, woh.order_no, woh.buyer_code, woh.status,woh.order_time,woh.audit_op,woh.audit_status, woh.audit_time, woh.outbound_type, woh.is_calculated,woh.is_cost_calculated,woh.voucher_id,woh.cost_voucher_id,woh.total_price,woh.cash,woh.price_different,woh.payment_time,woh.payment_pic_url,woh.remark,
+    woh.tracking_no,woh.logistics_no,woh.freight,woh.freight_type,woh.is_recieved_cash,woh.creator, woh.create_time, woh.modifier, woh.modify_time, woh.rec_ver, woh.company_id, woh.warehouse_id
   </sql>
   
    <!-- 条件 -->
@@ -76,7 +89,10 @@
           <if test="orderTimeTo!=null and orderTimeTo!=''"> AND woh.order_time &lt;= #{orderTimeTo}</if>
           <if test="isCalculated!=null and isCalculated!=''"> AND woh.is_calculated = #{isCalculated}</if>
           <if test="isCostCalculated!=null and isCostCalculated!=''"> AND woh.is_cost_calculated = #{isCostCalculated}</if>
+      <if test="isRecievedCash!=null and isRecievedCash!=''"> AND woh.is_recieved_cash = #{isRecievedCash}</if>
           <if test="companyId!=null and companyId!=''"> AND woh.company_id = #{companyId}</if>
+      <if test="paymentTime!=null and paymentTime!=''"> AND woh.payment_time = #{paymentTime}</if>
+      <if test="paymentPicUrl!=null and paymentPicUrl!=''"> AND woh.payment_pic_url = #{paymentPicUrl}</if>
           <if test="warehouseId!=null and warehouseId!=''"> AND woh.warehouse_id = #{warehouseId}</if>
           <if test="multiStatus!=null and multiStatus!=''"> AND woh.status IN (${multiStatus})</if>
           <if test="fuzzyCondition!=null and fuzzyCondition!=''"> AND (woh.order_no LIKE CONCAT('%','${fuzzyCondition}','%')
@@ -95,6 +111,11 @@
           <if test="outboundType!=null and outboundType!=''"> AND woh.outbound_type = #{outboundType}</if>
           <if test="isCalculated!=null and isCalculated!=''"> AND woh.is_calculated = #{isCalculated}</if>
           <if test="isCostCalculated!=null and isCostCalculated!=''"> AND woh.is_cost_calculated = #{isCostCalculated}</if>
+      <if test="isRecievedCash!=null and isRecievedCash!=''"> AND woh.is_recieved_cash = #{isRecievedCash}</if>
+      <if test="totalPrice!=null and totalPrice!=''"> AND woh.total_price = #{totalPrice}</if>
+      <if test="cash!=null and cash!=''"> AND woh.cash = #{cash}</if>
+      <if test="paymentTime!=null and paymentTime!=''"> AND woh.payment_time = #{paymentTime}</if>
+      <if test="paymentPicUrl!=null and paymentPicUrl!=''"> AND woh.payment_pic_url = #{paymentPicUrl}</if>
           <if test="companyId!=null and companyId!=''"> AND woh.company_id = #{companyId}</if>
           <if test="warehouseId!=null and warehouseId!=''"> AND woh.warehouse_id = #{warehouseId}</if>
   </sql>
@@ -113,12 +134,12 @@
   <!-- 【固定】：插入记录（支持一条及多条） -->
   <insert id="insert" parameterType="java.util.List">
   	INSERT INTO wm_outbound_header
-          (id, order_no,buyer_code,status,order_time,audit_op,audit_status,audit_time,outbound_type,is_calculated,is_cost_calculated,voucher_id,cost_voucher_id,tracking_no,logistics_no,freight,freight_type,
-          remark,creator,create_time, modifier,modify_time,rec_ver,company_id,warehouse_id)
+          (id, order_no,buyer_code,status,order_time,audit_op,audit_status,audit_time,outbound_type,is_calculated,is_cost_calculated,voucher_id,cost_voucher_id,tracking_no,logistics_no,freight,freight_type,is_recieved_cash,
+          total_price,cash,price_different,payment_time,payment_pic_url,remark,creator,create_time, modifier,modify_time,rec_ver,company_id,warehouse_id)
        VALUES
   		<foreach collection="list" item="item" index="index" separator=",">
 	   	(#{item.id}, #{item.orderNo},#{item.buyerCode},#{item.status},#{item.orderTime},#{item.auditOp},#{item.auditStatus},#{item.auditTime},#{item.outboundType},#{item.isCalculated},#{item.isCostCalculated},#{item.voucherId},#{item.costVoucherId},
-      #{item.trackingNo},#{item.logisticsNo},#{item.freight},#{item.freightType},#{item.remark},#{item.creator},#{item.createTime}, #{item.modifier},#{item.modifyTime},#{item.recVer},#{item.companyId},#{item.warehouseId})
+      #{item.trackingNo},#{item.logisticsNo},#{item.freight},#{item.freightType},#{item.isRecievedCash},#{item.totalPrice},#{item.cash},#{item.priceDifferent},#{item.paymentTime},#{item.paymentPicUrl},#{item.remark},#{item.creator},#{item.createTime}, #{item.modifier},#{item.modifyTime},#{item.recVer},#{item.companyId},#{item.warehouseId})
   		</foreach>
   </insert>
   
@@ -215,7 +236,36 @@
                 when (ID=#{item.id}) then #{item.freightType}
             </foreach>
         </trim>
-		
+        <trim prefix="is_recieved_cash =case"  suffix="end,"  >
+            <foreach collection="list" item="item" index="index">
+                when (ID=#{item.id}) then #{item.isRecievedCash}
+            </foreach>
+        </trim>
+        <trim prefix="total_price =case"  suffix="end,"  >
+            <foreach collection="list" item="item" index="index">
+                when (ID=#{item.id}) then #{item.totalPrice}
+            </foreach>
+        </trim>
+        <trim prefix="cash =case"  suffix="end,"  >
+            <foreach collection="list" item="item" index="index">
+                when (ID=#{item.id}) then #{item.cash}
+            </foreach>
+        </trim>
+        <trim prefix="price_different =case"  suffix="end,"  >
+            <foreach collection="list" item="item" index="index">
+                when (ID=#{item.id}) then #{item.priceDifferent}
+            </foreach>
+        </trim>
+        <trim prefix="payment_time =case"  suffix="end,"  >
+            <foreach collection="list" item="item" index="index">
+                when (ID=#{item.id}) then #{item.paymentTime}
+            </foreach>
+        </trim>
+        <trim prefix="payment_pic_url =case"  suffix="end,"  >
+            <foreach collection="list" item="item" index="index">
+                when (ID=#{item.id}) then #{item.paymentPicUrl}
+            </foreach>
+        </trim>
 		<trim prefix="remark =case"  suffix="end,"  >
              <foreach collection="list" item="item" index="index">
                      when (ID=#{item.id}) then #{item.remark}
@@ -269,8 +319,9 @@
   <select id="selectAllByPage" resultMap="QueryResultMap" parameterType="Map">
     select 
     <include refid="Base_Column_List" />
-    ,bc.customer_name as buyer_name,
-    bc2.customer_name as logistics_company
+    ,bc.customer_name as buyer_name
+    ,bc.payment_category as payment_category
+    ,bc2.customer_name as logistics_company
     from wm_outbound_header woh
     left join bd_customer bc on
     bc.customer_code = woh.buyer_code
@@ -289,8 +340,9 @@
   <select id="selectByKey" resultMap="QueryResultMap" resultType="java.util.List"  parameterType="java.lang.String" >
     select 
     <include refid="Base_Column_List" />
-    ,bc.customer_name as buyer_name,
-    bc2.customer_name as logistics_company
+    ,bc.customer_name as buyer_name
+    ,bc.payment_category as payment_category
+    ,bc2.customer_name as logistics_company
     from wm_outbound_header woh
     left join bd_customer bc on
     bc.customer_code = woh.buyer_code
@@ -335,10 +387,10 @@
 		wm_outbound_header woh
 	WHERE
 		1=1
-	AND woh.id &gt; #{id}
+    AND woh.order_time &gt; #{orderTime}
 	AND woh.company_id = #{companyId,jdbcType=INTEGER}
     AND woh.warehouse_id = #{warehouseId,jdbcType=INTEGER}
-      order by woh.id
+      order by woh.order_time
     limit 1
   </select>
   <select id="selectPreOrderNo"  resultType="String"  parameterType="Map" >
@@ -349,12 +401,28 @@
 		wm_outbound_header woh
 	WHERE
 		1=1
-	AND woh.id &lt; #{id}
+    AND woh.order_time &lt; #{orderTime}
 	AND woh.company_id = #{companyId,jdbcType=INTEGER}
     AND woh.warehouse_id = #{warehouseId,jdbcType=INTEGER}
-    order by woh.id DESC
+    order by woh.order_time DESC
     limit 1
   </select>
+    <select id="selectRecentOrderHeaderByBuyerCode"  resultType="Map"  parameterType="Map" >
+        SELECT
+        <include refid="Base_Column_List" />
+        ,bc.customer_name as logistics_company
+        FROM
+        wm_outbound_header woh
+        LEFT JOIN bd_customer bc ON bc.customer_code = woh.logistics_no AND bc.company_id = woh.company_id
+        WHERE
+        1=1
+        AND woh.status IN ('80','99')
+        AND woh.buyer_code = #{buyerCode}
+        AND woh.company_id = #{companyId,jdbcType=INTEGER}
+        AND woh.warehouse_id = #{warehouseId,jdbcType=INTEGER}
+        order by woh.order_time desc
+        limit 1
+    </select>
   <update id="updateCalculateByOrderNos" parameterType="Map">
   	UPDATE wm_outbound_header woh
   	set 

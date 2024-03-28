@@ -10,10 +10,13 @@ import com.xibin.core.utils.ComputeUtil;
 import com.xibin.wms.constants.WmsCodeMaster;
 import com.xibin.wms.dao.WmAvaiableInventoryViewMapper;
 import com.xibin.wms.dao.WmInventoryMapper;
+import com.xibin.wms.dao.WmOutboundAllocMapper;
 import com.xibin.wms.entity.InventoryUpdateEntity;
 import com.xibin.wms.pojo.WmActTran;
 import com.xibin.wms.pojo.WmInventory;
+import com.xibin.wms.query.BdLocQueryItem;
 import com.xibin.wms.query.WmInventoryQueryItem;
+import com.xibin.wms.service.BdLocService;
 import com.xibin.wms.service.WmActTranService;
 import com.xibin.wms.service.WmInventoryService;
 import org.springframework.beans.BeanUtils;
@@ -25,6 +28,7 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpSession;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -36,9 +40,13 @@ public class WmInventoryServiceImpl extends BaseManagerImpl implements WmInvento
 	@Resource
 	private WmInventoryMapper wmInventoryMapper;
 	@Resource
+	private WmOutboundAllocMapper wmOutboundAllocMapper;
+	@Resource
 	private WmActTranService wmActTranService;
 	@Resource
 	private WmAvaiableInventoryViewMapper wmAvaiableInventoryViewMapper;
+	@Resource
+	private BdLocService bdLocService;
 	@Override
 	public WmInventory getInventoryById(int id) {
 		// TODO Auto-generated method stub
@@ -64,7 +72,19 @@ public class WmInventoryServiceImpl extends BaseManagerImpl implements WmInvento
 		// TODO Auto-generated method stub
 		return wmInventoryMapper;
 	}
-
+	@Override
+	public WmInventoryQueryItem saveInventory(WmInventory model) throws BusinessException {
+		// TODO Auto-generated method stub
+		MyUserDetails myUserDetails = SecurityUtil.getMyUserDetails();
+		model.setCompanyId(myUserDetails.getCompanyId());
+		model.setWarehouseId(myUserDetails.getWarehouseId());
+		this.save(model);
+		List<WmInventoryQueryItem> list = selectByKey(model.getSkuCode(),model.getLocCode(),model.getLot());
+		if (list.size() > 0) {
+			return list.get(0);
+		}
+		return null;
+	}
 	@Override
 	public WmActTran updateInventory(InventoryUpdateEntity fmIn) throws BusinessException {
 		// TODO Auto-generated method stub
@@ -84,7 +104,11 @@ public class WmInventoryServiceImpl extends BaseManagerImpl implements WmInvento
 			actTran = cancelReceiveOperation(fmIn);
 		} else if (WmsCodeMaster.ACT_ALLOC.getCode().equals(actionCode)) {
 			actTran = allocOperation(fmIn);
-		} else if (WmsCodeMaster.ACT_CANCEL_ALLOC.getCode().equals(actionCode)) {
+		} else if (WmsCodeMaster.ACT_VIRTUAL_ALLOC.getCode().equals(actionCode)) {
+			actTran = allocOperation(fmIn);
+		}  else if (WmsCodeMaster.ACT_GENERIC_ALLOC.getCode().equals(actionCode)) {
+			actTran = allocOperation(fmIn);
+		}else if (WmsCodeMaster.ACT_CANCEL_ALLOC.getCode().equals(actionCode)) {
 			actTran = cancelAllocOperation(fmIn);
 		} else if (WmsCodeMaster.ACT_CANCEL_SHIP.getCode().equals(actionCode)) {
 			actTran = cancelShipOperation(fmIn);
@@ -125,6 +149,9 @@ public class WmInventoryServiceImpl extends BaseManagerImpl implements WmInvento
 				|| WmsCodeMaster.ACT_PRE_ASSEMBLE_PICK.getCode().equals(actionCode)) {
 			// 拣货
 			actTran = pickOperation(fmIn, toIn);
+		}  else if (WmsCodeMaster.ACT_RE_ALLOC.getCode().equals(actionCode)) {
+			// 重新分配
+			actTran = reAllocOperation(fmIn, toIn);
 		} else if (WmsCodeMaster.ACT_CANCEL_PICK.getCode().equals(actionCode)
 				|| WmsCodeMaster.ACT_CANCEL_PRE_ASSEMBLE_PICK.getCode().equals(actionCode)) {
 			actTran = cancelPickOperation(fmIn, toIn);
@@ -324,7 +351,73 @@ public class WmInventoryServiceImpl extends BaseManagerImpl implements WmInvento
 		}
 		return actTran;
 	}
-
+	// 重新分配
+	private WmActTran reAllocOperation(InventoryUpdateEntity fmIn, InventoryUpdateEntity toIn) throws BusinessException {
+		MyUserDetails myUserDetails = SecurityUtil.getMyUserDetails();
+		WmActTran actTran = new WmActTran();
+		actTran.setLineNo(fmIn.getLineNo());
+		actTran.setOrderNo(fmIn.getOrderNo());
+		actTran.setOrderType(fmIn.getOrderType());
+		actTran.setTranType(fmIn.getActionCode());
+		actTran.setTranTime(new Date());
+		actTran.setFmSku(fmIn.getSkuCode());
+		actTran.setFmLot(fmIn.getLotNum());
+		actTran.setFmLoc(fmIn.getLocCode());
+		actTran.setFmQtyBefore(fmIn.getQtyOpBefore());
+		actTran.setFmQtyOp(fmIn.getQtyOp());
+		actTran.setFmQtyAfter(fmIn.getQtyOpAfter());
+		actTran.setPrice(fmIn.getPrice());
+		actTran.setToSku(fmIn.getSkuCode());
+		actTran.setToLot(fmIn.getLotNum());
+		actTran.setToLoc(fmIn.getLocCode());
+		actTran.setToQtyBefore(fmIn.getQtyOpBefore());
+		actTran.setToQtyOp(fmIn.getQtyOp());
+		actTran.setToQtyAfter(fmIn.getQtyOpAfter());
+		List<WmInventoryQueryItem> list = this.selectByKey(fmIn.getSkuCode(), fmIn.getLocCode(), fmIn.getLotNum());
+		// 有库存
+		if (!list.isEmpty()) {
+			WmInventoryQueryItem queryItem = list.get(0);
+			WmInventory targetInv = new WmInventory();
+			BeanUtils.copyProperties(queryItem, targetInv);
+			Double avg = 0.0;
+			// 分配时就计算成本
+			if(targetInv.getInvAvailableNum().doubleValue()>0.0){
+				avg = ComputeUtil.div(targetInv.getTotalPrice(), targetInv.getInvAvailableNum(), 2);
+				actTran.setCost(avg);
+			}else {
+				actTran.setCost(0.0);
+			}
+			// 重新分配不会增加分配数，因为明细都是完全发货
+			// targetInv.setAllocNum(ComputeUtil.add(targetInv.getAllocNum(), fmIn.getQtyOp()));
+			targetInv.setInvAvailableNum(ComputeUtil.sub(targetInv.getInvAvailableNum(), fmIn.getQtyOp()));
+			targetInv.setInvNum(ComputeUtil.sub(targetInv.getInvNum(), fmIn.getQtyOp()));
+			// 按照加权平均数减少库存价值
+			targetInv.setTotalPrice(ComputeUtil.sub(targetInv.getTotalPrice(), ComputeUtil.mul(avg, fmIn.getQtyOp())));
+			this.save(targetInv);
+		} else {
+			throw new BusinessException("商品[" + fmIn.getSkuCode() + "]在库位[" + fmIn.getLocCode() + "]没有库存！");
+		}
+		WmInventory toQueryExample = new WmInventory();
+		toQueryExample.setSkuCode(toIn.getSkuCode());
+		toQueryExample.setLocCode(toIn.getLocCode());
+		toQueryExample.setCompanyId(myUserDetails.getCompanyId());
+		toQueryExample.setWarehouseId(myUserDetails.getWarehouseId());
+		List<WmInventory> toInventoryList = selectByExample(toQueryExample);
+		// 获取到目标虚拟库存
+		if (toInventoryList.size() > 0) {
+			WmInventory toInventory = toInventoryList.get(0);
+			actTran.setToQtyBefore(toInventory.getInvAvailableNum());
+			actTran.setToQtyAfter(ComputeUtil.add(toInventory.getInvAvailableNum(), toIn.getQtyOp()));
+			// 虚拟库存增加，抵消掉负数
+			toInventory.setInvNum(ComputeUtil.add(toInventory.getInvNum(), toIn.getQtyOp()));
+			toInventory.setInvAvailableNum(ComputeUtil.add(toInventory.getInvAvailableNum(), toIn.getQtyOp()));
+			// 库存价值增加
+			this.save(toInventory);
+		} else {
+			throw new BusinessException("商品[" + fmIn.getSkuCode() + "]没有虚拟库存，数据可能存在问题，请联系管理员");
+		}
+		return actTran;
+	}
 	private WmActTran pickOperation(InventoryUpdateEntity fmIn, InventoryUpdateEntity toIn) throws BusinessException {
 		MyUserDetails myUserDetails = SecurityUtil.getMyUserDetails();
 		WmActTran actTran = new WmActTran();
@@ -967,10 +1060,14 @@ public class WmInventoryServiceImpl extends BaseManagerImpl implements WmInvento
 			WmInventoryQueryItem queryItem = list.get(0);
 			WmInventory targetInv = new WmInventory();
 			BeanUtils.copyProperties(queryItem, targetInv);
+			Double avg = 0.0;
 			// 分配时就计算成本
-			Double avg = ComputeUtil.div(targetInv.getTotalPrice(), targetInv.getInvAvailableNum(), 2);
-			actTran.setCost(avg);
-
+			if(targetInv.getInvAvailableNum().doubleValue()>0.0){
+				avg = ComputeUtil.div(targetInv.getTotalPrice(), targetInv.getInvAvailableNum(), 2);
+				actTran.setCost(avg);
+			}else {
+				actTran.setCost(0.0);
+			}
 			targetInv.setAllocNum(ComputeUtil.add(targetInv.getAllocNum(), fmIn.getQtyOp()));
 			targetInv.setInvAvailableNum(ComputeUtil.sub(targetInv.getInvAvailableNum(), fmIn.getQtyOp()));
 			// 按照加权平均数减少库存价值
@@ -1163,7 +1260,11 @@ public class WmInventoryServiceImpl extends BaseManagerImpl implements WmInvento
 		// TODO Auto-generated method stub
 		return wmInventoryMapper.getAvailableInvByExample(model);
 	}
-
+	@Override
+	public List<WmInventory> getVirtualInvByExample(WmInventory model) {
+		// TODO Auto-generated method stub
+		return wmInventoryMapper.getVirtualInvByExample(model);
+	}
 	@Override
 	public List<WmInventoryQueryItem> getAvailableInvByPage(Map map) {
 		// TODO Auto-generated method stub
@@ -1237,4 +1338,62 @@ public class WmInventoryServiceImpl extends BaseManagerImpl implements WmInvento
 		return wmAvaiableInventoryViewMapper.selectAllByPage(map);
 	}
 
+	@Override
+	public Map<String, Object> getMaxInventoryBySkuCode(Map map) {
+		return wmInventoryMapper.getMaxInventoryBySkuCode(map);
+	}
+
+	@Override
+	public Message changeLocByAlloc(String skuCode, String targetLocCode) throws BusinessException{
+		Message message = new Message();
+		MyUserDetails myUserDetails = SecurityUtil.getMyUserDetails();
+		List<BdLocQueryItem> locQueryItems = this.bdLocService.selectByKey(targetLocCode);
+		if(locQueryItems.size()==0){
+			throw new BusinessException("库位[" + targetLocCode + "]不存在，请确认库位编码是否有误差！");
+		}
+		WmInventory queryExample = new WmInventory();
+		queryExample.setSkuCode(skuCode);
+		queryExample.setCompanyId(myUserDetails.getCompanyId());
+		queryExample.setWarehouseId(myUserDetails.getWarehouseId());
+		List<WmInventory> invs =this.wmInventoryMapper.getStorageInvByExample(queryExample);
+		double sumOfAllocNum = 0.0;
+		double sumOfAvailableInvNum = 0.0;
+		double sumOfInvNum = 0.0;
+		double sumOfTotalPrice = 0.0;
+		WmInventory targetInv = null;
+		for(WmInventory inv :invs){
+			sumOfAllocNum+=inv.getAllocNum();
+			sumOfAvailableInvNum+=inv.getInvAvailableNum();
+			sumOfInvNum+=inv.getInvNum();
+			sumOfTotalPrice+=inv.getTotalPrice();
+			// 在目标库位已经有库存记录
+			if(inv.getLocCode().equals(targetLocCode)){
+				targetInv = inv;
+			}else{
+				this.delete(inv.getId());
+			}
+		}
+		if(targetInv==null){
+			targetInv = new WmInventory();
+			targetInv.setSkuCode(skuCode);
+			targetInv.setLocCode(targetLocCode);
+			targetInv.setCompanyId(myUserDetails.getCompanyId());
+			targetInv.setWarehouseId(myUserDetails.getWarehouseId());
+		}
+		targetInv.setAllocNum(sumOfAllocNum);
+		targetInv.setInvAvailableNum(sumOfAvailableInvNum);
+		targetInv.setInvNum(sumOfInvNum);
+		targetInv.setTotalPrice(sumOfTotalPrice);
+		this.save(targetInv);
+		// 更新所有订单尚未关闭的分配明细的 分配库位
+		Map updateMap = new HashMap();
+		updateMap.put("targetLoc",targetLocCode);
+		updateMap.put("skuCode",skuCode);
+		updateMap.put("companyId",myUserDetails.getCompanyId().toString());
+		updateMap.put("warehouseId",myUserDetails.getWarehouseId().toString());
+		this.wmOutboundAllocMapper.changeLocForNotClosedOrder(updateMap);
+		message.setCode(200);
+		message.setMsg("产品编码["+skuCode+"]已将所有存储库存移动到库位["+targetLocCode+"]");
+		return message;
+	}
 }

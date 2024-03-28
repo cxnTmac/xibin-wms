@@ -1,8 +1,8 @@
 package com.xibin.wms.pojo;
 
-import java.util.Date;
-
 import com.xibin.core.daosupport.BaseModel;
+
+import java.util.Date;
 
 public class BdFittingSkuGroup extends BaseModel {
 	private Integer id;
@@ -10,6 +10,10 @@ public class BdFittingSkuGroup extends BaseModel {
 	private String groupCode;
 
 	private String groupName;
+
+	private String skuCode;
+
+	private String mainSku;
 
 	private String description;
 
@@ -127,4 +131,19 @@ public class BdFittingSkuGroup extends BaseModel {
 		this.description = description;
 	}
 
+	public String getSkuCode() {
+		return skuCode;
+	}
+
+	public void setSkuCode(String skuCode) {
+		this.skuCode = skuCode;
+	}
+
+	public String getMainSku() {
+		return mainSku;
+	}
+
+	public void setMainSku(String mainSku) {
+		this.mainSku = mainSku;
+	}
 }

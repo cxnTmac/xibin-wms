@@ -11,6 +11,7 @@
       <result column="type" property="type" jdbcType="VARCHAR" />
       <result column="voucher_id" property="voucherId" jdbcType="INTEGER" />
       <result column="date" property="date" jdbcType="TIMESTAMP" />
+      <result column="pic_url" property="picUrl" jdbcType="VARCHAR" />
     <result column="remark" property="remark" jdbcType="VARCHAR" />
     <result column="creator" property="creator" jdbcType="INTEGER" />
     <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
@@ -31,6 +32,7 @@
         <result column="type" property="type" jdbcType="VARCHAR" />
         <result column="voucher_id" property="voucherId" jdbcType="INTEGER" />
         <result column="date" property="date" jdbcType="TIMESTAMP" />
+        <result column="pic_url" property="picUrl" jdbcType="VARCHAR" />
         <result column="remark" property="remark" jdbcType="VARCHAR" />
         <result column="creator" property="creator" jdbcType="INTEGER" />
         <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
@@ -40,7 +42,7 @@
         <result column="company_id" property="companyId" jdbcType="INTEGER" />
     </resultMap>
   <sql id="Base_Column_List" >
-    bcr.id, bcr.customer_code, bcr.abstractt, bcr.auxi_id,bcr.order_no,bcr.pay,bcr.type,bcr.voucher_id,bcr.date,
+    bcr.id, bcr.customer_code, bcr.abstractt, bcr.auxi_id,bcr.order_no,bcr.pay,bcr.type,bcr.voucher_id,bcr.date,bcr.pic_url,
       bcr.remark, bcr.creator, bcr.create_time, bcr.modifier, bcr.modify_time, bcr.rec_ver,
       bcr.company_id
   </sql>
@@ -67,7 +69,7 @@
       <if test="customerCode!=null and customerCode!=''"> AND bcr.customer_code = #{customerCode}</if>
       <if test="orderNo!=null and orderNo!=''"> AND bcr.order_no = #{orderNo}</if>
       <if test="abstractt!=null and abstractt!=''"> AND bcr.abstractt = #{abstractt}</if>
-      <if test="type!=null and type!=''"> AND bcr.abstractt = #{type}</if>
+      <if test="type!=null and type!=''"> AND bcr.type = #{type}</if>
       <if test="voucherId!=null and voucherId!=''"> AND bcr.voucher_id = #{voucherId}</if>
       <if test="companyId!=null and companyId!=''"> AND bcr.company_id = #{companyId}</if>
   </sql>
@@ -85,11 +87,11 @@
   <!-- 【固定】：插入记录（支持一条及多条） -->
   <insert id="insert" parameterType="java.util.List">
   	INSERT INTO bs_customer_record
-          (id, customer_code, abstractt, auxi_id,order_no,pay,type,voucher_id,date,remark, creator, create_time, modifier, modify_time, rec_ver,
+          (id, customer_code, abstractt, auxi_id,order_no,pay,type,voucher_id,date,pic_url,remark, creator, create_time, modifier, modify_time, rec_ver,
     company_id)
        VALUES
   		<foreach collection="list" item="item" index="index" separator=",">
-	   		(#{item.id}, #{item.customerCode}, #{item.abstractt}, #{item.auxiId},#{item.orderNo},#{item.pay},#{item.type},#{item.voucherId},#{item.date},
+	   		(#{item.id}, #{item.customerCode}, #{item.abstractt}, #{item.auxiId},#{item.orderNo},#{item.pay},#{item.type},#{item.voucherId},#{item.date},#{item.picUrl},
             #{item.remark},#{item.creator},#{item.createTime}, #{item.modifier},  #{item.modifyTime},
       #{item.recVer}, #{item.companyId})
   		</foreach>
@@ -148,7 +150,11 @@
                 when (ID=#{item.id}) then #{item.date}
             </foreach>
         </trim>
-
+        <trim prefix="pic_url =case"  suffix="end,"  >
+            <foreach collection="list" item="item" index="index">
+                when (ID=#{item.id}) then #{item.picUrl}
+            </foreach>
+        </trim>
 		<trim prefix="remark =case"  suffix="end,"  >
              <foreach collection="list" item="item" index="index">
                      when (ID=#{item.id}) then #{item.remark}
@@ -198,6 +204,7 @@
     from bs_customer_record bcr
       left join bd_customer bc on bc.customer_code = bcr.customer_code and bc.company_id = bcr.company_id
     <include refid="findByConditionWhere" />
+      ORDER BY bcr.date
   </select>
   <select id="selectByExample" resultMap="BaseResultMap" parameterType="com.xibin.wms.pojo.BdArea">
     select 
@@ -219,69 +226,178 @@
 
 
 
+<!--    <select id="monthReport" resultType="Map"  parameterType="Map" >-->
+<!--        SELECT bc.customer_name,SALE.pay AS salePay,RECEIVE.pay AS receivePay,DIS.pay AS disPay,RE.pay AS rePay,FREIGHT.pay AS freightPay,bc.balance+BALANCE.balance AS balance-->
+<!--        FROM bd_customer bc-->
+<!--        LEFT JOIN-->
+<!--        (-->
+<!--        SELECT bcr.customer_code, SUM(bcr.pay) AS pay,bcr.company_id-->
+<!--        FROM bs_customer_record bcr-->
+<!--        WHERE-->
+<!--        1=1-->
+<!--        <if test="dateFm!=null and dateFm!=''"> AND bcr.date &gt;= #{dateFm}</if>-->
+<!--        <if test="dateTo!=null and dateTo!=''"> AND bcr.date &lt; #{dateTo} </if>-->
+<!--        AND bcr.`type` IN ('X_SALE','S_SALE')-->
+<!--        GROUP BY bcr.customer_code) SALE ON SALE.customer_code = bc.customer_code AND SALE.company_id = bc.company_id-->
+<!--        LEFT JOIN-->
+<!--        (-->
+<!--        SELECT bcr.customer_code, SUM(bcr.pay) AS pay,bcr.company_id-->
+<!--        FROM bs_customer_record bcr-->
+<!--        WHERE-->
+<!--        1=1-->
+<!--        <if test="dateFm!=null and dateFm!=''"> AND bcr.date &gt;= #{dateFm}</if>-->
+<!--        <if test="dateTo!=null and dateTo!=''"> AND bcr.date &lt; #{dateTo} </if>-->
+<!--        AND bcr.`type` IN ('RECEIVE')-->
+<!--        GROUP BY bcr.customer_code) RECEIVE ON RECEIVE.customer_code = bc.customer_code AND RECEIVE.company_id = bc.company_id-->
+<!--        LEFT JOIN-->
+<!--        (-->
+<!--        SELECT bcr.customer_code, SUM(bcr.pay) AS pay,bcr.company_id-->
+<!--        FROM bs_customer_record bcr-->
+<!--        WHERE-->
+<!--        1=1-->
+<!--        <if test="dateFm!=null and dateFm!=''"> AND bcr.date &gt;= #{dateFm}</if>-->
+<!--        <if test="dateTo!=null and dateTo!=''"> AND bcr.date &lt; #{dateTo} </if>-->
+<!--        AND bcr.`type` IN ('DISCOUNT','PRICE_DIFFRENCT')-->
+<!--        GROUP BY bcr.customer_code) DIS ON DIS.customer_code = bc.customer_code AND DIS.company_id = bc.company_id-->
+<!--        LEFT JOIN-->
+<!--        (-->
+<!--        SELECT bcr.customer_code, SUM(bcr.pay) AS pay,bcr.company_id-->
+<!--        FROM bs_customer_record bcr-->
+<!--        WHERE-->
+<!--        1=1-->
+<!--        <if test="dateFm!=null and dateFm!=''"> AND bcr.date &gt;= #{dateFm}</if>-->
+<!--        <if test="dateTo!=null and dateTo!=''"> AND bcr.date &lt; #{dateTo} </if>-->
+<!--        AND bcr.`type` IN ('RETURN')-->
+<!--        GROUP BY bcr.customer_code) RE ON RE.customer_code = bc.customer_code AND RE.company_id = bc.company_id-->
+<!--        LEFT JOIN-->
+<!--        (-->
+<!--        SELECT bcr.customer_code, SUM(bcr.pay) AS pay,bcr.company_id-->
+<!--        FROM bs_customer_record bcr-->
+<!--        WHERE-->
+<!--        1=1-->
+<!--        <if test="dateFm!=null and dateFm!=''"> AND bcr.date &gt;= #{dateFm}</if>-->
+<!--        <if test="dateTo!=null and dateTo!=''"> AND bcr.date &lt; #{dateTo} </if>-->
+<!--        AND bcr.`type` IN ('FREIGHT_COLLECT')-->
+<!--        GROUP BY bcr.customer_code) FREIGHT ON FREIGHT.customer_code = bc.customer_code AND FREIGHT.company_id = bc.company_id-->
+<!--        LEFT JOIN-->
+<!--        (-->
+<!--        SELECT bcr.customer_code,SUM(IF(bcr.`type` IN ('X_SALE','S_SALE','X_PURCHASE','S_PURCHASE'),bcr.pay,-bcr.pay)) AS balance,bcr.company_id-->
+<!--        FROM bs_customer_record bcr-->
+<!--        GROUP BY bcr.customer_code) BALANCE ON BALANCE.customer_code = bc.customer_code AND BALANCE.company_id = bc.company_id-->
+<!--        WHERE-->
+<!--        1=1-->
+<!--        <if test="dateTo!=null and dateTo!=''"> AND bcr.date &lt; #{dateFm} </if>-->
+<!--        AND bc.customer_type LIKE CONCAT('%','${customerType}','%')-->
+<!--        AND bc.company_id  = #{companyId}-->
+<!--        ORDER BY SALE.pay DESC-->
+<!--    </select>-->
+
     <select id="monthReport" resultType="Map"  parameterType="Map" >
-        SELECT bc.customer_name,SALE.pay AS salePay,RECEIVE.pay AS receivePay,DIS.pay AS disPay,RE.pay AS rePay,FREIGHT.pay AS freightPay,bc.balance+BALANCE.balance AS balance
-        FROM bd_customer bc
-        LEFT JOIN
+        SELECT
+        X1.SALE AS salePay,X1.RECEIVE AS receivePay,X1.DIS AS disPay,X1.RE AS rePay,X2.FREIGHT AS freightPay,
+        B.current_balance AS balance,B.customer_name AS customer_name
+        FROM
         (
-        SELECT bcr.customer_code, SUM(bcr.pay) AS pay,bcr.company_id
-        FROM bs_customer_record bcr
+        SELECT
+        bsr.customer_code AS 'cusotomer_code',
+        SUM(
+
+        IF (
+        bsr.type = 'S_SALE'
+        OR bsr.type = 'X_SALE'
+        ,
+        bsr.pay,
+        0
+        )
+        ) AS 'SALE',
+        SUM(
+
+        IF (
+        bsr.type = 'RECEIVE',
+        bsr.pay,
+        0
+        )
+        ) AS 'RECEIVE',
+        SUM(
+
+        IF (
+        bsr.type = 'PRICE_DIFFRENCT'
+        OR bsr.type = 'ABSENCE_PAY'
+        OR bsr.type = 'DISCOUNT',
+        bsr.pay,
+        0
+        )
+        ) AS 'DIS',
+        SUM(
+
+        IF (
+        bsr.type = 'RETURN_INBOUND',
+        bsr.pay,
+        0
+        )
+        ) AS 'RE'
+        FROM
+        bs_customer_record bsr
         WHERE
         1=1
-        <if test="dateFm!=null and dateFm!=''"> AND bcr.date &gt;= #{dateFm}</if>
-        <if test="dateTo!=null and dateTo!=''"> AND bcr.date &lt; #{dateTo} </if>
-        AND bcr.`type` IN ('X_SALE','S_SALE')
-        GROUP BY bcr.customer_code) SALE ON SALE.customer_code = bc.customer_code AND SALE.company_id = bc.company_id
-        LEFT JOIN
-        (
-        SELECT bcr.customer_code, SUM(bcr.pay) AS pay,bcr.company_id
-        FROM bs_customer_record bcr
+        <if test="dateFm!=null and dateFm!=''"> AND bsr.date &gt;= #{dateFm}</if>
+        <if test="dateTo!=null and dateTo!=''"> AND bsr.date &lt; #{dateTo} </if>
+        GROUP BY
+        bsr.customer_code
+        ) AS X1
+        LEFT JOIN (
+        SELECT
+        woh.buyer_code AS 'buyer_code',
+        SUM(
+
+        IF (
+        bsr.type = 'FREIGHT_PAID',
+        bsr.pay,
+        0
+        )
+        ) AS 'FREIGHT'
+        FROM
+        bs_customer_record bsr
+        LEFT JOIN wm_outbound_header woh ON bsr.order_no = woh.order_no
+        AND bsr.company_id = woh.company_id
         WHERE
         1=1
-        <if test="dateFm!=null and dateFm!=''"> AND bcr.date &gt;= #{dateFm}</if>
-        <if test="dateTo!=null and dateTo!=''"> AND bcr.date &lt; #{dateTo} </if>
-        AND bcr.`type` IN ('RECEIVE')
-        GROUP BY bcr.customer_code) RECEIVE ON RECEIVE.customer_code = bc.customer_code AND RECEIVE.company_id = bc.company_id
-        LEFT JOIN
-        (
-        SELECT bcr.customer_code, SUM(bcr.pay) AS pay,bcr.company_id
-        FROM bs_customer_record bcr
+        <if test="dateFm!=null and dateFm!=''"> AND bsr.date &gt;= #{dateFm}</if>
+        <if test="dateTo!=null and dateTo!=''"> AND bsr.date &lt; #{dateTo} </if>
+        GROUP BY
+        woh.buyer_code
+        ) AS X2 ON X1.cusotomer_code = X2.buyer_code
+        LEFT JOIN (
+        SELECT
+        bsr.customer_code AS B_customer_code,
+        bc.customer_name AS customer_name,
+        SUM(
+
+        IF (
+        bsr.type IN (
+        'X_SALE',
+        'S_SALE',
+        'X_PURCHASE',
+        'S_PURCHASE'
+        ),
+        pay ,- pay
+        )
+        ) + bc.balance AS current_balance
+        FROM
+        bs_customer_record bsr
+        LEFT JOIN bd_customer bc ON bc.customer_code = bsr.customer_code
         WHERE
         1=1
-        <if test="dateFm!=null and dateFm!=''"> AND bcr.date &gt;= #{dateFm}</if>
-        <if test="dateTo!=null and dateTo!=''"> AND bcr.date &lt; #{dateTo} </if>
-        AND bcr.`type` IN ('DISCOUNT','PRICE_DIFFRENCT')
-        GROUP BY bcr.customer_code) DIS ON DIS.customer_code = bc.customer_code AND DIS.company_id = bc.company_id
-        LEFT JOIN
-        (
-        SELECT bcr.customer_code, SUM(bcr.pay) AS pay,bcr.company_id
-        FROM bs_customer_record bcr
+        <if test="dateTo!=null and dateTo!=''"> AND bsr.date &lt; #{dateTo} </if>
+        GROUP BY
+        bsr.customer_code
+        ) AS B ON X1.cusotomer_code = B.B_customer_code
         WHERE
-        1=1
-        <if test="dateFm!=null and dateFm!=''"> AND bcr.date &gt;= #{dateFm}</if>
-        <if test="dateTo!=null and dateTo!=''"> AND bcr.date &lt; #{dateTo} </if>
-        AND bcr.`type` IN ('RETURN')
-        GROUP BY bcr.customer_code) RE ON RE.customer_code = bc.customer_code AND RE.company_id = bc.company_id
-        LEFT JOIN
-        (
-        SELECT bcr.customer_code, SUM(bcr.pay) AS pay,bcr.company_id
-        FROM bs_customer_record bcr
-        WHERE
-        1=1
-        <if test="dateFm!=null and dateFm!=''"> AND bcr.date &gt;= #{dateFm}</if>
-        <if test="dateTo!=null and dateTo!=''"> AND bcr.date &lt; #{dateTo} </if>
-        AND bcr.`type` IN ('FREIGHT_COLLECT')
-        GROUP BY bcr.customer_code) FREIGHT ON FREIGHT.customer_code = bc.customer_code AND FREIGHT.company_id = bc.company_id
-        LEFT JOIN
-        (
-        SELECT bcr.customer_code,SUM(IF(bcr.`type` IN ('X_SALE','S_SALE','X_PURCHASE','S_PURCHASE'),bcr.pay,-bcr.pay)) AS balance,bcr.company_id
-        FROM bs_customer_record bcr
-        GROUP BY bcr.customer_code) BALANCE ON BALANCE.customer_code = bc.customer_code AND BALANCE.company_id = bc.company_id
-        WHERE
-        1=1
-        <if test="dateTo!=null and dateTo!=''"> AND bcr.date &lt; #{dateFm} </if>
-        AND bc.customer_type LIKE CONCAT('%','${customerType}','%')
-        AND bc.company_id  = #{companyId}
-        ORDER BY SALE.pay DESC
+        X1.SALE > 0
+        OR X1.RECEIVE > 0
+        OR X1.DIS > 0
+        OR X1.RE > 0
+        OR X2.FREIGHT > 0
+        ORDER BY X1.SALE DESC
     </select>
 </mapper>

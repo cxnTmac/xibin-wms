@@ -56,7 +56,8 @@ public class WmOutboundDetailServiceImpl extends BaseManagerImpl implements WmOu
 	private WmInboundHeaderService wmInboundHeaderService;
 	@Autowired
 	private WmInboundDetailMapper wmInboundDetailMapper;
-
+	@Autowired
+	private BdFittingSkuGroupMapper bdFittingSkuGroupMapper;
 	@Autowired
 	private WmInboundRecieveMapper wmInboundRecieveMapper;
 	@Resource
@@ -276,7 +277,71 @@ public class WmOutboundDetailServiceImpl extends BaseManagerImpl implements WmOu
 		this.save(model);
 		return this.selectByKey(model.getOrderNo(), model.getLineNo()).get(0);
 	}
-
+    private void getGenericSkuForDetail(WmOutboundDetail model){
+		MyUserDetails myUserDetails = SecurityUtil.getMyUserDetails();
+		BdFittingSkuGroup queryExample = new BdFittingSkuGroup();
+		queryExample.setCompanyId(myUserDetails.getCompanyId());
+		queryExample.setSkuCode(model.getSkuCode());
+		List<BdFittingSkuGroup> groupDetails = this.bdFittingSkuGroupMapper.selectByExample(queryExample);
+		if(groupDetails.size()>0){
+			BdFittingSkuGroup group = groupDetails.get(0);
+			if(!group.getSkuCode().equals(group.getMainSku())){
+				model.setGenericSkuCode(group.getMainSku());
+			}
+		}
+	}
+	@Override
+	public Message mobileScanSaveOutboundDetail(String orderNo,String skuCode,double outboundNum) throws BusinessException {
+		Message message = new Message();
+		WmOutboundDetail queryExample = new WmOutboundDetail();
+		MyUserDetails myUserDetails = SecurityUtil.getMyUserDetails();
+		queryExample.setCompanyId(myUserDetails.getCompanyId());
+		queryExample.setWarehouseId(myUserDetails.getWarehouseId());
+		queryExample.setOrderNo(orderNo);
+		queryExample.setSkuCode(skuCode);
+		List<WmOutboundDetail> queryResults = this.selectByExample(queryExample);
+		if(queryResults.size()>0){
+			WmOutboundDetail newDetail = queryResults.get(0);
+			if(newDetail.getOutboundNum()+outboundNum<=0.0){
+				// 减少的数量已经小于0，则删除明细
+				this.delete(newDetail.getId());
+				message.setMsg("发货数减少后已经小于0，删除行号["+newDetail.getLineNo()+"]产品编码["+newDetail.getSkuCode()+"]的明细！");
+			}else{
+				// 更新明细
+				newDetail.setOutboundNum(newDetail.getOutboundNum()+outboundNum);
+				this.saveOutboundDetail(newDetail);
+			}
+		}else{
+			List<WmOutboundHeaderQueryItem> orderHeaderList = this.wmOutboundHeaderService.selectByKey(orderNo);
+			if(orderHeaderList.size()>0){
+				WmOutboundHeaderQueryItem orderHeader = orderHeaderList.get(0);
+				WmOutboundDetail newDetail = new WmOutboundDetail();
+				newDetail.setOrderNo(orderNo);
+				newDetail.setSkuCode(skuCode);
+				newDetail.setStatus(WmsCodeMaster.SO_NEW.getCode());
+				newDetail.setBuyerCode(orderHeader.getBuyerCode());
+				newDetail.setSkuCode(skuCode);
+				newDetail.setOutboundNum(outboundNum);
+				newDetail.setOutboundOriginNum(outboundNum);
+				newDetail.setOutboundAllocNum(0.0);
+				newDetail.setOutboundPickNum(0.0);
+				newDetail.setOutboundShipNum(0.0);
+				newDetail.setPlanShipLoc("SORTATION");
+				Double recentPrice = this.queryRecentPrice(skuCode,orderHeader.getBuyerCode());
+				if(recentPrice == null||recentPrice.doubleValue() == 0.0){
+					message.setMsg("未查到产品编码["+newDetail.getSkuCode()+"]的最近售价！");
+					newDetail.setOutboundPrice(0.0);
+				}else{
+					newDetail.setOutboundPrice(recentPrice);
+				}
+				this.saveOutboundDetail(newDetail);
+			}else{
+				throw new BusinessException("出库单单号：["+orderNo+"]不存在！");
+			}
+		}
+		message.setCode(200);
+		return message;
+	}
 	@Override
 	public WmOutboundDetailQueryItem saveOutboundDetail(WmOutboundDetail model) throws BusinessException {
 		// int i = 1 / 0;
@@ -288,6 +353,8 @@ public class WmOutboundDetailServiceImpl extends BaseManagerImpl implements WmOu
 		MyUserDetails myUserDetails = SecurityUtil.getMyUserDetails();
 		model.setCompanyId(myUserDetails.getCompanyId());
 		model.setWarehouseId(myUserDetails.getWarehouseId());
+		// 查询通用主产品
+		this.getGenericSkuForDetail(model);
 		if (null == model.getId() || 0 == model.getId()) {
 			List<Integer> lastLineNo = selectLastLineNo(model.getOrderNo(), model.getCompanyId().toString(),
 					model.getWarehouseId().toString());
@@ -364,11 +431,14 @@ public class WmOutboundDetailServiceImpl extends BaseManagerImpl implements WmOu
 				detail.setOrderNo(header.getOrderNo());
 				detail.setOutboundAllocNum(0.0);
 				detail.setOutboundNum(entity.getOutboundNum());
+				detail.setOutboundOriginNum(entity.getOutboundNum());
 				detail.setOutboundPickNum(0.0);
 				detail.setOutboundPrice(entity.getOutboundPrice());
 				detail.setOutboundShipNum(0.0);
 				detail.setPlanShipLoc(loc);
 				detail.setSkuCode(entity.getFittingSkuCode());
+				// 查询通用主产品
+				this.getGenericSkuForDetail(detail);
                 // 没有价格自动查询最近售价
                 if((entity.getOutboundPrice() == null||entity.getOutboundPrice().doubleValue() == 0.0)&&isQueryRecentPrice.equals("true")){
                     Double recentPrice = this.queryRecentPrice(detail.getSkuCode(),buyerCode);
@@ -577,6 +647,12 @@ public class WmOutboundDetailServiceImpl extends BaseManagerImpl implements WmOu
 		// 如果出库单明细不等于完全分配/部分分配
 		if (WmsCodeMaster.SO_FULL_ALLOC.getCode().equals(detail.getStatus())
 				|| WmsCodeMaster.SO_PART_ALLOC.getCode().equals(detail.getStatus())) {
+			String targetSkuCode = null;
+			if(null!=detail.getGenericSkuCode()&&!"".equals(detail.getGenericSkuCode())){
+				targetSkuCode = detail.getGenericSkuCode();
+			}else{
+				targetSkuCode = detail.getSkuCode();
+			}
 			WmOutboundAlloc allocQueryExample = new WmOutboundAlloc();
 			allocQueryExample.setOrderNo(detail.getOrderNo());
 			allocQueryExample.setLineNo(detail.getLineNo());
@@ -590,7 +666,8 @@ public class WmOutboundDetailServiceImpl extends BaseManagerImpl implements WmOu
 				allocIds[i] = allocList.get(i).getId();
 				// 更新库存
 				InventoryUpdateEntity entity = new InventoryUpdateEntity();
-				if (WmsCodeMaster.ALLOC_AUTO.getCode().equals(allocList.get(i).getAllocType())) {
+				if (WmsCodeMaster.ALLOC_AUTO.getCode().equals(allocList.get(i).getAllocType())||WmsCodeMaster.ALLOC_VIRTUAL.getCode().equals(allocList.get(i).getAllocType())
+						||WmsCodeMaster.ALLOC_GENERIC.getCode().equals(allocList.get(i).getAllocType())) {
 					entity.setActionCode(WmsCodeMaster.ACT_CANCEL_ALLOC.getCode());
 				} else if (WmsCodeMaster.ALLOC_ASS.getCode().equals(allocList.get(i).getAllocType())) {
 					entity.setActionCode(WmsCodeMaster.ACT_CANCEL_PRE_ASSEMBLE_ALLOC.getCode());
@@ -599,7 +676,7 @@ public class WmOutboundDetailServiceImpl extends BaseManagerImpl implements WmOu
 				entity.setLocCode(allocList.get(i).getAllocLocCode());
 				entity.setOrderNo(detail.getOrderNo());
 				entity.setOrderType(WmsCodeMaster.ORDER_OUB.getCode());
-				entity.setSkuCode(allocList.get(i).getSkuCode());
+				entity.setSkuCode(targetSkuCode);
 				entity.setQtyOp(allocList.get(i).getOutboundNum());
 				entity.setPrice(allocList.get(i).getOutboundPrice());
 				entity.setCost(allocList.get(i).getCost());
@@ -734,6 +811,93 @@ public class WmOutboundDetailServiceImpl extends BaseManagerImpl implements WmOu
 		}
 		return message;
 	}
+	// 执行通用产品分配
+	// 执行虚拟分配
+	// @param: detail 必须为实时从数据库中获取到的数据
+	private Message virtualAlloc(WmOutboundDetail detail) throws BusinessException {
+		Message message = new Message();
+		MyUserDetails myUserDetails = SecurityUtil.getMyUserDetails();
+		if (WmsCodeMaster.SO_PART_ALLOC.getCode().equals(detail.getStatus())
+				|| WmsCodeMaster.SO_NEW.getCode().equals(detail.getStatus())) {
+			String targetSkuCode = null;
+			if(null!=detail.getGenericSkuCode()&&!"".equals(detail.getGenericSkuCode())){
+				targetSkuCode = detail.getGenericSkuCode();
+			}else{
+				targetSkuCode = detail.getSkuCode();
+			}
+			WmInventory example = new WmInventory();
+			example.setSkuCode(targetSkuCode);
+			example.setCompanyId(myUserDetails.getCompanyId());
+			// 查询虚拟库存
+			example.setLocCode("VIRTUAL");
+			example.setWarehouseId(myUserDetails.getWarehouseId());
+			List<WmInventory> inventoryRecords = wmInventoryService.getVirtualInvByExample(example);
+			WmInventory virtualInventoryRecord = new WmInventory();
+			if(inventoryRecords.size() == 0){
+				// 如果虚拟库存不存在，则创造一条新的虚拟库存
+				example.setAllocNum(0.0);
+				example.setInvNum(0.0);
+				example.setInvAvailableNum(0.0);
+				example.setPreAssembleNum(0.0);
+				example.setTotalPrice(0.0);
+				WmInventoryQueryItem queryItem = wmInventoryService.saveInventory(example);
+				BeanUtils.copyProperties(queryItem,virtualInventoryRecord);
+			}else{
+				// 正常情况下虚拟库存只有一条记录
+				virtualInventoryRecord = inventoryRecords.get(0);
+			}
+			double totalCost = ComputeUtil.mul(detail.getCost() != null ? detail.getCost() : 0.0,
+					detail.getOutboundAllocNum());
+			// 获得需要分配的数量 = 订货数 - 分配数
+			double outboundNumForCalculate = ComputeUtil.sub(detail.getOutboundNum(), detail.getOutboundAllocNum());
+				WmOutboundAlloc alloc = new WmOutboundAlloc();
+				alloc.setBuyerCode(detail.getBuyerCode());
+				alloc.setOrderNo(detail.getOrderNo());
+				alloc.setLineNo(detail.getLineNo());
+				// 设置分配类型为虚拟分配
+				alloc.setAllocType(WmsCodeMaster.ALLOC_VIRTUAL.getCode());
+				alloc.setSkuCode(virtualInventoryRecord.getSkuCode());
+				alloc.setGenericSkuCode(detail.getGenericSkuCode());
+				alloc.setOutboundPrice(detail.getOutboundPrice());
+				alloc.setToLocCode(detail.getPlanShipLoc());
+				alloc.setAllocLocCode(virtualInventoryRecord.getLocCode());
+				alloc.setStatus(WmsCodeMaster.SO_FULL_ALLOC.getCode());
+				alloc.setRemark(detail.getRemark());
+				InventoryUpdateEntity entity = new InventoryUpdateEntity();
+				entity.setActionCode(WmsCodeMaster.ACT_VIRTUAL_ALLOC.getCode());
+				entity.setLineNo(detail.getLineNo());
+				entity.setLocCode(virtualInventoryRecord.getLocCode());
+				entity.setOrderNo(detail.getOrderNo());
+				entity.setOrderType(WmsCodeMaster.ORDER_OUB.getCode());
+				entity.setSkuCode(targetSkuCode);
+				entity.setPrice(detail.getOutboundPrice());
+					alloc.setOutboundNum(outboundNumForCalculate);
+					alloc.setPickNum(outboundNumForCalculate);
+					entity.setQtyOp(outboundNumForCalculate);
+					entity.setQtyOpBefore(virtualInventoryRecord.getInvAvailableNum());
+					entity.setQtyOpAfter(ComputeUtil.sub(virtualInventoryRecord.getInvAvailableNum(), outboundNumForCalculate));
+					// 更新库存
+					WmActTran actTran = wmInventoryService.updateInventory(entity);
+					// 回填计算出的成本数据
+					alloc.setCost(actTran.getCost());
+					totalCost = ComputeUtil.add(totalCost, actTran.getCost() * outboundNumForCalculate);
+					wmOutboundAllocService.saveOutboundAlloc(alloc);
+					outboundNumForCalculate = 0.0;
+			WmOutboundDetail targetDetail = new WmOutboundDetail();
+			BeanUtils.copyProperties(detail, targetDetail);
+			targetDetail.setOutboundAllocNum(
+					ComputeUtil.sub(detail.getOutboundNum().doubleValue(), outboundNumForCalculate));
+				targetDetail.setCost(ComputeUtil.div(totalCost, targetDetail.getOutboundAllocNum(), 2));
+				targetDetail.setStatus(WmsCodeMaster.SO_FULL_ALLOC.getCode());
+				DaoUtil.save(targetDetail, wmOutboundDetailMapper, session);
+				// 根据出库单明细更新出库单的状态
+				wmOutboundUpdateService.updataOutboundStatusByOutboundDetail(detail.getOrderNo());
+				message.setCode(200);
+				return message;
+		} else {
+			throw new BusinessException("出库单号[" + detail.getOrderNo() + "]行号[" + detail.getLineNo() + "]的不能分配");
+		}
+	}
 
 	// 执行分配
 	// @param: detail 必须为实时从数据库中获取到的数据
@@ -742,8 +906,14 @@ public class WmOutboundDetailServiceImpl extends BaseManagerImpl implements WmOu
 		MyUserDetails myUserDetails = SecurityUtil.getMyUserDetails();
 		if (WmsCodeMaster.SO_PART_ALLOC.getCode().equals(detail.getStatus())
 				|| WmsCodeMaster.SO_NEW.getCode().equals(detail.getStatus())) {
+			String targetSkuCode = null;
+			if(null!=detail.getGenericSkuCode()&&!"".equals(detail.getGenericSkuCode())){
+				targetSkuCode = detail.getGenericSkuCode();
+			}else{
+				targetSkuCode = detail.getSkuCode();
+			}
 			WmInventory example = new WmInventory();
-			example.setSkuCode(detail.getSkuCode());
+			example.setSkuCode(targetSkuCode);
 			example.setCompanyId(myUserDetails.getCompanyId());
 			example.setWarehouseId(myUserDetails.getWarehouseId());
 			List<WmInventory> inventoryRecords = wmInventoryService.getAvailableInvByExample(example);
@@ -765,18 +935,20 @@ public class WmOutboundDetailServiceImpl extends BaseManagerImpl implements WmOu
 				alloc.setLineNo(detail.getLineNo());
 				// 设置分配类型
 				alloc.setAllocType(WmsCodeMaster.ALLOC_AUTO.getCode());
-				alloc.setSkuCode(inventory.getSkuCode());
+				alloc.setSkuCode(detail.getSkuCode());
+				alloc.setGenericSkuCode(detail.getGenericSkuCode());
 				alloc.setOutboundPrice(detail.getOutboundPrice());
 				alloc.setToLocCode(detail.getPlanShipLoc());
 				alloc.setAllocLocCode(inventory.getLocCode());
 				alloc.setStatus(WmsCodeMaster.SO_FULL_ALLOC.getCode());
+				alloc.setRemark(detail.getRemark());
 				InventoryUpdateEntity entity = new InventoryUpdateEntity();
 				entity.setActionCode(WmsCodeMaster.ACT_ALLOC.getCode());
 				entity.setLineNo(detail.getLineNo());
 				entity.setLocCode(inventory.getLocCode());
 				entity.setOrderNo(detail.getOrderNo());
 				entity.setOrderType(WmsCodeMaster.ORDER_OUB.getCode());
-				entity.setSkuCode(inventory.getSkuCode());
+				entity.setSkuCode(targetSkuCode);
 				entity.setPrice(detail.getOutboundPrice());
 				// 库存数量足够
 				if (inventory.getInvAvailableNum().doubleValue() >= outboundNumForCalculate) {
@@ -875,7 +1047,26 @@ public class WmOutboundDetailServiceImpl extends BaseManagerImpl implements WmOu
 			throw new BusinessException("出库单号[" + orderNo + "]行号[" + lineNo + "]的出库单明细已不存在");
 		}
 	}
-
+	public Message virtualAllocByKey(String orderNo, String lineNo, String type) throws BusinessException {
+		MyUserDetails myUserDetails = SecurityUtil.getMyUserDetails();
+		Message message = new Message();
+		WmOutboundDetail queryExample = new WmOutboundDetail();
+		queryExample.setOrderNo(orderNo);
+		queryExample.setLineNo(lineNo);
+		queryExample.setCompanyId(myUserDetails.getCompanyId());
+		queryExample.setWarehouseId(myUserDetails.getWarehouseId());
+		List<WmOutboundDetail> detailList = this.selectByExample(queryExample);
+		if (detailList.size() > 0) {
+			WmOutboundDetail detail = detailList.get(0);
+			if (WmsCodeMaster.SO_FULL_ALLOC.getCode().equals(detail.getStatus())) {
+				throw new BusinessException("出库单号[" + orderNo + "]行号[" + lineNo + "]的出库单明细已经分配!");
+			}
+			message = this.virtualAlloc(detail);
+			return message;
+		} else {
+			throw new BusinessException("出库单号[" + orderNo + "]行号[" + lineNo + "]的出库单明细已不存在");
+		}
+	}
 	@Override
 	public Message createCrossDockInboundByDetails(String supplierCode, String orderNo, String[] lineNos)
 			throws BusinessException {

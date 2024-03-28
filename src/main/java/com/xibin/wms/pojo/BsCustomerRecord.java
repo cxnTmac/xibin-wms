@@ -28,6 +28,8 @@ public class BsCustomerRecord extends BaseModel{
 
 	private Date date;
 
+	private String picUrl;
+
 	private String remark;
 
     private Integer creator;
@@ -169,4 +171,12 @@ public class BsCustomerRecord extends BaseModel{
 	public void setOrderNo(String orderNo) {
 		this.orderNo = orderNo;
 	}
+
+    public String getPicUrl() {
+        return picUrl;
+    }
+
+    public void setPicUrl(String picUrl) {
+        this.picUrl = picUrl;
+    }
 }

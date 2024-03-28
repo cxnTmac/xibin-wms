@@ -10,6 +10,7 @@ public class MyUserDetails implements UserDetails {
 	private Integer userId;
 	private String username;
 	private String password;
+	private String openId;
 	private Integer companyId;
 	private String companyName;
 	private Integer warehouseId;
@@ -101,5 +102,13 @@ public class MyUserDetails implements UserDetails {
 
 	public void setWarehouseName(String warehouseName) {
 		this.warehouseName = warehouseName;
+	}
+
+	public String getOpenId() {
+		return openId;
+	}
+
+	public void setOpenId(String openId) {
+		this.openId = openId;
 	}
 }

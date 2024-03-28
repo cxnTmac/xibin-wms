@@ -1,11 +1,11 @@
 package com.xibin.wms.service;
 
-import java.util.List;
-import java.util.Map;
-
 import com.xibin.core.exception.BusinessException;
 import com.xibin.wms.pojo.SysUser;
 import com.xibin.wms.query.SysUserQueryItem;
+
+import java.util.List;
+import java.util.Map;
 
 public interface UserService {
 	public SysUser getUserById(int userId);
@@ -23,4 +23,5 @@ public interface UserService {
 	public List<SysUser> selectByUserName(String userName);
 
 	public List<SysUser> selectByWXOpenId(String openId);
+
 }

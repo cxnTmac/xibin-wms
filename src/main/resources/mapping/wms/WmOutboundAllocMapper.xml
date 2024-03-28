@@ -10,6 +10,7 @@
     <result column="alloc_type" property="allocType" jdbcType="VARCHAR" />
     <result column="status" property="status" jdbcType="VARCHAR" />
     <result column="sku_code" property="skuCode" jdbcType="VARCHAR" />
+      <result column="generic_sku_code" property="genericSkuCode" jdbcType="VARCHAR" />
     <result column="outbound_num" property="outboundNum" jdbcType="DOUBLE" />
     <result column="pick_num" property="pickNum" jdbcType="DOUBLE" />
     <result column="outbound_price" property="outboundPrice" jdbcType="DOUBLE" />
@@ -19,6 +20,8 @@
     <result column="pick_time" property="pickTime" jdbcType="TIMESTAMP" />
     <result column="ship_op" property="shipOp" jdbcType="INTEGER" />
     <result column="ship_time" property="shipTime" jdbcType="TIMESTAMP" />
+      <result column="package_no" property="packageNo" jdbcType="INTEGER" />
+      <result column="package_num" property="packageNum" jdbcType="INTEGER" />
     <result column="cost" property="cost" jdbcType="DOUBLE" />
     <result column="remark" property="remark" jdbcType="VARCHAR" />
     <result column="creator" property="creator" jdbcType="INTEGER" />
@@ -39,8 +42,10 @@
     <result column="alloc_type" property="allocType" jdbcType="VARCHAR" />
     <result column="status" property="status" jdbcType="VARCHAR" />
     <result column="sku_code" property="skuCode" jdbcType="VARCHAR" />
+      <result column="generic_sku_code" property="genericSkuCode" jdbcType="VARCHAR" />
     <result column="sku_name" property="skuName" jdbcType="VARCHAR" />
     <result column="model_code" property="modelCode" jdbcType="VARCHAR" />
+      <result column="total_outbound_num" property="totalOutboundNum" jdbcType="DOUBLE" />
     <result column="outbound_num" property="outboundNum" jdbcType="DOUBLE" />
     <result column="pick_num" property="pickNum" jdbcType="DOUBLE" />
     <result column="outbound_price" property="outboundPrice" jdbcType="DOUBLE" />
@@ -50,6 +55,9 @@
     <result column="pick_time" property="pickTime" jdbcType="TIMESTAMP" />
     <result column="ship_op" property="shipOp" jdbcType="INTEGER" />
     <result column="ship_time" property="shipTime" jdbcType="TIMESTAMP" />
+      <result column="package_code" property="packageCode" jdbcType="VARCHAR" />
+      <result column="package_no" property="packageNo" jdbcType="INTEGER" />
+      <result column="package_num" property="packageNum" jdbcType="INTEGER" />
     <result column="cost" property="cost" jdbcType="DOUBLE" />
     <result column="remark" property="remark" jdbcType="VARCHAR" />
     <result column="creator" property="creator" jdbcType="INTEGER" />
@@ -61,7 +69,7 @@
     <result column="warehouse_id" property="warehouseId" jdbcType="INTEGER" />
   </resultMap>
   <sql id="Base_Column_List" >
-    woa.id, woa.order_no, woa.line_no,woa.alloc_id,woa.status,woa.alloc_type,woa.buyer_code, woa.sku_code, woa.outbound_num,woa.pick_num, woa.outbound_price, woa.alloc_loc_code,woa.to_loc_code,woa.pick_op,woa.pick_time,woa.ship_op,woa.ship_time,woa.cost, woa.remark, 
+    woa.id, woa.order_no, woa.line_no,woa.alloc_id,woa.status,woa.alloc_type,woa.buyer_code, woa.sku_code,woa.generic_sku_code, woa.outbound_num,woa.pick_num, woa.outbound_price, woa.alloc_loc_code,woa.to_loc_code,woa.pick_op,woa.pick_time,woa.ship_op,woa.ship_time,woa.package_no,woa.package_num,woa.cost, woa.remark,
     woa.creator, woa.create_time, woa.modifier, woa.modify_time, woa.rec_ver, woa.company_id, woa.warehouse_id
   </sql>
   
@@ -72,10 +80,14 @@
           <if test="orderNo!=null and orderNo!=''"> AND woa.order_no = #{orderNo}</if>
           <if test="lineNo!=null and lineNo!=''"> AND woa.line_no LIKE CONCAT('%','${lineNo}','%')</if>
           <if test="skuCode!=null and skuCode!=''"> AND woa.sku_code LIKE CONCAT('%','${skuCode}','%')</if>
+      <if test="genericSkuCode!=null and genericSkuCode!=''"> AND woa.generic_sku_code = #{genericSkuCode}</if>
           <if test="allocLocCode!=null and allocLocCode!=''"> AND woa.alloc_loc_code LIKE CONCAT('%','${allocLocCode}','%')</if>
           <if test="status!=null and status!=''"> AND woa.status = #{status}</if>
           <if test="multiStatus!=null and multiStatus!=''"> AND woa.status IN (${multiStatus})</if>
           <if test="companyId!=null and companyId!=''"> AND woa.company_id = #{companyId}</if>
+          <if test="packageNo!=null and packageNo!=''"> AND woa.package_no = #{packageNo}</if>
+          <if test="needPacking==1"> AND (woa.package_no  &gt;= 1 OR woa.package_no= -1)</if>
+          <if test="packageNum!=null and packageNum!=''"> AND woa.package_num = #{packageNum}</if>
           <if test="warehouseId!=null and warehouseId!=''"> AND woa.warehouse_id = #{warehouseId}</if>
           <if test="fuzzyCondition!=null and fuzzyCondition!=''">AND (woa.order_no LIKE CONCAT('%','${fuzzyCondition}','%')
           OR woa.line_no LIKE CONCAT('%','${fuzzyCondition}','%')
@@ -89,8 +101,12 @@
           <if test="status!=null and status!=''"> AND woa.status = #{status}</if>
           <if test="lineNo!=null and lineNo!=''"> AND woa.line_no = #{lineNo}</if>
           <if test="skuCode!=null and skuCode!=''"> AND woa.sku_code = #{skuCode}</if>
+      <if test="genericSkuCode!=null and genericSkuCode!=''"> AND woa.generic_sku_code = #{genericSkuCode}</if>
           <if test="status!=null and status!=''"> AND woa.status = #{status}</if>
+      <if test="allocType!=null and allocType!=''"> AND woa.alloc_type = #{allocType}</if>
           <if test="allocLocCode!=null and allocLocCode!=''"> AND woa.alloc_loc_code = #{allocLocCode}</if>
+      <if test="packageNo!=null and packageNo!=''"> AND woa.package_no = #{packageNo}</if>
+      <if test="packageNum!=null and packageNum!=''"> AND woa.package_num = #{packageNum}</if>
           <if test="companyId!=null and companyId!=''"> AND woa.company_id = #{companyId}</if>
           <if test="warehouseId!=null and warehouseId!=''"> AND woa.warehouse_id = #{warehouseId}</if>
   </sql>
@@ -109,12 +125,12 @@
   <!-- 【固定】：插入记录（支持一条及多条） -->
   <insert id="insert" parameterType="java.util.List">
   	INSERT INTO wm_outbound_alloc
-          (id, order_no, line_no,alloc_id,status,alloc_type,buyer_code, sku_code, outbound_num,pick_num,outbound_price, alloc_loc_code,to_loc_code, pick_op,pick_time,ship_op,ship_time,cost,remark, 
+          (id, order_no, line_no,alloc_id,status,alloc_type,buyer_code, sku_code, generic_sku_code,outbound_num,pick_num,outbound_price, alloc_loc_code,to_loc_code, pick_op,pick_time,ship_op,ship_time,package_no,package_num,cost,remark,
     creator, create_time, modifier, modify_time, rec_ver, company_id, warehouse_id)
        VALUES
   		<foreach collection="list" item="item" index="index" separator=",">
-	   		(#{item.id}, #{item.orderNo},#{item.lineNo},#{item.allocId},#{item.status}, #{item.allocType},#{item.buyerCode},  #{item.skuCode},#{item.outboundNum},#{item.pickNum},#{item.outboundPrice},
-	   		#{item.allocLocCode},#{item.toLocCode},#{item.pickOp},#{item.pickTime},#{item.shipOp},#{item.shipTime},#{item.cost},
+	   		(#{item.id}, #{item.orderNo},#{item.lineNo},#{item.allocId},#{item.status}, #{item.allocType},#{item.buyerCode},  #{item.skuCode},#{item.genericSkuCode},#{item.outboundNum},#{item.pickNum},#{item.outboundPrice},
+	   		#{item.allocLocCode},#{item.toLocCode},#{item.pickOp},#{item.pickTime},#{item.shipOp},#{item.shipTime},#{item.packageNo},#{item.packageNum},#{item.cost},
       #{item.remark},#{item.creator},#{item.createTime}, #{item.modifier},  #{item.modifyTime},
       #{item.recVer}, #{item.companyId},#{item.warehouseId})
   		</foreach>
@@ -168,6 +184,11 @@
                      when (ID=#{item.id}) then #{item.skuCode}
              </foreach>
 		</trim>
+        <trim prefix="generic_sku_code =case"  suffix="end,"  >
+            <foreach collection="list" item="item" index="index">
+                when (ID=#{item.id}) then #{item.genericSkuCode}
+            </foreach>
+        </trim>
 		<trim prefix="outbound_num =case"  suffix="end,"  >
              <foreach collection="list" item="item" index="index">
                      when (ID=#{item.id}) then #{item.outboundNum}
@@ -213,6 +234,16 @@
                      when (ID=#{item.id}) then #{item.shipTime}
              </foreach>
 		</trim>
+        <trim prefix="package_no =case"  suffix="end,"  >
+            <foreach collection="list" item="item" index="index">
+                when (ID=#{item.id}) then #{item.packageNo}
+            </foreach>
+        </trim>
+        <trim prefix="package_num =case"  suffix="end,"  >
+            <foreach collection="list" item="item" index="index">
+                when (ID=#{item.id}) then #{item.packageNum}
+            </foreach>
+        </trim>
 		<trim prefix="cost =case"  suffix="end,"  >
              <foreach collection="list" item="item" index="index">
                      when (ID=#{item.id}) then #{item.cost}
@@ -266,10 +297,12 @@
   </select>
   
    <select id="selectAllByPage" resultMap="QueryResultMap" parameterType="Map">
-    select 
+    select
     <include refid="Base_Column_List" />
-    ,bfs.fitting_sku_name as sku_name,
+    ,wod.outbound_num as total_outbound_num,
+    bfs.fitting_sku_name as sku_name,
     bfs.model_code,
+    bfs.package_code,
     bc.customer_name as buyer_name
     from wm_outbound_alloc woa
     left join bd_fitting_sku bfs on 
@@ -278,6 +311,10 @@
     left join bd_customer bc on
     bc.customer_code = woa.buyer_code
     and bc.company_id = woa.company_id
+    left join wm_outbound_detail wod on
+    wod.line_no = woa.line_no
+    and wod.order_no = woa.order_no
+    and wod.company_id = woa.company_id
     <include refid="findByConditionWhere" />
     <if test="orderByConditions!=null and orderByConditions!=''">${orderByConditions}</if>
   </select>
@@ -341,5 +378,124 @@
 	AND woa.company_id = #{companyId,jdbcType=INTEGER}
 	AND woa.warehouse_id = #{warehouseId,jdbcType=INTEGER}
  </select>
-  
+
+    <select id="queryLCLSumByOrderNo"   resultType="Double"   parameterType="Map" >
+        SELECT
+        COUNT(DISTINCT woa.package_no)
+        FROM
+        wm_outbound_alloc woa
+        WHERE
+        1 = 1
+        <if test="orderNo!=null and orderNo!=''">
+            AND woa.order_no = #{orderNo}
+        </if>
+        AND woa.package_no &gt;=1
+        AND woa.company_id = #{companyId,jdbcType=INTEGER}
+        AND woa.warehouse_id = #{warehouseId,jdbcType=INTEGER}
+    </select>
+    <select id="queryFCLSumByOrderNo"   resultType="Double"   parameterType="Map" >
+        SELECT
+        SUM(woa.package_num)
+        FROM
+        wm_outbound_alloc woa
+        WHERE
+        1 = 1
+        <if test="orderNo!=null and orderNo!=''">
+            AND woa.order_no = #{orderNo}
+        </if>
+        AND woa.package_no =0
+        AND woa.company_id = #{companyId,jdbcType=INTEGER}
+        AND woa.warehouse_id = #{warehouseId,jdbcType=INTEGER}
+    </select>
+
+    <select id="selectForReAlloc" resultType="Map" parameterType="Map">
+        select
+        <include refid="Base_Column_List" />
+        ,woh.order_time,
+        woh.outbound_type,
+        bfs.fitting_sku_name as sku_name,
+        bfs.model_code,
+        bc.customer_name as buyer_name
+        from wm_outbound_alloc woa
+        left join bd_fitting_sku bfs on
+        bfs.fitting_sku_code = woa.sku_code
+        and bfs.company_id = woa.company_id
+        left join bd_customer bc on
+        bc.customer_code = woa.buyer_code
+        and bc.company_id = woa.company_id
+        left join wm_outbound_header woh on
+        woh.order_no = woa.order_no
+        and woh.company_id = woa.company_id
+        where
+        1=1
+        <if test="orderNo!=null and orderNo!=''">AND woa.order_no = #{orderNo}</if>
+        <if test="orderTimeFm!=null and orderTimeFm!=''"> AND woh.order_time &gt;= #{orderTimeFm}</if>
+        <if test="orderTimeTo!=null and orderTimeTo!=''"> AND woh.order_time &lt;= #{orderTimeTo}</if>
+        AND woa.status ='80'
+        AND woa.alloc_type ='VIRTUAL'
+        AND woa.company_id = #{companyId,jdbcType=INTEGER}
+        AND woa.warehouse_id = #{warehouseId,jdbcType=INTEGER}
+        ORDER BY woa.sku_code,woh.order_time
+    </select>
+    <select id="selectForMobileAlloc" resultMap="QueryResultMap" parameterType="Map">
+        SELECT
+        <include refid="Base_Column_List" />
+        ,wod.outbound_num as total_outbound_num,
+        bfs.fitting_sku_name as sku_name,
+        bfs.model_code,
+        bfs.package_code,
+        bc.customer_name as buyer_name
+        FROM wm_outbound_alloc woa
+        LEFT JOIN bd_fitting_sku bfs on
+        bfs.fitting_sku_code = woa.sku_code
+        AND bfs.company_id = woa.company_id
+        LEFT JOIN bd_customer bc on
+        bc.customer_code = woa.buyer_code
+        AND bc.company_id = woa.company_id
+        LEFT JOIN wm_outbound_detail wod on
+        wod.line_no = woa.line_no
+        AND wod.order_no = woa.order_no
+        AND wod.company_id = woa.company_id
+        LEFT JOIN (
+        SELECT
+        woa2.sku_code,
+        MIN(woa2.alloc_loc_code) AS maxtime
+        FROM
+        wm_outbound_alloc woa2
+        WHERE
+        woa2.order_no = #{orderNo}
+        AND woa2.company_id = #{companyId,jdbcType=INTEGER}
+        AND woa2.warehouse_id = #{warehouseId,jdbcType=INTEGER}
+        GROUP BY
+        woa2.sku_code
+        ) woa3 ON woa.sku_code = woa3.sku_code
+        WHERE
+        1=1
+        <if test="multiStatus!=null and multiStatus!=''"> AND woa.status IN (${multiStatus})</if>
+        AND woa.order_no = #{orderNo}
+        AND woa.company_id = #{companyId,jdbcType=INTEGER}
+        AND woa.warehouse_id = #{warehouseId,jdbcType=INTEGER}
+        ORDER BY
+        woa3.maxtime DESC,
+        woa.sku_code,
+        woa.alloc_loc_code DESC
+    </select>
+
+    <update id="changeLocForNotClosedOrder" parameterType="Map">
+    UPDATE wm_outbound_alloc woa
+    SET woa.alloc_loc_code = #{targetLoc}
+    WHERE
+    woa.order_no IN (
+    SELECT
+    woh.order_no
+    FROM
+    wm_outbound_header woh
+    WHERE
+    woa.sku_code = #{skuCode}
+    AND woh.status &lt;&gt;  '99'
+    AND woa.company_id = #{companyId}
+    AND woa.warehouse_id = #{warehouseId}
+    )
+    AND woa.alloc_type &lt;&gt; 'VIRTUAL'
+    </update>
 </mapper>

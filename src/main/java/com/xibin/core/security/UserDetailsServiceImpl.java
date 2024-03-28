@@ -11,13 +11,13 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-@Component
+@Service
 public class UserDetailsServiceImpl implements UserDetailsService {
     @Autowired
     private UserService userService;
@@ -26,6 +26,26 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         List<SysUser> users = userService.selectByUserName(username);
+        if(users.size()==0){
+            throw new BadCredentialsException("用户不存在");
+        }
+        if("N".equals(users.get(0).getIsEnable())){
+            throw new BadCredentialsException("用户被禁用");
+        }
+        MyUserDetails userInfo = new MyUserDetails();
+        BeanUtils.copyProperties(users.get(0),userInfo);
+        userInfo.setUsername(users.get(0).getUserName());
+        userInfo.setUserId(users.get(0).getId());
+        // 暂时默认为1
+        userInfo.setWarehouseId(1);
+        Set authoritiesSet = new HashSet();
+        GrantedAuthority authority = new SimpleGrantedAuthority("ROLE_ADMIN"); // 模拟从数据库中获取用户角色
+        authoritiesSet.add(authority);
+        userInfo.setAuthorities(authoritiesSet);
+        return userInfo;
+    }
+    public UserDetails loadUserByOpenId(String openId) throws UsernameNotFoundException {
+        List<SysUser> users = userService.selectByWXOpenId(openId);
         if(users.size()==0){
             throw new BadCredentialsException("用户不存在");
         }

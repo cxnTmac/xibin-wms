@@ -229,7 +229,7 @@ public class WmInboundHeaderServiceImpl extends BaseManagerImpl implements WmInb
             }
             BsCustomerRecord bsCustomerRecordSale = new BsCustomerRecord();
             bsCustomerRecordSale.setCompanyId(myUserDetails.getCompanyId());
-            bsCustomerRecordSale.setAbstractt("销售配件");
+            bsCustomerRecordSale.setAbstractt("采购配件");
             bsCustomerRecordSale.setDate(wmInboundHeader.getOrderTime());
             bsCustomerRecordSale.setOrderNo(wmInboundHeader.getOrderNo());
             bsCustomerRecordSale.setCustomerCode(wmInboundHeader.getSupplierCode());

@@ -213,8 +213,32 @@
     and bl.warehouse_id = wi.warehouse_id
     <include refid="findByExampleWhere" />
     and wi.inv_available_num>0
-    and bl.use_type not in('SS','KT')
+    and bl.use_type not in('SS','KT','VI','CD')
   </select>
+    <select id="getStorageInvByExample" resultMap="BaseResultMap" parameterType="com.xibin.wms.pojo.WmInventory">
+        select
+        <include refid="Base_Column_List" />
+        from wm_inventory wi
+        left join bd_loc bl on
+        bl.loc_code = wi.loc_code
+        and bl.company_id =wi.company_id
+        and bl.warehouse_id = wi.warehouse_id
+        <include refid="findByExampleWhere" />
+        and wi.inv_num>=0
+        and bl.use_type not in('SS','KT','VI','CD')
+    </select>
+    <select id="getVirtualInvByExample" resultMap="BaseResultMap" parameterType="com.xibin.wms.pojo.WmInventory">
+        select
+        <include refid="Base_Column_List" />
+        from wm_inventory wi
+        left join bd_loc bl on
+        bl.loc_code = wi.loc_code
+        and bl.company_id =wi.company_id
+        and bl.warehouse_id = wi.warehouse_id
+        <include refid="findByExampleWhere" />
+        and wi.inv_available_num>0
+        and bl.use_type  in('VI')
+    </select>
   <select id="getAvailableInvByPage" resultMap="QueryResultMap" parameterType="Map">
     select 
     <include refid="Base_Column_List" />
@@ -228,11 +252,13 @@
     left join bd_loc bl on
     bl.loc_code = wi.loc_code
     and bl.company_id =wi.company_id
-    and bl.warehouse_id = wi.warehouse_id
     <include refid="findByConditionWhere" />
     and wi.inv_available_num>0
-    <!--  and bl.use_type not in('SS','KT') -->
+<!--      页面查询方便查看所以不屏蔽 -->
+<!--    and bl.use_type not in('SS','KT','CD','VI')-->
+      and bl.warehouse_id = wi.warehouse_id
   </select>
+
   <select id="selectByKey" resultMap="QueryResultMap" resultType="java.util.List"  parameterType="Map" >
     select 
     <include refid="Base_Column_List" />
@@ -258,5 +284,17 @@
         <if test="companyId!=null and companyId!=''">and wi.company_id = #{companyId,jdbcType=INTEGER}</if>
         <if test="warehouseId!=null and warehouseId!=''">and wi.warehouse_id = #{warehouseId,jdbcType=INTEGER}</if>
         GROUP BY wi.sku_code
+    </select>
+    <select id="getMaxInventoryBySkuCode" resultType="java.util.HashMap"     parameterType="Map" >
+        SELECT wi.inv_num,wi.loc_code,wi.sku_code FROM  wm_inventory wi
+        LEFT JOIN bd_loc bl ON bl.loc_code = wi.loc_code
+        AND bl.company_id = wi.company_id
+        WHERE
+            1=1
+        AND bl.use_type = 'RS'
+        <if test="skuCode!=null and skuCode!=''">and wi.sku_code = #{skuCode,jdbcType=VARCHAR}</if>
+        <if test="companyId!=null and companyId!=''">and wi.company_id = #{companyId,jdbcType=INTEGER}</if>
+        <if test="warehouseId!=null and warehouseId!=''">and wi.warehouse_id = #{warehouseId,jdbcType=INTEGER}</if>
+        ORDER BY wi.inv_num DESC,wi.modify_time DESC  LIMIT 1
     </select>
 </mapper>

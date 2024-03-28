@@ -1,0 +1,64 @@
+server:
+  servlet:
+    session:
+      timeout: 28800
+spring:
+  jackson:
+    date-format: yyyy-MM-dd HH:mm:ss
+    time-zone: GMT+8
+  datasource:
+    type: com.alibaba.druid.pool.DruidDataSource
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 100MB
+primary:
+  datasource:
+    druid:
+      driver-class-name: com.mysql.cj.jdbc.Driver
+      url: jdbc:mysql://5977f21193df0.gz.cdb.myqcloud.com:5079/xibin_test?useUnicode=true&characterEncoding=utf-8&useSSL=true&serverTimezone=Asia/Shanghai&allowMultiQueries=true
+      username: root
+      password: cxn22111578
+      initial-size: 20
+      min-idle: 20
+      max-active: 100
+      max-wait: 60000
+      time-between-eviction-runs-millis: 60000
+      min-evictable-idle-time-millis: 300000
+      validation-query: SELECT 1 FROM sys_user
+      test-while-idle: true
+      test-on-borrow: false
+      test-on-return: false
+back:
+  datasource:
+    druid:
+      driver-class-name: com.mysql.cj.jdbc.Driver
+      url: jdbc:mysql://5977f21193df0.gz.cdb.myqcloud.com:5079/jun_finance_test?useUnicode=true&characterEncoding=utf-8&useSSL=true&serverTimezone=UTC&allowMultiQueries=true
+      username: root
+      password: cxn22111578
+      initial-size: 5
+      min-idle: 5
+      max-active: 30
+      max-wait: 60000
+      time-between-eviction-runs-millis: 60000
+      min-evictable-idle-time-millis: 300000
+      validation-query: SELECT 1 FROM sys_user
+      test-while-idle: true
+      test-on-borrow: false
+      test-on-return: false
+#mybatis:
+#  mapper-locations: classpath:mapping/*Mapper.xml
+#  type-aliases-package: com.xibin.wms.pojo
+logging:
+  level:
+    com:
+      xibin:
+        wms:
+          dao: debug
+        finance:
+          dao: debug
+file:
+  webPicUploadUrl: /usr/local/nginx/html/pic
+  webPicUploadWithOutHost : pic
+  paymentPicUploadUrl: /usr/local/nginx/html/pic
+

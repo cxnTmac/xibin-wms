@@ -125,6 +125,8 @@ public class WmInboundReceiveServiceImpl extends BaseManagerImpl implements WmIn
 			WmInboundRecieveQueryItem queryItem = queryItems.get(0);
 			WmInboundRecieve wmInboundRecieve = new WmInboundRecieve();
 			BeanUtils.copyProperties(queryItem, wmInboundRecieve);
+			// 默认全量收货
+			wmInboundRecieve.setInboundNum(wmInboundRecieve.getInboundPreNum());
 			return this.receiveByRecieve(wmInboundRecieve);
 		} else {
 			throw new BusinessException("单号[" + orderNo + "]行号[" + lineNo + "]收货明细行号[" + recLineNo + "]的收货明细不存在！");

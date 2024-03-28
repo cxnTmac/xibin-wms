@@ -16,11 +16,17 @@ public class WmOutboundDetailQueryItem implements Serializable {
 
 	private String skuCode;
 
+	private String genericSkuCode;
+
 	private String skuName;
 
 	private String modelCode;
 
 	private String quickCode;
+
+	private String packageCode;
+
+	private String uomDesc;
 
 	private String status;
 
@@ -364,4 +370,27 @@ public class WmOutboundDetailQueryItem implements Serializable {
 		this.inboundLineNo = inboundLineNo;
 	}
 
+	public String getPackageCode() {
+		return packageCode;
+	}
+
+	public void setPackageCode(String packageCode) {
+		this.packageCode = packageCode;
+	}
+
+	public String getUomDesc() {
+		return uomDesc;
+	}
+
+	public void setUomDesc(String uomDesc) {
+		this.uomDesc = uomDesc;
+	}
+
+	public String getGenericSkuCode() {
+		return genericSkuCode;
+	}
+
+	public void setGenericSkuCode(String genericSkuCode) {
+		this.genericSkuCode = genericSkuCode;
+	}
 }

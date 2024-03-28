@@ -1,13 +1,18 @@
 package com.xibin.core.controller;
 
 import com.xibin.core.costants.CodeMaster;
+import com.xibin.core.exception.BusinessException;
 import com.xibin.core.pojo.Message;
 import com.xibin.core.security.pojo.MyUserDetails;
 import com.xibin.core.security.util.SecurityUtil;
 import com.xibin.core.utils.ImageUtils;
 import com.xibin.wms.pojo.BdFittingSkuPic;
+import com.xibin.wms.pojo.WmOutboundHeader;
+import com.xibin.wms.query.WmOutboundHeaderQueryItem;
 import com.xibin.wms.service.BdFittingSkuPicService;
+import com.xibin.wms.service.WmOutboundHeaderService;
 import org.apache.commons.io.FileUtils;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
@@ -37,10 +42,15 @@ public class FileUploadController {
 	private String webPicUploadUrl;
 	@Value("${file.webPicUploadWithOutHost}")
 	private String webPicUploadWithOutHost;
+	@Value("${file.paymentPicUploadUrl}")
+	private String paymentPicUploadUrl;
 	@Autowired
 	HttpSession session;
 	@Autowired
 	BdFittingSkuPicService bdFittingSkuPicService;
+
+	@Autowired
+	WmOutboundHeaderService wmOutboundHeaderService;
 	@RequestMapping("/uploadFittingSkuPics")  
 	@ResponseBody
     public Message uploadFittingSkuPics(@RequestParam MultipartFile[] pics, HttpServletRequest request) throws IOException{
@@ -102,7 +112,58 @@ public class FileUploadController {
 		message.setCode(200);
 		return message;
 	}
-	
+	@RequestMapping(value="/uploadOutboundPaymentPic",consumes="multipart/form-data",method = RequestMethod.POST)
+	@ResponseBody
+	public Message uploadOutboundPaymentPic(HttpServletRequest request,@RequestParam("file") MultipartFile pic){
+		Message message = new Message();
+		String buyerCode = request.getParameter("buyerCode");
+		String orderNo = request.getParameter("orderNo");
+		//String realPath = request.getSession().getServletContext().getRealPath("/upload/payment/"+buyerCode);
+		String realPath = webPicUploadUrl+"/payment/"+buyerCode;
+		System.out.println("图片上传路径："+realPath);
+		String weburl = webPicUploadWithOutHost+"/payment/"+buyerCode;
+		List<WmOutboundHeaderQueryItem> headerQueryItems = wmOutboundHeaderService.selectByKey(orderNo);
+		if(headerQueryItems.size()>0){
+			WmOutboundHeader header = new WmOutboundHeader();
+			BeanUtils.copyProperties(headerQueryItems.get(0),header);
+			String oldWebUrl = header.getPaymentPicUrl();
+			if(null!=oldWebUrl&&!"".equals(oldWebUrl)){
+				// 删除旧图片
+				String oldRealUrl = webPicUploadUrl+oldWebUrl.replaceAll(webPicUploadWithOutHost,"");
+				File file = new File(oldRealUrl);
+				boolean fileDeleteResult = file.delete();
+				if(!fileDeleteResult){
+					System.out.println("Old file delete failed!");
+				}
+			}
+			String fileName = System.currentTimeMillis()+"";
+			File originFile = new File(realPath, fileName +".jpg");
+			try {
+				FileUtils.copyInputStreamToFile(pic.getInputStream(), originFile);
+			} catch (IOException e) {
+				e.printStackTrace();
+				message.setCode(0);
+				message.setMsg("文件["+pic.getOriginalFilename()+"]上传失败!");
+				return message;
+			}
+			// 保存新的图片地址
+			header.setPaymentPicUrl(weburl+"/"+fileName+".jpg");
+			try {
+				wmOutboundHeaderService.saveOutbound(header);
+			} catch (BusinessException e) {
+				e.printStackTrace();
+				message.setCode(0);
+				message.setMsg(e.getMessage());
+				return message;
+			}
+		}else{
+			message.setCode(0);
+			message.setMsg("出库单["+orderNo+"]不存在");
+			return message;
+		}
+		message.setCode(200);
+		return message;
+	}
 	@RequestMapping(value="/uploadFittingSkuPicx",consumes="multipart/form-data",method = RequestMethod.POST)  
 	@ResponseBody
     public Message uploadFittingSkuPicx(HttpServletRequest request){

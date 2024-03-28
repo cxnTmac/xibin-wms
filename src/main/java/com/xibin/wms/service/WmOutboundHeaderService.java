@@ -28,11 +28,15 @@ public interface WmOutboundHeaderService {
 
 	public WmOutboundHeaderQueryItem account(String orderNo) throws BusinessException;
 
+	public WmOutboundHeaderQueryItem newAccount(String orderNo) throws BusinessException;
+
 	public WmOutboundHeaderQueryItem cancelAccount(String orderNo) throws BusinessException;
 
-	public String selectNextOrderNo(String orderNo);
+	public String selectNextOrderNo(String orderTime);
 
-	public String selectPreOrderNo(String orderNo);
+	public String selectPreOrderNo(String orderTime);
 
 	public List<Map> queryForOutboundDaily(Map map);
+
+	public Map selectRecentOrderHeaderByBuyerCode(String buyerCode);
 }

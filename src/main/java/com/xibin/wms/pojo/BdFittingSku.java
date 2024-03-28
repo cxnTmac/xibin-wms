@@ -60,8 +60,19 @@ public class BdFittingSku extends BaseModel {
 	private Date lastInboundTime;
 
 	private Date lastOutboundTime;
+	private String labelSkuName;
+
+	private String labelModelCode;
+
+	private String labelSpecification;
+
+	private String labelDrawingNo;
+
+	private String labelPackageNum;
 
 	private Date createTime;
+
+	private Date releaseDate;
 
 	private Integer creator;
 
@@ -355,5 +366,53 @@ public class BdFittingSku extends BaseModel {
 
 	public void setSeries(String series) {
 		this.series = series;
+	}
+
+	public Date getReleaseDate() {
+		return releaseDate;
+	}
+
+	public void setReleaseDate(Date releaseDate) {
+		this.releaseDate = releaseDate;
+	}
+
+	public String getLabelSkuName() {
+		return labelSkuName;
+	}
+
+	public void setLabelSkuName(String labelSkuName) {
+		this.labelSkuName = labelSkuName;
+	}
+
+	public String getLabelModelCode() {
+		return labelModelCode;
+	}
+
+	public void setLabelModelCode(String labelModelCode) {
+		this.labelModelCode = labelModelCode;
+	}
+
+	public String getLabelSpecification() {
+		return labelSpecification;
+	}
+
+	public void setLabelSpecification(String labelSpecification) {
+		this.labelSpecification = labelSpecification;
+	}
+
+	public String getLabelDrawingNo() {
+		return labelDrawingNo;
+	}
+
+	public void setLabelDrawingNo(String labelDrawingNo) {
+		this.labelDrawingNo = labelDrawingNo;
+	}
+
+	public String getLabelPackageNum() {
+		return labelPackageNum;
+	}
+
+	public void setLabelPackageNum(String labelPackageNum) {
+		this.labelPackageNum = labelPackageNum;
 	}
 }

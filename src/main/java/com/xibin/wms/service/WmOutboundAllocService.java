@@ -13,11 +13,15 @@ public interface WmOutboundAllocService {
 
 	public List<WmOutboundAllocQueryItem> getAllOutboundAllocByPage(Map map);
 
+	public List<WmOutboundAllocQueryItem> selectForMobileAlloc(Map map);
+
+	public List<Map> selectForReAlloc(Map map);
+
 	public List<WmOutboundAllocQueryItem> selectByKey(String orderNo, String linNo);
 
 	public List<WmOutboundAlloc> selectByExample(WmOutboundAlloc model);
 
-	public void pickByAlloc(WmOutboundAlloc alloc, double pickNum) throws BusinessException;
+	public void pickByAlloc(WmOutboundAlloc alloc, double pickNum,boolean isPackedSku,int packageNum) throws BusinessException;
 
 	public void cancelPickByAlloc(WmOutboundAlloc alloc) throws BusinessException;
 
@@ -34,5 +38,15 @@ public interface WmOutboundAllocService {
 	public Message cancelShipByHeader(String orderNo) throws BusinessException;
 
 	public Message pickByOrderNo(String orderNo) throws BusinessException;
+
+	public void packByAlloc(WmOutboundAlloc alloc) throws BusinessException;
+
+	public void cancelPackByAlloc(WmOutboundAlloc alloc) throws BusinessException;
+
+	public Double getTotalPackageNumByOrderNo(String orderNo);
+
+	public void reAllocByAlloc(WmOutboundAlloc alloc) throws BusinessException;
+
+	public void reAllocByAllocId(int allocId) throws BusinessException;
 
 }

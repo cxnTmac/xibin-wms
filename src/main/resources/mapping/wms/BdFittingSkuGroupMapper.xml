@@ -5,6 +5,8 @@
     <id column="id" property="id" jdbcType="INTEGER" />
     <result column="group_code" property="groupCode" jdbcType="VARCHAR" />
     <result column="group_name" property="groupName" jdbcType="VARCHAR" />
+      <result column="sku_code" property="skuCode" jdbcType="VARCHAR" />
+      <result column="main_sku" property="mainSku" jdbcType="VARCHAR" />
     <result column="description" property="description" jdbcType="VARCHAR" />
     <result column="creator" property="creator" jdbcType="INTEGER" />
     <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
@@ -17,6 +19,8 @@
     <id column="id" property="id" jdbcType="INTEGER" />
     <result column="group_code" property="groupCode" jdbcType="VARCHAR" />
     <result column="group_name" property="groupName" jdbcType="VARCHAR" />
+      <result column="sku_code" property="skuCode" jdbcType="VARCHAR" />
+      <result column="main_sku" property="mainSku" jdbcType="VARCHAR" />
     <result column="description" property="description" jdbcType="VARCHAR" />
     <result column="fitting_sku_code" property="fittingSkuCode" jdbcType="VARCHAR" />
     <result column="fitting_sku_name" property="fittingSkuName" jdbcType="VARCHAR" />
@@ -29,7 +33,7 @@
     <result column="company_id" property="companyId" jdbcType="INTEGER" />
   </resultMap>
   <sql id="Base_Column_List" >
-    bfsg.id, bfsg.group_code, bfsg.group_name, bfsg.description, bfsg.creator, bfsg.create_time, bfsg.modifier, bfsg.modify_time, bfsg.rec_ver, 
+    bfsg.id, bfsg.group_code, bfsg.group_name, bfsg.sku_code, bfsg.main_sku, bfsg.description, bfsg.creator, bfsg.create_time, bfsg.modifier, bfsg.modify_time, bfsg.rec_ver,
     bfsg.company_id
   </sql>
   
@@ -38,6 +42,8 @@
       WHERE 1=1
           <if test="id!=null and id!=''"> AND ba.id = #{id}</if>
           <if test="groupCode!=null and groupCode!=''"> AND bfsg.group_code = #{groupCode}</if>
+      <if test="skuCode!=null and skuCode!=''"> AND bfsg.sku_code = #{skuCode}</if>
+      <if test="mainSku!=null and mainSku!=''"> AND bfsg.main_sku = #{mainSku}</if>
           <if test="groupName!=null and groupName!=''"> AND bfsg.group_name LIKE CONCAT('%','${groupName}','%')</if>
           <if test="description!=null and description!=''"> AND bfsg.description LIKE CONCAT('%','${description}','%')</if>
           <if test="companyId!=null and companyId!=''"> AND bfsg.company_id = #{companyId}</if>
@@ -47,6 +53,8 @@
       WHERE 1=1
           <if test="id!=null and id!=''"> AND bfsg.id = #{id}</if>
           <if test="groupCode!=null and groupCode!=''"> AND bfsg.group_code = #{groupCode}</if>
+      <if test="skuCode!=null and skuCode!=''"> AND bfsg.sku_code = #{skuCode}</if>
+      <if test="mainSku!=null and mainSku!=''"> AND bfsg.main_sku = #{mainSku}</if>
           <if test="groupName!=null and groupName!=''"> AND bfsg.group_name = #{groupName}</if>
           <if test="description!=null and description!=''"> AND bfsg.description = #{description}</if>
           <if test="companyId!=null and companyId!=''"> AND bfsg.company_id = #{companyId}</if>
@@ -65,12 +73,12 @@
   <!-- 【固定】：插入记录（支持一条及多条） -->
   <insert id="insert" parameterType="java.util.List">
   	INSERT INTO bd_fitting_sku_group
-          (id, group_code, group_name, description, creator, create_time, modifier, modify_time, rec_ver, 
+          (id, group_code, group_name, sku_code,main_sku,description, creator, create_time, modifier, modify_time, rec_ver,
     company_id)
        VALUES
   		<foreach collection="list" item="item" index="index" separator=",">
-	   		(#{item.id},#{item.groupCode},#{item.groupName}, 
-      #{item.description},#{item.creator},#{item.createTime},#{item.modifier},#{item.modifyTime},
+	   		(#{item.id},#{item.groupCode},#{item.groupName}, #{item.skuCode},#{item.mainSku},
+            #{item.description},#{item.creator},#{item.createTime},#{item.modifier},#{item.modifyTime},
       #{item.recVer},#{item.companyId})
   		</foreach>
   </insert>
@@ -98,6 +106,16 @@
                      when (ID=#{item.id}) then #{item.groupName}
              </foreach>
 		</trim>
+        <trim prefix="sku_code =case"  suffix="end,"  >
+            <foreach collection="list" item="item" index="index">
+                when (ID=#{item.id}) then #{item.skuCode}
+            </foreach>
+        </trim>
+        <trim prefix="main_sku =case"  suffix="end,"  >
+            <foreach collection="list" item="item" index="index">
+                when (ID=#{item.id}) then #{item.mainSku}
+            </foreach>
+        </trim>
 		<trim prefix="description =case"  suffix="end,"  >
              <foreach collection="list" item="item" index="index">
                      when (ID=#{item.id}) then #{item.description}
@@ -147,7 +165,7 @@
     bfs.fitting_sku_name,
     bfs.model_code
     from bd_fitting_sku_group bfsg
-    left join bd_fitting_sku bfs on bfs.group_code = bfsg.group_code
+    left join bd_fitting_sku bfs on bfs.fitting_sku_code = bfsg.sku_code
     and bfs.company_id = bfsg.company_id
     
     <include refid="findByConditionWhere" />

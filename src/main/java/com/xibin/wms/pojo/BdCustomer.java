@@ -65,6 +65,13 @@ public class BdCustomer extends BaseModel {
 
 	private Integer auxiId;
 
+
+	private String paymentCategory;
+
+	private String labelCity;
+
+	private String labelName;
+
 	private String remark;
 
 	private Integer creator;
@@ -305,5 +312,29 @@ public class BdCustomer extends BaseModel {
 
 	public void setBalance(Double balance) {
 		this.balance = balance;
+	}
+
+	public String getPaymentCategory() {
+		return paymentCategory;
+	}
+
+	public void setPaymentCategory(String paymentCategory) {
+		this.paymentCategory = paymentCategory;
+	}
+
+	public String getLabelCity() {
+		return labelCity;
+	}
+
+	public void setLabelCity(String labelCity) {
+		this.labelCity = labelCity;
+	}
+
+	public String getLabelName() {
+		return labelName;
+	}
+
+	public void setLabelName(String labelName) {
+		this.labelName = labelName;
 	}
 }

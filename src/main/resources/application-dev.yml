@@ -1,8 +1,7 @@
-#server:
-#  port: 8080
-#  servlet:
-#    session:
-#      timeout:10800
+server:
+  servlet:
+    session:
+      timeout: 28800
 spring:
   jackson:
     date-format: yyyy-MM-dd HH:mm:ss
@@ -61,3 +60,4 @@ logging:
 file:
   webPicUploadUrl: C:\servers\apachehttp\Apache24\src\pic
   webPicUploadWithOutHost : pic
+  paymentPicUploadUrl: /usr/local/nginx/html/pic

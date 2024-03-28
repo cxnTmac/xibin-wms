@@ -23,6 +23,8 @@ public class WmOutboundDetailSaleHistoryQueryItem implements Serializable {
 
 	private Double outboundPrice;
 
+	private Double cost;
+
 	public String getFittingSkuName() {
 		return fittingSkuName;
 	}
@@ -93,5 +95,13 @@ public class WmOutboundDetailSaleHistoryQueryItem implements Serializable {
 
 	public void setPackageCode(String packageCode) {
 		this.packageCode = packageCode;
+	}
+
+	public Double getCost() {
+		return cost;
+	}
+
+	public void setCost(Double cost) {
+		this.cost = cost;
 	}
 }
