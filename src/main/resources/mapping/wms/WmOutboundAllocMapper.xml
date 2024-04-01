@@ -46,6 +46,7 @@
     <result column="sku_name" property="skuName" jdbcType="VARCHAR" />
     <result column="model_code" property="modelCode" jdbcType="VARCHAR" />
       <result column="total_outbound_num" property="totalOutboundNum" jdbcType="DOUBLE" />
+      <result column="total_alloc_num" property="totalAllocNum" jdbcType="DOUBLE" />
     <result column="outbound_num" property="outboundNum" jdbcType="DOUBLE" />
     <result column="pick_num" property="pickNum" jdbcType="DOUBLE" />
     <result column="outbound_price" property="outboundPrice" jdbcType="DOUBLE" />
@@ -441,6 +442,7 @@
         SELECT
         <include refid="Base_Column_List" />
         ,wod.outbound_num as total_outbound_num,
+        wod.outbound_alloc_num as total_alloc_num,
         bfs.fitting_sku_name as sku_name,
         bfs.model_code,
         bfs.package_code,

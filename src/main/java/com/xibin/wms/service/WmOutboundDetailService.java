@@ -25,7 +25,11 @@ public interface WmOutboundDetailService {
 
 	public WmOutboundDetailQueryItem saveOutboundDetail(WmOutboundDetail model) throws BusinessException;
 
-	public WmOutboundDetailQueryItem saveOutboundDetailWithOutCheck(WmOutboundDetail model) throws BusinessException;
+	void updateOutboundDetailAndReAlloc(String orderNo, String lineNo, double newOutboundNum) throws BusinessException;
+
+	void updateOutboundDetailAndReAlloc(WmOutboundDetail detail, double newOutboundNum) throws BusinessException;
+
+    public WmOutboundDetailQueryItem saveOutboundDetailWithOutCheck(WmOutboundDetail model) throws BusinessException;
 
 	public Message removeOutboundDetail(int[] ids, String orderNo) throws BusinessException;
 

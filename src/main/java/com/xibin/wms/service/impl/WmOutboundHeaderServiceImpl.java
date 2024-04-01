@@ -306,7 +306,7 @@ public class WmOutboundHeaderServiceImpl extends BaseManagerImpl implements WmOu
                 // 已打款
                 if (WmsCodeMaster.IS_RECEIVE_CASH_Y.getCode().equals(wmOutboundHeader.getIsRecievedCash())) {
                     // 计算差价
-                    double discount = wmOutboundHeader.getPriceDifferent();
+                    double discount = wmOutboundHeader.getPriceDifferent()==null?0.0:wmOutboundHeader.getPriceDifferent();
                     if (discount != 0) {
                         // 增加 差价账
                         BsCustomerRecord bsCustomerRecordDiscount = new BsCustomerRecord();

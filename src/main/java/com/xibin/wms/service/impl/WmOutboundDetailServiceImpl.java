@@ -256,7 +256,89 @@ public class WmOutboundDetailServiceImpl extends BaseManagerImpl implements WmOu
 		message.setMsg("出库单[" + orderNo + "]数据丢失,请联系管理员");
 		return message;
 	}
+	@Override
+	public void updateOutboundDetailAndReAlloc(String orderNo,String lineNo,double newOutboundNum) throws BusinessException {
+		MyUserDetails myUserDetails = SecurityUtil.getMyUserDetails();
+		WmOutboundDetail queryExample = new WmOutboundDetail();
+		queryExample.setOrderNo(orderNo);
+		queryExample.setLineNo(lineNo);
+		queryExample.setCompanyId(myUserDetails.getCompanyId());
+		queryExample.setWarehouseId(myUserDetails.getWarehouseId());
+		List<WmOutboundDetail> queryList = this.selectByExample(queryExample);
+		WmOutboundDetail detail;
+		if (!queryList.isEmpty()) {
+			detail = queryList.get(0);
+		}else{
+			throw new BusinessException("该出库明细不存在");
+		}
+		if(!detail.getStatus().equals(WmsCodeMaster.SO_PART_ALLOC.getCode())&&!detail.getStatus().equals(WmsCodeMaster.SO_FULL_ALLOC.getCode())&&!detail.getStatus().equals(WmsCodeMaster.SO_NEW.getCode())){
+			throw new BusinessException("该出库明细的状态必须为[创建][部分分配][完全分配]才能执行此操作！");
+		}
+		// 如果不是创建状态贼先取消分配
+		if(detail.getStatus().equals(WmsCodeMaster.SO_PART_ALLOC.getCode())||detail.getStatus().equals(WmsCodeMaster.SO_FULL_ALLOC.getCode())) {
+			this.cancelAlloc(detail);
+			queryList = this.selectByExample(queryExample);
+			if (!queryList.isEmpty()) {
+				detail = queryList.get(0);
+			}else{
+				throw new BusinessException("该出库明细不存在");
+			}
+		}
+		// 更新订单数
+		detail.setOutboundNum(newOutboundNum);
+		WmOutboundDetailQueryItem result = this.saveOutboundDetailWithOutCheck(detail);
+		BeanUtils.copyProperties(result,detail);
+		// 重新执行分配
+		this.alloc(detail);
+		queryList = this.selectByExample(queryExample);
+		if (!queryList.isEmpty()) {
+			detail = queryList.get(0);
+		}else{
+			throw new BusinessException("该出库明细不存在");
+		}
+		// 并且分配数不足，自动再进行虚拟分配
+		if(detail.getStatus().equals(WmsCodeMaster.SO_PART_ALLOC.getCode())){
+			this.virtualAlloc(detail);
+		}
+	}
 
+	@Override
+	public void updateOutboundDetailAndReAlloc(WmOutboundDetail detail,double newOutboundNum) throws BusinessException {
+		WmOutboundDetail queryExample = new WmOutboundDetail();
+		queryExample.setOrderNo(detail.getOrderNo());
+		queryExample.setLineNo(detail.getLineNo());
+		queryExample.setCompanyId(detail.getCompanyId());
+		queryExample.setWarehouseId(detail.getWarehouseId());
+		if(!detail.getStatus().equals(WmsCodeMaster.SO_PART_ALLOC.getCode())&&!detail.getStatus().equals(WmsCodeMaster.SO_FULL_ALLOC.getCode())&&!detail.getStatus().equals(WmsCodeMaster.SO_NEW.getCode())){
+			throw new BusinessException("该出库明细的状态必须为[创建][部分分配][完全分配]才能执行此操作！");
+		}
+		// 如果不是创建状态贼先取消分配
+		if(detail.getStatus().equals(WmsCodeMaster.SO_PART_ALLOC.getCode())||detail.getStatus().equals(WmsCodeMaster.SO_FULL_ALLOC.getCode())) {
+			this.cancelAlloc(detail);
+			List<WmOutboundDetail> queryList = this.selectByExample(queryExample);
+			if (!queryList.isEmpty()) {
+				detail = queryList.get(0);
+			}else{
+				throw new BusinessException("该出库明细不存在");
+			}
+		}
+		// 更新订单数
+		detail.setOutboundNum(newOutboundNum);
+		WmOutboundDetailQueryItem result = this.saveOutboundDetailWithOutCheck(detail);
+		BeanUtils.copyProperties(result,detail);
+		// 重新执行分配
+		this.alloc(detail);
+		List<WmOutboundDetail> queryList = this.selectByExample(queryExample);
+		if (!queryList.isEmpty()) {
+			detail = queryList.get(0);
+		}else{
+			throw new BusinessException("该出库明细不存在");
+		}
+		// 并且分配数不足，自动再进行虚拟分配
+		if(detail.getStatus().equals(WmsCodeMaster.SO_PART_ALLOC.getCode())){
+			this.virtualAlloc(detail);
+		}
+	}
 	@Override
 	public WmOutboundDetailQueryItem saveOutboundDetailWithOutCheck(WmOutboundDetail model) throws BusinessException {
 		// TODO Auto-generated method stub
@@ -1010,9 +1092,9 @@ public class WmOutboundDetailServiceImpl extends BaseManagerImpl implements WmOu
 						+ surplusOutboundNum + "剩余" + outboundNumForCalculate + "");
 				return message;
 			} else {
-				// 订货数没有变化
-				throw new BusinessException(
-						"出库单号[" + detail.getOrderNo() + "]行号[" + detail.getLineNo() + "]的出库单明细在仓库中没有库存!");
+				message.setCode(0);
+				message.setMsg("出库单号[" + detail.getOrderNo() + "]行号[" + detail.getLineNo() + "]的出库单明细没有库存");
+				return message;
 			}
 		} else {
 			throw new BusinessException("出库单号[" + detail.getOrderNo() + "]行号[" + detail.getLineNo() + "]的不能分配");
@@ -1031,7 +1113,6 @@ public class WmOutboundDetailServiceImpl extends BaseManagerImpl implements WmOu
 		queryExample.setWarehouseId(myUserDetails.getWarehouseId());
 		List<WmOutboundDetail> detailList = this.selectByExample(queryExample);
 		if (detailList.size() > 0) {
-
 			WmOutboundDetail detail = detailList.get(0);
 			if (WmsCodeMaster.SO_FULL_ALLOC.getCode().equals(detail.getStatus())) {
 				throw new BusinessException("出库单号[" + orderNo + "]行号[" + lineNo + "]的出库单明细已经分配!");

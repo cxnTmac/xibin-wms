@@ -985,4 +985,46 @@ public class OutboundController {
 			return message;
 		}
 	}
+
+	@RequestMapping("/updateOutboundDetailAndReAlloc")
+	@ResponseBody
+	public Message updateOutboundDetailAndReAlloc(HttpServletRequest request, Model model) {
+		Message message = new Message();
+		String str = request.getParameter("detail");
+		String newOutboundNumStr = request.getParameter("newOutboundNum");
+		double newOutboundNum = Double.parseDouble(newOutboundNumStr);
+		WmOutboundDetail bean = JSON.parseObject(str, WmOutboundDetail.class);
+		try {
+			this.outboundDetailService.updateOutboundDetailAndReAlloc(bean,newOutboundNum);
+			message.setCode(200);
+			message.setMsg("操作成功！");
+		} catch (BusinessException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			message.setCode(0);
+			message.setMsg(e.getMessage());
+		}
+		return message;
+	}
+
+	@RequestMapping("/updateOutboundDetailAndReAllocByLineNo")
+	@ResponseBody
+	public Message updateOutboundDetailAndReAllocByLineNo(HttpServletRequest request, Model model) {
+		Message message = new Message();
+		String orderNo = request.getParameter("orderNo");
+		String lineNo = request.getParameter("lineNo");
+		String newOutboundNumStr = request.getParameter("newOutboundNum");
+		double newOutboundNum = Double.parseDouble(newOutboundNumStr);
+		try {
+			this.outboundDetailService.updateOutboundDetailAndReAlloc(orderNo,lineNo,newOutboundNum);
+			message.setCode(200);
+			message.setMsg("操作成功！");
+		} catch (BusinessException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			message.setCode(0);
+			message.setMsg(e.getMessage());
+		}
+		return message;
+	}
 }

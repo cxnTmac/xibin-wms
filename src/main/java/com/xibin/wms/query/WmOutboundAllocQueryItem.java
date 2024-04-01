@@ -32,6 +32,8 @@ public class WmOutboundAllocQueryItem implements Serializable {
 
 	private Double totalOutboundNum;
 
+	private Double totalAllocNum;
+
 	private Double pickNum;
 
 	private Double outboundPrice;
@@ -342,5 +344,13 @@ public class WmOutboundAllocQueryItem implements Serializable {
 
 	public void setPackageCode(String packageCode) {
 		this.packageCode = packageCode;
+	}
+
+	public Double getTotalAllocNum() {
+		return totalAllocNum;
+	}
+
+	public void setTotalAllocNum(Double totalAllocNum) {
+		this.totalAllocNum = totalAllocNum;
 	}
 }
