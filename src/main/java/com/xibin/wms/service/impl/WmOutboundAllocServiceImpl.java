@@ -838,7 +838,6 @@ public class WmOutboundAllocServiceImpl extends BaseManagerImpl implements WmOut
 				entityTo.setOrderNo(alloc.getOrderNo());
 				entityTo.setOrderType(WmsCodeMaster.ORDER_OUB.getCode());
 				entityTo.setSkuCode(alloc.getSkuCode());
-				entityTo.setQtyOp(alloc.getOutboundNum());
 				entityTo.setPrice(alloc.getOutboundPrice());
 				// 库存数量足够
 				if (inventory.getInvAvailableNum().doubleValue() >= outboundNumForCalculate) {
@@ -847,6 +846,7 @@ public class WmOutboundAllocServiceImpl extends BaseManagerImpl implements WmOut
 					entity.setQtyOp(outboundNumForCalculate);
 					entity.setQtyOpBefore(inventory.getInvAvailableNum());
 					entity.setQtyOpAfter(ComputeUtil.sub(inventory.getInvAvailableNum(), outboundNumForCalculate));
+					entityTo.setQtyOp(outboundNumForCalculate);
 					// 更新库存
 					WmActTran actTran = wmInventoryService.updateInventory(entity,entityTo);
 					// 回填计算出的成本数据
@@ -861,6 +861,7 @@ public class WmOutboundAllocServiceImpl extends BaseManagerImpl implements WmOut
 					entity.setQtyOp(inventory.getInvAvailableNum());
 					entity.setQtyOpBefore(inventory.getInvAvailableNum());
 					entity.setQtyOpAfter(0.0);
+					entityTo.setQtyOp(inventory.getInvAvailableNum());
 					// 更新库存
 					WmActTran actTran = wmInventoryService.updateInventory(entity,entityTo);
 					// 回填计算出的成本数据

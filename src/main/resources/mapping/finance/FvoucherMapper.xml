@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.xibin.finance.dao.FvoucherDao">
+	<select id="queryForVoucher" resultType="Map"  parameterType="Map" >
+		SELECT
+		header.voucherID,
+		header.fdate,
+		header.fyear,
+		header.fperiod,
+		header.explanation AS headerExplanation,
+		header.entryCount,
+		fve.explanation,
+		fve.accountID,
+		fa.`name` AS accountName,
+		fve.itemID,
+		fi.`name` AS itemName,
+		fve.amount,
+		fve.dc,
+		header.checked,
+		header.posted,
+		header.isSettleAccounts,
+		header.preparerID,
+		header.checkerID,
+		header.posterID,
+		header.cashierID,
+		header.serialNum,
+		header.transDate,
+		header.isProfitLoss
+		FROM
+		(
+		SELECT
+		fv.voucherID,
+		fv.fdate,
+		fv.fyear,
+		fv.fperiod,
+		fv.explanation,
+		fv.entryCount,
+		fv.preparerID,
+		fv.checked,
+		fv.checkerID,
+		fv.posted,
+		fv.posterID,
+		fv.cashierID,
+		fv.isSettleAccounts,
+		fv.serialNum,
+		fv.transDate,
+		fv.isProfitLoss
+		FROM
+		f_voucher fv
+		WHERE
+		1=1
+		<if test="dateFm!=null and dateFm!=''"> AND fv.fdate &gt;= #{dateFm}</if>
+		<if test="dateTo!=null and dateTo!=''"> AND fv.fdate &lt;= #{dateTo}</if>
+		ORDER BY
+		fdate DESC,number DESC
+		LIMIT #{indexStart},#{indexEnd}
+		) AS header
+		LEFT JOIN f_voucherentry fve ON fve.voucherID = header.voucherID
+		LEFT JOIN f_account fa ON fa.accountID = fve.accountID
+		LEFT JOIN f_item fi ON fi.itemID = fve.itemID;
+	</select>
+	<select id="queryForVoucherCount" resultType="Long"  parameterType="Map" >
+		SELECT
+		count(fv.voucherID)
+		FROM
+		f_voucher fv
+		WHERE
+		1=1
+		<if test="dateFm!=null and dateFm!=''"> AND fv.fdate &gt;= #{dateFm}</if>
+		<if test="dateTo!=null and dateTo!=''"> AND fv.fdate &lt;= #{dateTo}</if>
+	</select>
+</mapper>

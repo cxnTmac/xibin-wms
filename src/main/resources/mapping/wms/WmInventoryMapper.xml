@@ -236,7 +236,7 @@
         and bl.company_id =wi.company_id
         and bl.warehouse_id = wi.warehouse_id
         <include refid="findByExampleWhere" />
-        and wi.inv_available_num>0
+<!--        and wi.inv_available_num>0-->
         and bl.use_type  in('VI')
     </select>
   <select id="getAvailableInvByPage" resultMap="QueryResultMap" parameterType="Map">

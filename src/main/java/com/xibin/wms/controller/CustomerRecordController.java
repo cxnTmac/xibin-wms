@@ -2,15 +2,15 @@ package com.xibin.wms.controller;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
-import com.xibin.wms.pojo.BsCustomerRecord;
-import com.xibin.wms.query.BsCustomerRecordQueryItem;
-import com.xibin.wms.service.BsCustomerRecordService;
 import com.xibin.core.exception.BusinessException;
 import com.xibin.core.page.pojo.Page;
 import com.xibin.core.page.pojo.PageEntity;
 import com.xibin.core.pojo.Message;
 import com.xibin.core.security.pojo.MyUserDetails;
 import com.xibin.core.security.util.SecurityUtil;
+import com.xibin.wms.pojo.BsCustomerRecord;
+import com.xibin.wms.query.BsCustomerRecordQueryItem;
+import com.xibin.wms.service.BsCustomerRecordService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -123,6 +123,19 @@ public class CustomerRecordController {
 		}
 		return message;
 	  }
-	  
+	@RequestMapping("/queryForVoucher")
+	@ResponseBody
+	public PageEntity<Map> queryForVoucher(HttpServletRequest request, Model model){
+		// 开始分页
+		MyUserDetails userDetails = SecurityUtil.getMyUserDetails();
+		PageEntity<Map> pageEntity = new PageEntity<Map>();
+		//配置分页参数
+		Integer page = Integer.parseInt(request.getParameter("page"));
+		Integer size = Integer.parseInt(request.getParameter("size"));
+		Map map = JSONObject.parseObject(request.getParameter("conditions"));
+		map.put("indexStart", (page-1)*size);
+		map.put("indexEnd", page*size);
+		return bsCustomerRecordService.queryForVoucher(map);
+	}
 	  
 }

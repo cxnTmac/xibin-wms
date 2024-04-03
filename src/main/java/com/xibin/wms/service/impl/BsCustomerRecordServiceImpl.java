@@ -3,9 +3,11 @@ package com.xibin.wms.service.impl;
 import com.xibin.core.daosupport.BaseManagerImpl;
 import com.xibin.core.daosupport.BaseMapper;
 import com.xibin.core.exception.BusinessException;
+import com.xibin.core.page.pojo.PageEntity;
 import com.xibin.core.pojo.Message;
 import com.xibin.core.security.pojo.MyUserDetails;
 import com.xibin.core.security.util.SecurityUtil;
+import com.xibin.finance.dao.FvoucherDao;
 import com.xibin.wms.dao.BdCustomerMapper;
 import com.xibin.wms.dao.BsCustomerRecordMapper;
 import com.xibin.wms.pojo.BsCustomerRecord;
@@ -31,6 +33,8 @@ public class BsCustomerRecordServiceImpl extends BaseManagerImpl implements BsCu
 	private BsCustomerRecordMapper bsCustomerRecordMapper;
 	@Autowired
 	private BdCustomerMapper bdCustomerMapper;
+	@Autowired
+	private FvoucherDao fvoucherDao;
 	public BsCustomerRecordServiceImpl() {
 	}
 
@@ -40,7 +44,14 @@ public class BsCustomerRecordServiceImpl extends BaseManagerImpl implements BsCu
 		return bsCustomerRecordMapper.selectByPrimaryKey(id);
 	}
 
-
+	@Override
+	public PageEntity<Map> queryForVoucher(Map map) {
+		// TODO Auto-generated method stub
+		PageEntity<Map> pageEntity = new PageEntity<>();
+		pageEntity.setList(fvoucherDao.queryForVoucher(map));
+		pageEntity.setSize(fvoucherDao.queryForVoucherCount(map));
+		return pageEntity;
+	}
 	@Override
 	public List<BsCustomerRecordQueryItem> getAllBsCustomerRecordByPage(Map map) {
 		// TODO Auto-generated method stub
