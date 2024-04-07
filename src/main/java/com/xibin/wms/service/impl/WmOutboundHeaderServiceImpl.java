@@ -289,6 +289,9 @@ public class WmOutboundHeaderServiceImpl extends BaseManagerImpl implements WmOu
             if (!WmsCodeMaster.SO_FULL_SHIPPING.getCode().equals(wmOutboundHeader.getStatus())) {
                 throw new BusinessException("出库单[" + wmOutboundHeader.getOrderNo() + "]不是完全发货状态");
             }
+            if (null == wmOutboundHeader.getFreightType()||"".equals(wmOutboundHeader.getFreightType())||WmsCodeMaster.FREIGHT_UNCONFIRMED.getCode().equals(wmOutboundHeader.getFreightType())) {
+                throw new BusinessException("出库单[" + wmOutboundHeader.getOrderNo() + "]运费情况还未确定，不能进行核算");
+            }
             if ("Y".equals(wmOutboundHeader.getIsCalculated())) {
                 throw new BusinessException("出库单[" + wmOutboundHeader.getOrderNo() + "]已完成销售核算！");
             }

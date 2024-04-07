@@ -41,6 +41,13 @@
         <result column="rec_ver" property="recVer" jdbcType="INTEGER" />
         <result column="company_id" property="companyId" jdbcType="INTEGER" />
     </resultMap>
+
+    <resultMap id="SumPriceResultMap" type="com.xibin.wms.entity.BsCustomerRecordSumPriceQueryItem" >
+        <result column="total" property="total" jdbcType="DOUBLE" />
+        <result column="customer_code" property="customerCode" jdbcType="VARCHAR" />
+        <result column="customer_name" property="customerName" jdbcType="VARCHAR" />
+        <result column="auxi_id" property="auxiId" jdbcType="INTEGER" />
+    </resultMap>
   <sql id="Base_Column_List" >
     bcr.id, bcr.customer_code, bcr.abstractt, bcr.auxi_id,bcr.order_no,bcr.pay,bcr.type,bcr.voucher_id,bcr.date,bcr.pic_url,
       bcr.remark, bcr.creator, bcr.create_time, bcr.modifier, bcr.modify_time, bcr.rec_ver,
@@ -399,5 +406,111 @@
         OR X1.RE > 0
         OR X2.FREIGHT > 0
         ORDER BY X1.SALE DESC
+    </select>
+
+    <select id="querySumPriceGroupByCustomerForAccount"   resultMap="SumPriceResultMap"   parameterType="Map" >
+        SELECT
+        sum(
+        round(bcr.pay,2)
+        )as total,
+        bcr.customer_code,
+        bcr.type,
+        bc.customer_name,
+        bc.auxi_id
+        FROM
+        bs_customer_record bcr
+        LEFT JOIN bd_customer bc ON bc.company_id = bcr.company_id
+        AND bc.customer_code = bcr.customer_code
+        WHERE
+        1 = 1
+        <if test="orderNos!=null and orderNos.size()>0">
+            AND bcr.order_no in
+            <foreach item="item" index="index" collection="orderNos" open="(" separator="," close=")">
+                #{item}
+            </foreach>
+        </if>
+        <if test="type!=null and type!=''">
+            AND bcr.type = #{type}
+        </if>
+        <if test="types!=null and types.size()>0">
+            AND bcr.type in
+            <foreach item="item" index="index" collection="types" open="(" separator="," close=")">
+                #{item}
+            </foreach>
+        </if>
+        <if test="timeFm!=null and timeFm!=''">
+            AND bcr.date &gt;= #{timeFm}
+        </if>
+        <if test="timeTo!=null and timeTo!=''">
+            AND bcr.date &lt;= #{timeTo}
+        </if>
+        <if test="noVoucherId == 1">
+            AND (bcr.voucher_id = 0 OR bcr.voucher_id IS NULL)
+        </if>
+        AND bcr.company_id = #{companyId}
+        GROUP BY
+        bcr.customer_code
+        <if test="isGroupByType==1">
+            ,bcr.type
+        </if>
+    </select>
+    <update id="updateVoucherIdByOrderNos" parameterType="Map">
+        UPDATE bs_customer_record bcr
+        set
+        bcr.voucher_id = #{toVoucherId}
+        WHERE 1=1
+        <if test="orderNos!=null and orderNos.size()>0">
+            AND bcr.order_no in
+            <foreach item="item" index="index" collection="orderNos" open="(" separator="," close=")">
+                #{item}
+            </foreach>
+        </if>
+        <if test="ids!=null and ids.size()>0">
+            AND bcr.id in
+            <foreach item="item" index="index" collection="ids" open="(" separator="," close=")">
+                #{item}
+            </foreach>
+        </if>
+        <if test="voucherId!=null and voucherId!=''">
+            AND bcr.voucher_id = #{voucherId}
+        </if>
+        <if test="type!=null and type!=''">
+            AND bcr.type = #{type}
+        </if>
+        <if test="types!=null and types.size()>0">
+            AND bcr.type in
+            <foreach item="item" index="index" collection="types" open="(" separator="," close=")">
+                #{item}
+            </foreach>
+        </if>
+        AND bcr.company_id = #{companyId}
+    </update>
+
+    <select id="queryIdsByForAccount"   resultType="String"   parameterType="Map" >
+        SELECT
+        bcr.id
+        FROM
+        bs_customer_record bcr
+        WHERE
+        1 = 1
+        <if test="type!=null and type!=''">
+            AND bcr.type = #{type}
+        </if>
+        <if test="types!=null and types.size()>0">
+            AND bcr.type in
+            <foreach item="item" index="index" collection="types" open="(" separator="," close=")">
+                #{item}
+            </foreach>
+        </if>
+        <if test="timeFm!=null and timeFm!=''">
+            AND bcr.date &gt;= #{timeFm}
+        </if>
+        <if test="timeTo!=null and timeTo!=''">
+            AND bcr.date &lt;= #{timeTo}
+        </if>
+        <if test="noVoucherId == 1">
+            AND (bcr.voucher_id = 0 OR bcr.voucher_id IS NULL)
+        </if>
+        AND bcr.company_id = #{companyId}
     </select>
 </mapper>

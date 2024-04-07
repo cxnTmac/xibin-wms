@@ -19,13 +19,15 @@ public interface BsCustomerRecordService {
 	
 	public Message removeBsCustomerRecord(int id) throws BusinessException;
 
-	public BsCustomerRecord saveBsCustomerRecord(BsCustomerRecord model) throws BusinessException;
+//	public BsCustomerRecord saveBsCustomerRecord(BsCustomerRecord model) throws BusinessException;
 
 	public BaseModel save(BaseModel baseModel);
 
 	public int delete(int id);
 
 	public int delete(int []ids);
+
+	BsCustomerRecord saveBsCustomerRecord(BsCustomerRecord model, String resetOrderChecked) throws BusinessException;
 
 	public List<BsCustomerRecord> selectByExample(BsCustomerRecord model);
 

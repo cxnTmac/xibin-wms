@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.xibin.finance.dao.FCarriedDao">
+	<select id="findFCarriedList" parameterType="java.util.Map" resultType="java.util.Map">
+		select a.* from f_carried a
+		where 1=1
+		<if test="fyear != null and fyear != ''">
+			and a.fyear = #{fyear}
+		</if>
+		<if test="fperiod != null and fperiod != ''">
+			and a.fperiod = #{fperiod}
+		</if>
+		<if test="voucherID != null and voucherID != ''">
+			and a.voucherID = #{voucherID}
+		</if>
+		<if test="type != null and type != ''">
+			and a.type = #{type}
+		</if>
+	</select>
+	
+ 	<update id="fanVoucheer" parameterType="java.util.Map">
+		<if test="type == 1">
+			update elncdb.orders set voucherID = null where voucherID = #{voucherID};
+		</if>
+		<if test="type == 2">
+			update elncdb.sup_orders set voucherID = null where voucherID = #{voucherID};
+		</if>
+		update f_carried set carried = 1 where id = #{id};
+	</update>
+	
+	<delete id="deleteVoucheerByIds"> 		
+ 		delete from f_carried where id in
+ 		<foreach collection="array" item="id" open="(" separator="," close=")">
+ 			#{id}
+        </foreach> 
+ 	</delete>
+ 	
+	<select id="findtranTypeAddVoucheer" parameterType="java.util.Map" resultType="java.util.Map">
+		<if test="type == 1">
+			select 
+				IFNULL(SUM(a.payMoney),0) as payMoney
+				,IFNULL(SUM(b.addMoney),0) as addMoney
+				,IFNULL(SUM(b.sendMoney),0) as sendMoney
+			from elncdb.order_pay a
+			LEFT JOIN elncdb.orders b on a.pid=b.id
+			where b.voucherID is NULL
+		</if>
+		<if test="type == 2">
+			select 
+				IFNULL(SUM(a.payMoney),0) as payMoney
+				,IFNULL(SUM(b.addMoney),0) as addMoney
+				,IFNULL(SUM(b.sendMoney),0) as sendMoney
+			from elncdb.order_pay a
+			LEFT JOIN elncdb.sup_orders b on a.pid=b.id
+			where b.voucherID is NULL
+		</if>
+		<if test="payState == 1">
+			and a.payState = 1
+		</if>
+		<if test="payState != 1">
+			and a.payState != 1
+		</if>
+		<if test="payTime != null and payTime != ''">
+  			and DATE_FORMAT(a.payTime, '%Y-%m') = #{payTime}
+		</if>
+	</select>
+ 	
+	<select id="findSupplierSend" parameterType="java.util.Map" resultType="java.util.Map">
+		select IFNULL(sum(itemMoney),0) as itemMoney, IFNULL(sum(sendMoney),0) as sendMoney
+		from elncdb.supplier_send AS os where state = 6 and voucherID is null
+		<if test="payTime != null and payTime != ''">
+  			AND DATE_FORMAT(os.createTime,'%Y-%m-%D') <![CDATA[>=]]> #{payTime}
+		</if>
+		<if test="payTime2 != null and payTime2 != ''">
+  			AND DATE_FORMAT(os.createTime,'%Y-%m-%D') <![CDATA[<=]]> #{payTime2}
+		</if>
+	</select>
+	
+ 	<update id="updateSupplierSend" parameterType="java.util.Map">
+ 		update elncdb.supplier_send
+ 		set voucherID = #{voucherID}
+ 		where state = 6 and voucherID is null
+		<if test="payTime != null and payTime != ''">
+  			AND DATE_FORMAT(createTime, '%Y-%m-%D') <![CDATA[>=]]> DATE_FORMAT(#{payTime}, '%Y-%m-%D')
+		</if>
+		<if test="payTime2 != null and payTime2 != ''">
+  			AND DATE_FORMAT(createTime, '%Y-%m-%D') <![CDATA[<=]]> DATE_FORMAT(#{payTime2}, '%Y-%m-%D')
+		</if>
+	</update>
+	
+ 	<update id="deleteFCarried">
+ 		update elncdb.supplier_send
+		set voucherID = null
+ 		where voucherID = #{voucherID}
+	</update>
+	
+	<insert id="saveFCarried" parameterType="com.xibin.finance.pojo.FCarried" useGeneratedKeys="true" keyProperty="id">
+ 		insert into f_carried
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="fyear != null">fyear,</if>
+			<if test="fperiod != null">fperiod,</if>
+			<if test="voucherID != null">voucherID,</if>
+			<if test="type != null">type,</if>
+			<if test="carried != null">carried,</if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="fyear != null">#{fyear},</if>
+			<if test="fperiod != null">#{fperiod},</if>
+			<if test="voucherID != null">#{voucherID},</if>
+			<if test="type != null">#{type},</if>
+			<if test="carried != null">#{carried},</if>
+		</trim>
+ 	</insert>
+ 	
+</mapper>

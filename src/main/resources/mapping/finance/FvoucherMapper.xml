@@ -1,6 +1,259 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
-<mapper namespace="com.xibin.finance.dao.FvoucherDao">
+<mapper namespace="com.xibin.finance.dao.FVoucherDao">
+	<resultMap type="com.xibin.finance.pojo.FVoucher" id="FVoucherMap">
+		<id     property="voucherID"  column="voucherID"  />
+		<result property="fdate"  column="fdate"  />
+		<result property="fyear"  column="fyear"  />
+		<result property="fperiod"  column="fperiod"  />
+		<result property="groupID"  column="groupID"  />
+		<result property="number"  column="number"  />
+		<result property="explanation"  column="explanation"  />
+		<result property="entryCount"  column="entryCount"  />
+		<result property="debitTotal"  column="debitTotal"  />
+		<result property="creditTotal"  column="creditTotal"  />
+		<result property="checked"  column="checked"  />
+		<result property="posted"  column="posted"  />
+		<result property="preparerID"  column="preparerID"  />
+		<result property="checkerID"  column="checkerID"  />
+		<result property="posterID"  column="posterID"  />
+		<result property="cashierID"  column="cashierID"  />
+		<result property="serialNum"  column="serialNum"  />
+		<result property="tranType"  column="tranType"  />
+		<result property="transDate"  column="transDate"  />
+	</resultMap>
+
+	<sql id="selectVo">
+		select
+		a.voucherID, DATE_FORMAT(a.fdate,'%Y-%m-%d') as fdate, a.fyear, a.fperiod, a.groupID, a.number, a.explanation, a.entryCount, a.debitTotal, a.creditTotal, a.checked, a.posted, a.preparerID, a.checkerID, a.posterID, a.cashierID, a.serialNum, a.tranType, a.isProfitLoss, DATE_FORMAT(a.transDate,'%Y-%m-%d') as transDate,a.isSettleAccounts as isJz
+		,(select txt from bean_type where tKey="fVoucher_checked" and val=a.checked) as checkedTxt
+		,(select txt from bean_type where tKey="fVoucher_posted" and val=a.posted) as postedTxt
+		,(select name from f_sys_user where id = a.posterID) as posterIDName
+		,(select name from f_sys_user where id = a.cashierID) as cashierIDName
+		,(select name from f_sys_user where id = a.preparerID) as preparerIDName
+		,(select name from f_sys_user where id = a.checkerID) as checkerIDName
+		,(select tplTypeName from f_vouchertpltype where tplTypeID = a.tranType) as tranTypeName
+		,(select name from f_voucher_group where groupID = a.groupID) as groupName
+		,(select GROUP_CONCAT(fa.name) from f_voucherentry fv LEFT JOIN f_account fa on fv.accountID = fa.accountID where fv.voucherID = a.voucherID) as accountName
+		,(select GROUP_CONCAT(IF(fv.itemID IS NULL OR fv.itemID='','',fi.name)) from f_voucherentry fv LEFT JOIN f_item fi on fv.itemID = fi.itemID where fv.voucherID = a.voucherID) as itemName
+		,(select GROUP_CONCAT(explanation ORDER BY entryID SEPARATOR ',') from f_voucherentry where voucherID = a.voucherID) as explanations
+		,(select GROUP_CONCAT(dc ORDER BY entryID SEPARATOR ',') from f_voucherentry where voucherID = a.voucherID)  dcs
+		,(select GROUP_CONCAT(amount ORDER BY entryID SEPARATOR ',') from f_voucherentry where voucherID = a.voucherID)  amounts
+		from f_voucher a
+	</sql>
+
+	<select id="findFVoucherList" parameterType="java.util.Map" resultType="java.util.Map">
+		<include refid="selectVo"/>
+		where 1=1
+		<if test="fstartdate != null and fstartdate != ''">
+			AND a.fdate <![CDATA[>=]]> DATE_FORMAT(#{fstartdate},'%Y-%m-%d 00:00:00')
+		</if>
+		<if test="fendtdate != null and fendtdate != ''">
+			AND a.fdate <![CDATA[<=]]> DATE_FORMAT(#{fendtdate},'%Y-%m-%d 23:59:59')
+		</if>
+		<if test="fyear != null and fyear != ''">
+			AND a.fyear like concat('%', #{fyear}, '%')
+		</if>
+		<if test="fperiod != null and fperiod != ''">
+			AND a.fperiod like concat('%', #{fperiod}, '%')
+		</if>
+		<if test="groupID != null and groupID != ''">
+			AND a.groupID like concat('%', #{groupID}, '%')
+		</if>
+		<if test="number != null and number != ''">
+			AND a.number = #{number}
+		</if>
+		<if test="explanation != null and explanation != ''">
+			AND a.explanation like concat('%', #{explanation}, '%')
+		</if>
+		<if test="entryCount != null and entryCount != ''">
+			AND a.entryCount like concat('%', #{entryCount}, '%')
+		</if>
+		<if test="debitTotal != null and debitTotal != ''">
+			AND a.debitTotal like concat('%', #{debitTotal}, '%')
+		</if>
+		<if test="creditTotal != null and creditTotal != ''">
+			AND a.creditTotal like concat('%', #{creditTotal}, '%')
+		</if>
+		<if test="checked != null and checked != ''">
+			AND a.checked like concat('%', #{checked}, '%')
+		</if>
+		<if test="posted != null and posted != ''">
+			AND a.posted like concat('%', #{posted}, '%')
+		</if>
+		<if test="preparerID != null and preparerID != ''">
+			AND a.preparerID like concat('%', #{preparerID}, '%')
+		</if>
+		<if test="checkerID != null and checkerID != ''">
+			AND a.checkerID like concat('%', #{checkerID}, '%')
+		</if>
+		<if test="posterID != null and posterID != ''">
+			AND a.posterID like concat('%', #{posterID}, '%')
+		</if>
+		<if test="cashierID != null and cashierID != ''">
+			AND a.cashierID like concat('%', #{cashierID}, '%')
+		</if>
+		<if test="serialNum != null and serialNum != ''">
+			AND a.serialNum like concat('%', #{serialNum}, '%')
+		</if>
+		<if test="tranType != null and tranType != ''">
+			AND a.tranType like concat('%', #{tranType}, '%')
+		</if>
+		<if test="startTime != null and startTime != ''">
+			AND a.transDate <![CDATA[>=]]> DATE_FORMAT(#{startTime},'%Y-%m-%d 00:00:00')
+		</if>
+		<if test="endTime != null and endTime != ''">
+			AND a.transDate <![CDATA[<=]]> DATE_FORMAT(#{endTime},'%Y-%m-%d 23:59:59')
+		</if>
+		order by fdate desc,number desc
+	</select>
+
+	<select id="getById" resultMap="FVoucherMap">
+		<include refid="selectVo"/>
+		where a.voucherID = #{id}
+	</select>
+
+	<select id="findtranTypeMin" resultType="String">
+		select groupID from f_voucher_group LIMIT 1
+	</select>
+
+	<select id="getByFperiod" resultType="java.util.Map">
+		select
+		(select IFNULL(max(number),0) from f_voucher where fperiod = #{fperiod} and fyear = #{fyear}) AS maxNumber
+		,IFNULL(max(serialNum),0) AS maxSerialNum
+		from f_voucher
+	</select>
+
+	<select id="findtranTypeList" resultType="java.util.Map">
+		select groupID as val, name as txt from f_voucher_group
+	</select>
+
+	<select id="fVoucherIsNumber" parameterType="java.util.Map" resultType="java.lang.Long">
+		SELECT COUNT(*) from f_voucher a where a.number= #{number} and DATE_FORMAT(a.fdate,'%Y-%m') = DATE_FORMAT(#{fdate},'%Y-%m') and a.voucherID <![CDATA[<>]]> #{voucherID}
+	</select>
+
+	<delete id="deleteFVoucherByIds">
+		delete from f_voucher where voucherID in
+		<foreach collection="array" item="id" open="(" separator="," close=")">
+			#{id}
+		</foreach>
+	</delete>
+
+	<update id="updateFVoucher" parameterType="com.xibin.finance.pojo.FVoucher">
+		update f_voucher
+		<set>
+			<if test="fdate != null">fdate = #{fdate},</if>
+			<if test="fyear != null">fyear = #{fyear},</if>
+			<if test="fperiod != null">fperiod = #{fperiod},</if>
+			<if test="groupID != null">groupID = #{groupID},</if>
+			<if test="number != null">number = #{number},</if>
+			<if test="explanation != null">explanation = #{explanation},</if>
+			<if test="entryCount != null">entryCount = #{entryCount},</if>
+			<if test="debitTotal != null">debitTotal = #{debitTotal},</if>
+			<if test="creditTotal != null">creditTotal = #{creditTotal},</if>
+			<if test="checked != null">checked = #{checked},</if>
+			<if test="posted != null">posted = #{posted},</if>
+			<if test="preparerID != null">preparerID = #{preparerID},</if>
+			<if test="checkerID != null">checkerID = #{checkerID},</if>
+			<if test="posterID != null">posterID = #{posterID},</if>
+			<if test="cashierID != null">cashierID = #{cashierID},</if>
+			<if test="serialNum != null">serialNum = #{serialNum},</if>
+			<if test="tranType != null">tranType = #{tranType},</if>
+			<if test="transDate != null">transDate = #{transDate},</if>
+			<if test="isProfitLoss != null">isProfitLoss = #{isProfitLoss},</if>
+		</set>
+		where voucherID = #{voucherID}
+	</update>
+
+	<update id="updateOrders" parameterType="java.util.Map">
+		<if test="type == 1">
+			update elncdb.orders
+			set voucherID = #{voucherID}
+			where id in (
+			select * from (
+			select
+			b.id
+			from elncdb.order_pay a
+			LEFT JOIN elncdb.orders b on a.pid=b.id
+			where b.voucherID is NULL
+			and a.ptype = 1
+			and b.state = 4
+			and a.payState = 2
+			and (a.payType = 1 or a.payType = 2 or a.payType = 4)
+			<if test="payTime != null and payTime != ''">
+				and DATE_FORMAT(a.payTime, '%Y-%m-%d') <![CDATA[<=]]> DATE_FORMAT(#{payTime}, '%Y-%m-%d')
+			</if>
+			) a
+			) and voucherID is null
+		</if>
+		<if test="type == 2">
+			update elncdb.sup_orders
+			set voucherID = #{voucherID}
+			where id in (
+			select * from (
+			select
+			b.id
+			from elncdb.order_pay a
+			LEFT JOIN elncdb.sup_orders b on a.pid=b.id
+			where b.voucherID is NULL
+			and a.ptype = 2
+			and b.state = 4
+			and a.payState = 2
+			and (a.payType = 1 or a.payType = 2 or a.payType = 4)
+			<if test="payTime != null and payTime != ''">
+				and DATE_FORMAT(a.payTime, '%Y-%m-%d') <![CDATA[<=]]> DATE_FORMAT(#{payTime}, '%Y-%m-%d')
+			</if>
+			) a
+			) and voucherID is null
+		</if>
+
+	</update>
+
+	<insert id="saveFVoucher" parameterType="com.xibin.finance.pojo.FVoucher" useGeneratedKeys="true" keyProperty="voucherID">
+		insert into f_voucher
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="fdate != null">fdate,</if>
+			<if test="fyear != null">fyear,</if>
+			<if test="fperiod != null">fperiod,</if>
+			<if test="groupID != null">groupID,</if>
+			<if test="number != null">number,</if>
+			<if test="explanation != null">explanation,</if>
+			<if test="entryCount != null">entryCount,</if>
+			<if test="debitTotal != null">debitTotal,</if>
+			<if test="creditTotal != null">creditTotal,</if>
+			<if test="checked != null">checked,</if>
+			<if test="posted != null">posted,</if>
+			<if test="preparerID != null">preparerID,</if>
+			<if test="checkerID != null">checkerID,</if>
+			<if test="posterID != null">posterID,</if>
+			<if test="cashierID != null">cashierID,</if>
+			<if test="serialNum != null">serialNum,</if>
+			<if test="tranType != null">tranType,</if>
+			<if test="transDate != null">transDate,</if>
+			<if test="isProfitLoss != null">isProfitLoss,</if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="fdate != null">#{fdate},</if>
+			<if test="fyear != null">#{fyear},</if>
+			<if test="fperiod != null">#{fperiod},</if>
+			<if test="groupID != null">#{groupID},</if>
+			<if test="number != null">#{number},</if>
+			<if test="explanation != null">#{explanation},</if>
+			<if test="entryCount != null">#{entryCount},</if>
+			<if test="debitTotal != null">#{debitTotal},</if>
+			<if test="creditTotal != null">#{creditTotal},</if>
+			<if test="checked != null">#{checked},</if>
+			<if test="posted != null">#{posted},</if>
+			<if test="preparerID != null">#{preparerID},</if>
+			<if test="checkerID != null">#{checkerID},</if>
+			<if test="posterID != null">#{posterID},</if>
+			<if test="cashierID != null">#{cashierID},</if>
+			<if test="serialNum != null">#{serialNum},</if>
+			<if test="tranType != null">#{tranType},</if>
+			<if test="transDate != null">#{transDate},</if>
+			<if test="isProfitLoss != null">#{isProfitLoss},</if>
+		</trim>
+	</insert>
 	<select id="queryForVoucher" resultType="Map"  parameterType="Map" >
 		SELECT
 		header.voucherID,
@@ -9,6 +262,8 @@
 		header.fperiod,
 		header.explanation AS headerExplanation,
 		header.entryCount,
+		header.debitTotal,
+		header.creditTotal,
 		fve.explanation,
 		fve.accountID,
 		fa.`name` AS accountName,
@@ -36,6 +291,8 @@
 		fv.explanation,
 		fv.entryCount,
 		fv.preparerID,
+		fv.debitTotal,
+		fv.creditTotal,
 		fv.checked,
 		fv.checkerID,
 		fv.posted,

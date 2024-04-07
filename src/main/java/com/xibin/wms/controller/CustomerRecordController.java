@@ -108,10 +108,11 @@ public class CustomerRecordController {
 	  public Message saveCustomerRecord(HttpServletRequest request,Model model){
 		Message message = new Message();
 		String str = request.getParameter("customerRecord");
+		String resetOrderChecked = request.getParameter("resetOrderChecked");
 		BsCustomerRecord bean = JSON.parseObject(str, BsCustomerRecord.class);
 		BsCustomerRecord result = new BsCustomerRecord();
 		try {
-			result = this.bsCustomerRecordService.saveBsCustomerRecord(bean);
+			result = this.bsCustomerRecordService.saveBsCustomerRecord(bean,resetOrderChecked);
 			message.setCode(200);
 			message.setData(result);
 			message.setMsg("操作成功！");

@@ -1,6 +1,7 @@
 package com.xibin.wms.dao;
 
 import com.xibin.core.daosupport.BaseMapper;
+import com.xibin.wms.entity.BsCustomerRecordSumPriceQueryItem;
 import com.xibin.wms.pojo.BsCustomerRecord;
 import com.xibin.wms.query.BsCustomerRecordQueryItem;
 
@@ -17,4 +18,10 @@ public interface BsCustomerRecordMapper extends BaseMapper{
     Double  getBalanceByCustomerCode(Map map);
 
     List<Map> monthReport(Map map);
+
+    List<BsCustomerRecordSumPriceQueryItem> querySumPriceGroupByCustomerForAccount(Map map);
+
+    void updateVoucherIdByOrderNos(Map map);
+
+    List<String> queryIdsByForAccount(Map map);
 }

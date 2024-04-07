@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.xibin.finance.dao.FProfitLossDao">
+
+	<select id="findFProfitLossList" parameterType="java.util.Map" resultType="java.util.Map">
+		select a.* from f_profitloss a
+		where 1=1
+		<if test="fyear != null and fyear != ''">
+			and a.fyear = #{fyear}
+		</if>
+		<if test="fperiod != null and fperiod != ''">
+			and a.fperiod = #{fperiod}
+		</if>
+		<if test="voucherID != null and voucherID != ''">
+			and a.voucherID = #{voucherID}
+		</if>
+		<if test="carried != null and carried != ''">
+			and a.carried = #{carried}
+		</if>
+		ORDER BY a.id desc 
+	</select>
+	
+	<insert id="saveFProfitLoss" parameterType="com.xibin.finance.pojo.FProfitLoss" useGeneratedKeys="true" keyProperty="id">
+ 		insert into f_profitloss
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="fyear != null">fyear,</if>
+			<if test="fperiod != null">fperiod,</if>
+			<if test="voucherID != null">voucherID,</if>
+			<if test="voucherIDs != null">voucherIDs,</if>
+			<if test="carried != null">carried,</if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="fyear != null">#{fyear},</if>
+			<if test="fperiod != null">#{fperiod},</if>
+			<if test="voucherID != null">#{voucherID},</if>
+			<if test="voucherIDs != null">#{voucherIDs},</if>
+			<if test="carried != null">#{carried},</if>
+		</trim>
+ 	</insert>
+	
+ 	<update id="fanVoucheer" parameterType="java.util.Map">
+		update f_profitloss set carried = 1 where id = #{id};
+	</update>
+	
+	<delete id="deleteFProfitLossByIds"> 		
+ 		delete from f_profitloss where id in
+ 		<foreach collection="array" item="id" open="(" separator="," close=")">
+ 			#{id}
+        </foreach> 
+ 	</delete>
+ 	
+</mapper>

@@ -1,0 +1,211 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.xibin.finance.dao.FVoucherentryDao">
+	<resultMap type="com.xibin.finance.pojo.FVoucherentry" id="FVoucherentryMap">
+		<id     property="voucherID"  column="voucherID"  />
+		<result property="entryID"  column="entryID"  />
+		<result property="explanation"  column="explanation"  />
+		<result property="accountID"  column="accountID"  />
+		<result property="itemID"  column="itemID"  />
+		<result property="dc"  column="dc"  />
+		<result property="amount"  column="amount"  />
+		<result property="quantity"  column="quantity"  />
+		<result property="measureUnitID"  column="measureUnitID"  />
+		<result property="unitPrice"  column="unitPrice"  />
+		<result property="accountID2"  column="accountID2"  />
+		<result property="cashFlowItem"  column="cashFlowItem"  />
+	</resultMap>
+	
+	<sql id="selectVo">
+        select
+			a.voucherID, a.entryID, a.explanation, a.accountID, a.itemID, a.dc, a.amount, a.quantity, a.measureUnitID, a.unitPrice, a.accountID2, a.cashFlowItem 
+			,b.name as accountName
+			,(select name from f_account where accountID = a.accountID) as accountIDText
+			,(select txt from bean_type where tKey='account_boolean' and val = a.cashFlowItem) as cashFlowItemTxt
+			,(select GROUP_CONCAT(CONCAT(number,'-',name)) from f_item where FIND_IN_SET(itemID,a.itemID)) as itemIDTxt
+			,b.parentID, b.number, b.groupID
+			,v.debitTotal,v.creditTotal,v.fdate,v.number as vnumber
+		from f_voucherentry a
+		LEFT JOIN f_account b on a.accountID=b.accountID
+		LEFT JOIN f_voucher v on a.voucherID = v.voucherID
+    </sql>
+    
+	<select id="findFVoucherentryList1" parameterType="java.util.Map" resultType="java.util.Map">
+		<include refid="selectVo"/>
+		where 1=1
+		<if test="voucherID != null and voucherID != ''">
+			AND a.voucherID = #{voucherID}
+		</if>
+		<if test="entryID != null and entryID != ''">
+			AND a.entryID like concat('%', #{entryID}, '%')
+		</if>
+		<if test="explanation != null and explanation != ''">
+			AND a.explanation like concat('%', #{explanation}, '%')
+		</if>
+		<if test="accountID != null and accountID != ''">
+			AND a.accountID like concat('%', #{accountID}, '%')
+		</if>
+		<if test="accountName != null and accountName != ''">
+			AND b.name like concat('%', #{accountName}, '%')
+		</if>
+		<if test="itemID != null and itemID != ''">
+			AND a.itemID like concat('%', #{itemID}, '%')
+		</if>
+		<if test="dc != null and dc != ''">
+			AND a.dc like concat('%', #{dc}, '%')
+		</if>
+		<if test="amount != null and amount != ''">
+			AND a.amount like concat('%', #{amount}, '%')
+		</if>
+		<if test="quantity != null and quantity != ''">
+			AND a.quantity like concat('%', #{quantity}, '%')
+		</if>
+		<if test="measureUnitID != null and measureUnitID != ''">
+			AND a.measureUnitID like concat('%', #{measureUnitID}, '%')
+		</if>
+		<if test="unitPrice != null and unitPrice != ''">
+			AND a.unitPrice like concat('%', #{unitPrice}, '%')
+		</if>
+		<if test="accountID2 != null and accountID2 != ''">
+			AND a.accountID2 like concat('%', #{accountID2}, '%')
+		</if>
+		<if test="cashFlowItem != null and cashFlowItem != ''">
+			AND a.cashFlowItem like concat('%', #{cashFlowItem}, '%')
+		</if>
+	</select>
+    
+	<select id="selectMaxEntryID" resultType="String">
+		select max(entryID) from f_voucherentry where voucherID = #{voucherID}
+	</select>
+	
+	<select id="findFVoucherentryAccouintIDList" parameterType="java.util.Map" resultType="java.util.Map">
+		SELECT
+			c.accountID,c. NAME,c.dc,
+			(
+				SUM(IF(a.dc = 0 AND c.dc = 1 AND a.amount <![CDATA[<]]> 0, a.amount, 0))
+				+ SUM(IF(a.dc = 1 AND c.dc = -1 AND a.amount <![CDATA[<]]> 0, a.amount, 0))
+				+ SUM(IF(a.dc = 1 AND c.dc = 1, a.amount, 0))
+				+ SUM(IF(a.dc = 0 AND c.dc = -1, a.amount, 0))
+				- SUM(IF(a.dc = 0 AND c.dc = 1 AND a.amount <![CDATA[>]]> 0, a.amount, 0))
+				- SUM(IF(a.dc = 1 AND c.dc = -1 AND a.amount <![CDATA[>]]> 0, a.amount, 0))
+			) AS money
+		FROM
+			f_voucherentry a
+		LEFT JOIN f_voucher b ON a.voucherID = b.voucherID
+		LEFT JOIN f_account c ON a.accountID = c.accountID
+		where 1=1 and b.posted = 1
+		<if test="ids != null and ids != ''">
+			AND FIND_IN_SET(a.accountID,#{ids})
+		</if>
+		<if test="fyear != null and fyear != ''">
+			AND b.fyear = #{fyear}
+		</if>
+		<if test="fperiod != null and fperiod != ''">
+			AND b.fperiod = #{fperiod}
+		</if>
+		GROUP BY
+			a.accountID
+		ORDER BY c.parentID asc , c.groupID,c.accountID desc 
+	</select>
+	
+	<select id="getById" resultMap="FVoucherentryMap">
+		<include refid="selectVo"/>
+		where a.id = #{id}
+	</select>
+	
+	<select id="getAccountID" resultType="Double">
+		select IFNULL(SUM(a.amount),0) as amount from v_pzmx a
+		LEFT JOIN f_account b on a.accountID = b.accountID
+		where 1=1 
+		<if test="dc != null and dc != ''">
+			AND  a.dc = #{dc}
+		</if>
+		<if test="accountID != null and accountID != ''">
+			AND b.number like concat('%', #{accountID}, '%')
+		</if>
+		<if test="groupID != null and groupID != ''">
+			AND b.groupID = #{groupID}
+		</if>
+		<if test="cashFlowItem != null and cashFlowItem != ''">
+			AND a.cashFlowItem = #{cashFlowItem}
+		</if>
+		<if test="fyear != null and fyear != ''">
+			AND a.fyear = #{fyear}
+		</if>
+		<if test="fperiod != null and fperiod != ''">
+			AND a.fperiod = ${fperiod}
+		</if>
+		<if test="qfyear != null and qfyear != ''">
+			AND a.fyear <![CDATA[<]]> #{qfyear}
+		</if>
+		<if test="qfperiod != null and qfperiod != ''">
+			AND a.fperiod <![CDATA[<]]> ${qfperiod}
+		</if>
+	</select>
+	
+	<delete id="deleteFVoucherentryByIds"> 		
+ 		delete from f_voucherentry where voucherID in
+ 		<foreach collection="array" item="id" open="(" separator="," close=")">
+ 			#{id}
+        </foreach> 
+ 	</delete>
+ 	
+	<delete id="deleteFVoucherentry" parameterType="java.util.Map"> 		
+ 		delete from f_voucherentry where voucherID = #{voucherID} and entryID = #{entryID}
+ 	</delete>
+ 	
+ 	<update id="updateFVoucherentry" parameterType="com.xibin.finance.pojo.FVoucherentry">
+ 		update f_voucherentry
+ 		<set>
+			<if test="explanation != null">explanation = #{explanation},</if>
+			<if test="accountID != null">accountID = #{accountID},</if>
+			<if test="itemID != null">itemID = #{itemID},</if>
+			<if test="dc != null">dc = #{dc},</if>
+			<if test="amount != null">amount = #{amount},</if>
+			<if test="quantity != null">quantity = #{quantity},</if>
+			<if test="measureUnitID != null">measureUnitID = #{measureUnitID},</if>
+			<if test="unitPrice != null">unitPrice = #{unitPrice},</if>
+			<if test="accountID2 != null">accountID2 = #{accountID2},</if>
+			<if test="cashFlowItem != null">cashFlowItem = #{cashFlowItem},</if>
+ 		</set>
+ 		where voucherID = #{voucherID} and entryID = #{entryID}
+	</update>
+	<update id="exchangefVoucherentry" parameterType="java.util.Map">
+ 		update f_voucherentry
+ 		<set>
+			<if test="newNumber != null"> accountID = #{newNumber},</if>
+ 		</set>
+ 		where accountID = #{oldNumber}
+	</update>
+ 	<insert id="saveFVoucherentry" parameterType="com.xibin.finance.pojo.FVoucherentry" useGeneratedKeys="true" keyProperty="id">
+ 		insert into f_voucherentry
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="voucherID != null">voucherID,</if>
+			<if test="entryID != null">entryID,</if>
+			<if test="explanation != null">explanation,</if>
+			<if test="accountID != null">accountID,</if>
+			<if test="itemID != null">itemID,</if>
+			<if test="dc != null">dc,</if>
+			<if test="amount != null">amount,</if>
+			<if test="quantity != null">quantity,</if>
+			<if test="measureUnitID != null">measureUnitID,</if>
+			<if test="unitPrice != null">unitPrice,</if>
+			<if test="accountID2 != null">accountID2,</if>
+			<if test="cashFlowItem != null">cashFlowItem,</if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="voucherID != null">#{voucherID},</if>
+			<if test="entryID != null">#{entryID},</if>
+			<if test="explanation != null">#{explanation},</if>
+			<if test="accountID != null">#{accountID},</if>
+			<if test="itemID != null">#{itemID},</if>
+			<if test="dc != null">#{dc},</if>
+			<if test="amount != null">#{amount},</if>
+			<if test="quantity != null">#{quantity},</if>
+			<if test="measureUnitID != null">#{measureUnitID},</if>
+			<if test="unitPrice != null">#{unitPrice},</if>
+			<if test="accountID2 != null">#{accountID2},</if>
+			<if test="cashFlowItem != null">#{cashFlowItem},</if>
+		</trim>
+ 	</insert>
+</mapper>

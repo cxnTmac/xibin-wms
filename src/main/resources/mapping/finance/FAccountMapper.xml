@@ -1,0 +1,225 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.xibin.finance.dao.FAccountDao">
+	<resultMap type="com.xibin.finance.pojo.FAccount" id="FAccountMap">
+		<id     property="accountID"  column="accountID"  />
+		<result property="number"  column="number"  />
+		<result property="name"  column="name"  />
+		<result property="level"  column="level"  />
+		<result property="detail"  column="detail"  />
+		<result property="parentID"  column="parentID"  />
+		<result property="rootID"  column="rootID"  />
+		<result property="groupID"  column="groupID"  />
+		<result property="itemClassID"  column="itemClassID"  />
+		<result property="dc"  column="dc"  />
+		<result property="isCash"  column="isCash"  />
+		<result property="isBank"  column="isBank"  />
+		<result property="isContact"  column="isContact"  />
+		<result property="isDelete"  column="isDelete"  />
+		<result property="initialMoney"  column="initialMoney"  />
+		<result property="initialJMoney"  column="initialJMoney"  />
+		<result property="initialDMoney"  column="initialDMoney"  />
+	</resultMap>
+	
+	<sql id="selectVo">
+        select
+			a.*
+			,(select txt from bean_type where tKey="account_dc" and val=a.dc) as dcTxt
+			,(select txt from bean_type where tKey="account_boolean" and val=a.isCash) as isCashTxt
+			,(select txt from bean_type where tKey="account_boolean" and val=a.isBank) as isBankTxt
+			,(select txt from bean_type where tKey="account_boolean" and val=a.isContact) as isContactTxt
+			,(select txt from bean_type where tKey="account_boolean" and val=a.isDelete) as isDeleteTxt 
+			,(select ovalue from f_sys_options where okey = "initial") as initial
+		from f_account a
+    </sql>
+    
+	<select id="findFAccountList" parameterType="java.util.Map" resultType="java.util.Map">
+		<include refid="selectVo"/>
+		where 1=1
+		<if test="groupTopId != null and groupTopId != ''">
+			AND (a.groupId = #{groupTopId} or a.groupId in(select groupId from f_acct_group where parentID=#{groupTopId}))
+		</if>
+		<if test="rootId != null and rootId != ''">
+			AND (a.rootId = #{rootId} or a.accountID = #{rootId})
+		</if>
+		<if test="fAccount_name != null and fAccount_name != ''">
+			AND (a.number like concat('%', #{fAccount_name}, '%') or a.name like concat('%', #{fAccount_name}, '%'))
+		</if>
+		<if test="number != null and number != ''">
+			AND a.number like concat('%', #{number}, '%')
+		</if>
+		<if test="name != null and name != ''">
+			AND a.name like concat('%', #{name}, '%')
+		</if>
+	</select>
+	
+	<select id="getById" resultType="java.util.Map">
+		<include refid="selectVo"/>
+		where a.accountID = #{id}
+	</select>
+	
+	<select id="getByParentID" resultType="java.util.Map">
+		<include refid="selectVo"/>
+		where a.parentID = #{parentID}
+	</select>
+	
+	<select id="getByGroupID" resultType="java.util.Map">
+		<include refid="selectVo"/>
+		where a.groupID = #{groupID}
+	</select>
+	
+	<select id="getByNumber" resultType="java.util.Map">
+		<include refid="selectVo"/>
+		where a.number = #{number}
+	</select>
+	
+	<select id="getByName" resultType="java.util.Map">
+		<include refid="selectVo"/>
+		where a.name = #{name}
+	</select>
+	
+	<!-- 查询直属下级 -->
+	<select id="findGroup" parameterType="java.util.Map" resultType="java.util.Map">	
+		select a.groupID as id, a.name, a.parentID, a.groupID as number
+		<if test="parentID == 0">
+		,(select count(*) from f_acct_group where parentID = a.groupID) as sonNum
+		</if>
+		<if test="parentID != 0">
+		,(select count(*) from f_account where groupID = a.groupID) as sonNum
+		</if>
+		from f_acct_group a where parentID = #{parentID}
+	</select>
+	
+	<!-- 查询别表直属下级 -->
+	<select id="findAccount" parameterType="java.util.Map" resultType="java.util.Map">	
+		select a.accountId as id, a.name, a.parentID, a.number
+		,(select count(*) from f_account where parentID = a.accountId) as sonNum
+		from f_account a 
+		<if test="groupID != null and groupID != ''">
+		where groupID = #{groupID} and level = 1
+		</if>
+		<if test="parentID != null and parentID != ''">
+		where parentID = #{parentID}
+		</if>
+	</select>
+	
+	<!-- 查询Id -->
+	<select id="selectId" resultType="String">	
+		select IFNULL(groupID
+		,(SELECT IFNULL(GROUP_CONCAT(accountID),
+			(SELECT IFNULL(GROUP_CONCAT(accountID),-1) from f_account where accountID = #{id})
+		) from f_account where groupID = #{name})
+		) from f_acct_group where parentID = #{name}
+	</select>
+	
+	<!-- 根据name获取科目id -->
+	<select id="selectName" resultType="java.util.Map">	
+		SELECT accountID, name
+		from f_account where number = #{name} AND accountID not in (select DISTINCT parentID from f_account) limit 1
+	</select>
+	
+	<!-- 科目下拉 -->
+	<select id="selectAccountName" resultType="java.util.Map">	
+		select accountID as id, number, name from f_account 
+		where accountID not in (select DISTINCT parentID from f_account)
+		<if test="search != null and search != ''">
+			and (number like concat('%', #{search}, '%') or name like concat('%', #{search}, '%'))
+		</if>
+		order by number
+	</select>
+	<!-- 总分类账科目下拉 -->
+	<select id="selectAccount"  resultType="java.util.Map">	
+		select accountID as id, number, name, itemClassID
+		from f_account
+		where 1=1
+		<if test="search != null and search != ''">
+			and (number like concat('%', #{search}, '%') or name like concat('%', #{search}, '%'))
+		</if>
+		order by number
+	</select>
+	<!-- 凭证科目下拉 -->
+	<select id="selectAccountFv"  resultType="java.util.Map">	
+		select accountID as id, number, name, itemClassID
+		from f_account
+		where 1=1 and accountID not in (select parentID from f_account)
+		<if test="search != null and search != ''">
+			and (number like concat('%', #{search}, '%') or name like concat('%', #{search}, '%'))
+		</if>
+		order by number
+	</select>
+	<!-- 科目级别-->
+	<select id="selectAccountLevel" resultType="java.util.Map">	
+		select DISTINCT level as tname from f_account
+	</select>
+	
+	<delete id="deleteFAccountByIds"> 		
+ 		delete from f_account where accountID in
+ 		<foreach collection="array" item="accountID" open="(" separator="," close=")">
+ 			#{accountID}
+        </foreach> 
+ 	</delete>
+ 	
+ 	<update id="updateFAccount" parameterType="com.xibin.finance.pojo.FAccount">
+ 		update f_account
+ 		<set>
+			<if test="number != null">number = #{number},</if>
+			<if test="name != null">name = #{name},</if>
+			<if test="level != null">level = #{level},</if>
+			<if test="detail != null">detail = #{detail},</if>
+			<if test="parentID != null">parentID = #{parentID},</if>
+			<if test="rootID != null">rootID = #{rootID},</if>
+			<if test="groupID != null">groupID = #{groupID},</if>
+			<if test="itemClassID != null">itemClassID = #{itemClassID},</if>
+			<if test="dc != null">dc = #{dc},</if>
+			<if test="isCash != null">isCash = #{isCash},</if>
+			<if test="isBank != null">isBank = #{isBank},</if>
+			<if test="isContact != null">isContact = #{isContact},</if>
+			<if test="isDelete != null">isDelete = #{isDelete},</if>
+			<if test="initialMoney != null">initialMoney = #{initialMoney},</if>
+			<if test="initialJMoney != null">initialJMoney = #{initialJMoney},</if>
+			<if test="initialDMoney != null">initialDMoney = #{initialDMoney},</if>
+ 		</set>
+ 		where accountID = #{accountID}
+	</update>
+	
+ 	<insert id="saveFAccount" parameterType="com.xibin.finance.pojo.FAccount" useGeneratedKeys="true" keyProperty="accountID">
+ 		insert into f_account
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="number != null">number,</if>
+			<if test="name != null">name,</if>
+			<if test="level != null">level,</if>
+			<if test="detail != null">detail,</if>
+			<if test="parentID != null">parentID,</if>
+			<if test="rootID != null">rootID,</if>
+			<if test="groupID != null">groupID,</if>
+			<if test="itemClassID != null">itemClassID,</if>
+			<if test="dc != null">dc,</if>
+			<if test="isCash != null">isCash,</if>
+			<if test="isBank != null">isBank,</if>
+			<if test="isContact != null">isContact,</if>
+			<if test="isDelete != null">isDelete,</if>
+			<if test="initialMoney != null">initialMoney,</if>
+			<if test="initialJMoney != null">initialJMoney,</if>
+			<if test="initialDMoney != null">initialDMoney,</if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="number != null">#{number},</if>
+			<if test="name != null">#{name},</if>
+			<if test="level != null">#{level},</if>
+			<if test="detail != null">#{detail},</if>
+			<if test="parentID != null">#{parentID},</if>
+			<if test="rootID != null">#{rootID},</if>
+			<if test="groupID != null">#{groupID},</if>
+			<if test="itemClassID != null">#{itemClassID},</if>
+			<if test="dc != null">#{dc},</if>
+			<if test="isCash != null">#{isCash},</if>
+			<if test="isBank != null">#{isBank},</if>
+			<if test="isContact != null">#{isContact},</if>
+			<if test="isDelete != null">#{isDelete},</if>
+			<if test="initialMoney != null">#{initialMoney},</if>
+			<if test="initialJMoney != null">#{initialJMoney},</if>
+			<if test="initialDMoney != null">#{initialDMoney},</if>
+		</trim>
+ 	</insert>
+ 	
+</mapper>

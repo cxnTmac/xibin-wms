@@ -74,8 +74,6 @@
 <!--			<scope>provided</scope>-->
 <!--		</dependency>-->
 <!-- 打包成WAR需要去掉该注释END -->
-
-
 		<!-- SPRINGBOOT DRUID -->
 		<dependency>
 			<groupId>com.alibaba</groupId>

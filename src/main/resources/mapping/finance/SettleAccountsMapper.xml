@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.xibin.finance.dao.SettleAccountsDao">
+
+	<select id="findSettleAccountsList" parameterType="java.util.Map" resultType="java.util.Map">
+		select a.* from f_settle_accounts a
+		where 1=1
+		<if test="fyear != null and fyear != ''">
+			and a.fyear = #{fyear}
+		</if>
+		<if test="fperiod != null and fperiod != ''">
+			and a.fperiod = #{fperiod}
+		</if>
+	</select>
+	
+	<select id="findIsJzList" parameterType="java.util.Map" resultType="java.lang.Long">
+		SELECT count(*) FROM f_settle_accounts where fyear = #{fyear} and fperiod = #{fperiod}
+	</select>
+	
+	<insert id="saveSettleAccounts" parameterType="java.util.Map" useGeneratedKeys="true" keyProperty="id">
+ 		insert into f_settle_accounts
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="fyear != null">fyear,</if>
+			<if test="fperiod != null">fperiod,</if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="fyear != null">#{fyear},</if>
+			<if test="fperiod != null">#{fperiod},</if>
+		</trim>
+ 	</insert>
+	
+ 	<update id="updateSettleAccounts" parameterType="java.util.Map">
+		update f_voucher set isSettleAccounts = #{jz} where fyear = #{fyear} and fperiod = #{fperiod}
+	</update>
+	
+	<delete id="deleteSettleAccountsByIds"> 		
+ 		delete from f_settle_accounts where id = #{id}
+ 	</delete>
+ 	
+ 	
+</mapper>

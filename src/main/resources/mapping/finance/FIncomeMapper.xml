@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.xibin.finance.dao.FIncomeDao">
+	<select id="findFIncomeList" parameterType="java.util.Map" resultType="java.util.Map">
+		select a.id, a.fyear, a.fperiod, a.voucherID, a.type, a.carried,DATE_FORMAT(a.fdate, '%Y-%m-%d') as fdate from f_income a
+		where 1=1
+		<if test="fyear != null and fyear != ''">
+			and a.fyear = #{fyear}
+		</if>
+		<if test="fperiod != null and fperiod != ''">
+			and a.fperiod = #{fperiod}
+		</if>
+		<if test="voucherID != null and voucherID != ''">
+			and a.voucherID = #{voucherID}
+		</if>
+		<if test="type != null and type != ''">
+			and a.type = #{type}
+		</if>
+		order by a.type
+	</select>
+	
+ 	<update id="fanVoucheer" parameterType="java.util.Map">
+		<if test="type == 1">
+			update elncdb.orders set voucherID = null where voucherID = #{voucherID};
+		</if>
+		<if test="type == 2">
+			update elncdb.sup_orders set voucherID = null where voucherID = #{voucherID};
+		</if>
+		update f_income set carried = 1 where id = #{id};
+	</update>
+ 	
+	<select id="findtranTypeAddVoucheer" parameterType="java.util.Map" resultType="java.util.Map">
+		<if test="type == 1">
+			select 
+				IFNULL(SUM(a.payMoney),0)as payMoney
+				,IFNULL(SUM(b.addMoney),0) as addMoney
+				,IFNULL(SUM(b.sendMoney),0) as sendMoney
+			from elncdb.order_pay a
+			LEFT JOIN elncdb.orders b on a.pid=b.id
+			where b.voucherID is NULL
+			and a.ptype = 1
+			and b.state = 4
+		</if>
+		<if test="type == 2">
+			select 
+				IFNULL(SUM(a.payMoney),0) as payMoney
+				,IFNULL(SUM(b.addMoney),0) as addMoney
+				,IFNULL(SUM(b.sendMoney),0) as sendMoney
+			from elncdb.order_pay a
+			LEFT JOIN elncdb.sup_orders b on a.pid=b.id
+			where b.voucherID is NULL
+			and a.ptype = 2
+			and b.state = 4
+		</if>
+		and a.payState = 2
+		<if test="payType != null and payType != ''">
+  			and a.payType = #{payType}
+		</if>
+		<if test="payTime != null and payTime != ''">
+  			and DATE_FORMAT(a.payTime, '%Y-%m-%d') <![CDATA[<=]]> DATE_FORMAT(#{payTime}, '%Y-%m-%d')
+		</if>
+	</select>
+ 	
+	<select id="selectYlWx" parameterType="java.util.Map" resultType="Double">
+		<if test="type == 1">
+			select 
+				IFNULL(SUM(ifnull(a.payMoney, 0)),0)
+			from elncdb.order_pay a
+			LEFT JOIN elncdb.orders b on a.pid=b.id
+			where b.voucherID is NULL
+			and a.ptype = 1
+			and b.state = 4
+		</if>
+		<if test="type == 2">
+			select 
+				IFNULL(SUM(ifnull(a.payMoney, 0)),0)
+			from elncdb.order_pay a
+			LEFT JOIN elncdb.sup_orders b on a.pid=b.id
+			where b.voucherID is NULL
+			and a.ptype = 2
+			and b.state = 4
+		</if>
+		and a.payState = 2
+		<if test="payType != null and payType != ''">
+  			and a.payType = #{payType}
+		</if>
+		<if test="payTime != null and payTime != ''">
+  			and DATE_FORMAT(a.payTime, '%Y-%m-%d') <![CDATA[<=]]> DATE_FORMAT(#{payTime}, '%Y-%m-%d')
+		</if>
+	</select>
+	
+	<insert id="saveFIncome" parameterType="com.xibin.finance.pojo.FIncome" useGeneratedKeys="true" keyProperty="id">
+ 		insert into f_income
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="fyear != null">fyear,</if>
+			<if test="fperiod != null">fperiod,</if>
+			<if test="voucherID != null">voucherID,</if>
+			<if test="type != null">type,</if>
+			<if test="carried != null">carried,</if>
+			<if test="fdate != null">fdate,</if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="fyear != null">#{fyear},</if>
+			<if test="fperiod != null">#{fperiod},</if>
+			<if test="voucherID != null">#{voucherID},</if>
+			<if test="type != null">#{type},</if>
+			<if test="carried != null">#{carried},</if>
+			<if test="fdate != null">#{fdate},</if>
+		</trim>
+ 	</insert>
+	
+	<delete id="deleteFIncomeByIds"> 		
+ 		delete from f_income where id in
+ 		<foreach collection="array" item="id" open="(" separator="," close=")">
+ 			#{id}
+        </foreach> 
+ 	</delete>
+ 	
+</mapper>

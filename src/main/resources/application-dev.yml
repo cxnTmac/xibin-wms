@@ -16,9 +16,9 @@ primary:
   datasource:
     druid:
       driver-class-name: com.mysql.cj.jdbc.Driver
-      url: jdbc:mysql://localhost:3306/xibin_new_1453?useUnicode=true&characterEncoding=utf-8&useSSL=true&serverTimezone=Asia/Shanghai&allowMultiQueries=true
+      url: jdbc:mysql://localhost:3306/xibin?useUnicode=true&characterEncoding=utf-8&useSSL=true&serverTimezone=Asia/Shanghai&allowMultiQueries=true
       username: root
-      password: 123456
+      password:
       initial-size: 5
       min-idle: 5
       max-active: 20
@@ -35,7 +35,7 @@ back:
       driver-class-name: com.mysql.cj.jdbc.Driver
       url: jdbc:mysql://localhost:3306/jun_finance?useUnicode=true&characterEncoding=utf-8&useSSL=true&serverTimezone=UTC&allowMultiQueries=true
       username: root
-      password: 123456
+      password:
       initial-size: 5
       min-idle: 5
       max-active: 20

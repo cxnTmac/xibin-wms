@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.xibin.finance.dao.FAcctGroupDao">
+	<resultMap type="com.xibin.finance.pojo.FAcctGroup" id="FAcctGroupMap">
+		<id     property="groupID"  column="groupID"  />
+		<result property="parentID"  column="parentID"  />
+		<result property="name"  column="name"  />
+	</resultMap>
+	
+	<sql id="selectVo">
+        select
+			a.groupID, a.parentID, a.name 
+		from f_acct_group a
+    </sql>
+    
+	<select id="findFAcctGroupList" parameterType="java.util.Map" resultMap="FAcctGroupMap">
+		<include refid="selectVo"/>
+		<if test="parentID != null and parentID != ''">
+			AND a.parentID like concat('%', #{parentID}, '%')
+		</if>
+		<if test="name != null and name != ''">
+			AND a.name like concat('%', #{name}, '%')
+		</if>
+	</select>
+	
+	<select id="getById" resultMap="FAcctGroupMap">
+		<include refid="selectVo"/>
+		where a.groupID = #{id}
+	</select>
+	
+	<select id="getByParentIDs" resultType="String">
+		select GROUP_CONCAT(DISTINCT a.accountID) from (f_account a, (select concat(number,'%') as num from f_account where accountID IN (SELECT
+			accountID
+				FROM
+					f_account
+				WHERE
+					FIND_IN_SET(
+						groupID,
+						(
+							SELECT
+								GROUP_CONCAT(a.groupID) AS groupIDs
+							FROM
+								f_acct_group a
+							WHERE
+								a.parentID = 5
+						)
+					))) b)
+		where a.number like b.num
+	</select>
+	
+	<delete id="deleteFAcctGroupByIds"> 		
+ 		delete from f_acct_group where id in
+ 		<foreach collection="array" item="id" open="(" separator="," close=")">
+ 			#{id}
+        </foreach> 
+ 	</delete>
+ 	
+ 	<update id="updateFAcctGroup" parameterType="com.xibin.finance.pojo.FAcctGroup">
+ 		update f_acct_group
+ 		<set>
+			<if test="parentID != null">parentID = #{parentID},</if>
+			<if test="name != null">name = #{name},</if>
+ 		</set>
+ 		where id = #{id}
+	</update>
+	
+ 	<insert id="saveFAcctGroup" parameterType="com.xibin.finance.pojo.FAcctGroup" useGeneratedKeys="true" keyProperty="id">
+ 		insert into f_acct_group
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="parentID != null">parentID,</if>
+			<if test="name != null">name,</if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="parentID != null">#{parentID},</if>
+			<if test="name != null">#{name},</if>
+		</trim>
+ 	</insert>
+ 	
+</mapper>

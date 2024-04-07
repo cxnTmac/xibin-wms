@@ -85,7 +85,7 @@ public class WmInboundUpdateImpl implements WmInboundUpdateService {
 				// sumOfInboundNum +=recieve.getInboundNum();
 			}
 			detail.setInboundNum(sumOfInboundNum);
-			if (detail.getInboundPreNum().doubleValue() == detail.getInboundNum().doubleValue()) {
+			if (detail.getInboundPreNum().doubleValue() <= detail.getInboundNum().doubleValue()) {
 				countOfFullRecDetail++;
 				detail.setStatus(WmsCodeMaster.INB_FULL_RECEIVING.getCode());
 			} else if (detail.getInboundNum().doubleValue() == 0.0) {

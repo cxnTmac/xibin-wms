@@ -7,13 +7,19 @@ import com.xibin.core.page.pojo.PageEntity;
 import com.xibin.core.pojo.Message;
 import com.xibin.core.security.pojo.MyUserDetails;
 import com.xibin.core.security.util.SecurityUtil;
-import com.xibin.finance.dao.FvoucherDao;
+import com.xibin.finance.dao.FVoucherDao;
+import com.xibin.wms.constants.BsCodeMaster;
+import com.xibin.wms.constants.WmsCodeMaster;
 import com.xibin.wms.dao.BdCustomerMapper;
 import com.xibin.wms.dao.BsCustomerRecordMapper;
 import com.xibin.wms.pojo.BsCustomerRecord;
+import com.xibin.wms.pojo.WmOutboundHeader;
 import com.xibin.wms.query.BdCustomerQueryItem;
 import com.xibin.wms.query.BsCustomerRecordQueryItem;
+import com.xibin.wms.query.WmOutboundHeaderQueryItem;
 import com.xibin.wms.service.BsCustomerRecordService;
+import com.xibin.wms.service.WmOutboundHeaderService;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
@@ -34,7 +40,9 @@ public class BsCustomerRecordServiceImpl extends BaseManagerImpl implements BsCu
 	@Autowired
 	private BdCustomerMapper bdCustomerMapper;
 	@Autowired
-	private FvoucherDao fvoucherDao;
+	private WmOutboundHeaderService wmOutboundHeaderService;
+	@Autowired
+	private FVoucherDao fvoucherDao;
 	public BsCustomerRecordServiceImpl() {
 	}
 
@@ -103,10 +111,50 @@ public class BsCustomerRecordServiceImpl extends BaseManagerImpl implements BsCu
 		return msg;
 	}
 
-		@Override
-	public BsCustomerRecord saveBsCustomerRecord(BsCustomerRecord model) throws BusinessException {
+	@Override
+	public BsCustomerRecord saveBsCustomerRecord(BsCustomerRecord model, String resetOrderChecked) throws BusinessException {
 		// TODO Auto-generated method stub
 		MyUserDetails myUserDetails = SecurityUtil.getMyUserDetails();
+		if("Y".equals(resetOrderChecked)){
+			if(!BsCodeMaster.TYPE_RECEIVE_CASH.getCode().equals(model.getType())&&
+					!BsCodeMaster.TYPE_FREIGHT_CASH_PAID.getCode().equals(model.getType())&&
+					!BsCodeMaster.TYPE_FREIGHT_DEBIT_ON_ACCOUNT.getCode().equals(model.getType())&&
+					!BsCodeMaster.TYPE_PRICE_DIFFRENCT.getCode().equals(model.getType())){
+				throw  new BusinessException("只有现金转账/差价/运费才可以回填订单数据，否则请把回填订单数据勾选为否");
+			}
+			// 回填订单数据
+			if(model.getOrderNo().startsWith("OUB")){
+				List<WmOutboundHeaderQueryItem> list = wmOutboundHeaderService.selectByKey(model.getOrderNo());
+				if(list.isEmpty()){
+					throw  new BusinessException("出库单["+model.getOrderNo()+"]不存在！");
+				}else{
+					WmOutboundHeader header = new WmOutboundHeader();
+					BeanUtils.copyProperties(list.get(0),header);
+					if(!WmsCodeMaster.SO_CLOSE.getCode().equals(header.getStatus())){
+						throw  new BusinessException("出库单["+model.getOrderNo()+"]不是关闭状态，请直接在订单处填写转账数据！");
+					}
+					if(BsCodeMaster.TYPE_RECEIVE_CASH.getCode().equals(model.getType())){
+						header.setCash(model.getPay());
+						header.setPaymentTime(model.getDate());
+						header.setIsRecievedCash("Y");
+					}
+					if(BsCodeMaster.TYPE_FREIGHT_CASH_PAID.getCode().equals(model.getType())){
+						header.setFreight(model.getPay());
+						header.setFreightType(WmsCodeMaster.FREIGHT_CASH_PAID.getCode());
+					}
+					if(BsCodeMaster.TYPE_FREIGHT_DEBIT_ON_ACCOUNT.getCode().equals(model.getType())){
+						header.setFreight(model.getPay());
+						header.setFreightType(WmsCodeMaster.FREIGHT_DEBIT_ON_ACCOUNT.getCode());
+					}
+					if(BsCodeMaster.TYPE_PRICE_DIFFRENCT.getCode().equals(model.getType())){
+						header.setPriceDifferent(model.getPay());
+					}
+					wmOutboundHeaderService.saveOutbound(header);
+				}
+			}else{
+				throw  new BusinessException("非出库订单暂时不支持数据回填！");
+			}
+		}
 		model.setCompanyId(myUserDetails.getCompanyId());
 		return (BsCustomerRecord) this.save(model);
 	}

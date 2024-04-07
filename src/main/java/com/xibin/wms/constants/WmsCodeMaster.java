@@ -372,6 +372,10 @@ public enum WmsCodeMaster {
 	 */
 	FREIGHT_CUSTOMER_PAID("CUSTOMER_PAID"),
 	/**
+	 * 未确定
+	 */
+	FREIGHT_UNCONFIRMED("UNCONFIRMED"),
+	/**
 	 * 客户付款后账上扣除
 	 */
 	FREIGHT_CUSTOMER_PAID_DEDUCTION("CUSTOMER_PAID_DEDUCTION"),
